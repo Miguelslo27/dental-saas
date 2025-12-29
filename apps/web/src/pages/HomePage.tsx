@@ -14,7 +14,12 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/health')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`)
+        }
+        return res.json()
+      })
       .then(setHealth)
       .catch((err) => setError(err.message))
   }, [])

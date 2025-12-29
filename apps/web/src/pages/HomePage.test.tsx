@@ -10,6 +10,7 @@ describe('HomePage', () => {
 
   it('should render the title', () => {
     vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
       json: () => Promise.resolve({ success: true, data: { status: 'ok', timestamp: new Date().toISOString() } }),
     } as Response)
 
@@ -42,6 +43,7 @@ describe('HomePage', () => {
     }
 
     vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
       json: () => Promise.resolve(mockHealth),
     } as Response)
 
