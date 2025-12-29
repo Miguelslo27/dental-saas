@@ -10,7 +10,10 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:unit": "vitest run --exclude '**/*.integration.test.ts'",
+    "test:integration": "vitest run --include '**/*.integration.test.ts'",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@dental/database": "workspace:*",
@@ -25,7 +28,9 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.16.2",
+    "@types/supertest": "^6.0.3",
     "eslint": "^9.29.0",
+    "supertest": "^7.1.4",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
