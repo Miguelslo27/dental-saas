@@ -20,11 +20,27 @@ app.use((req, _res, next) => {
 // Routes
 app.use('/api/health', healthRouter)
 
+// 404 handler for unmapped routes
+app.use((_req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      message: 'Not Found',
+      code: 'NOT_FOUND',
+    },
+  })
+})
+
 // Error handling
 app.use(errorHandler)
 
-app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, () => {
   logger.info(`🚀 API server running on http://localhost:${env.PORT}`)
+})
+
+server.on('error', (error) => {
+  logger.error({ err: error }, 'Failed to start API server')
+  process.exit(1)
 })
 
 export { app }

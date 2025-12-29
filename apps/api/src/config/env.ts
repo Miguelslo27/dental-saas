@@ -8,7 +8,19 @@ const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string().optional(),
   CORS_ORIGIN: z.string().default('*'),
-})
+}).refine(
+  (data) => {
+    // Don't allow wildcard CORS in production
+    if (data.NODE_ENV === 'production' && data.CORS_ORIGIN === '*') {
+      return false
+    }
+    return true
+  },
+  {
+    message: 'CORS_ORIGIN cannot be "*" in production. Please configure a specific origin.',
+    path: ['CORS_ORIGIN'],
+  }
+)
 
 const parsed = envSchema.safeParse(process.env)
 
