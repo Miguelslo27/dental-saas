@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -150,7 +150,7 @@ enum UserRole {
 model RefreshToken {
   id        String   @id @default(cuid())
   userId    String
-  token     String   @unique @db.VarChar(500)
+  token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
   
