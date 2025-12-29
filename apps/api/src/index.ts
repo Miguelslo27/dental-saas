@@ -1,22 +1,14 @@
 import express from 'express'
 import cors from 'cors'
-import { pino } from 'pino'
 import { healthRouter } from './routes/health.js'
 import { errorHandler } from './middleware/error-handler.js'
-
-const logger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-    },
-  },
-})
+import { logger } from './utils/logger.js'
+import { env } from './config/env.js'
 
 const app = express()
 
 // Middleware
-app.use(cors())
+app.use(cors({ origin: env.CORS_ORIGIN }))
 app.use(express.json())
 
 // Request logging
@@ -31,10 +23,8 @@ app.use('/api/health', healthRouter)
 // Error handling
 app.use(errorHandler)
 
-const PORT = process.env.PORT || 3000
-
-app.listen(PORT, () => {
-  logger.info(`🚀 API server running on http://localhost:${PORT}`)
+app.listen(env.PORT, () => {
+  logger.info(`🚀 API server running on http://localhost:${env.PORT}`)
 })
 
-export { app, logger }
+export { app }
