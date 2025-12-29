@@ -17,11 +17,11 @@ async function main() {
         maxAdmins: 1,
         maxDoctors: 3,
         maxPatients: 15,
-        features: JSON.stringify([
+        features: [
           'Basic patient management',
           'Appointment scheduling',
           'Email support',
-        ]),
+        ],
       },
     }),
     prisma.plan.upsert({
@@ -34,12 +34,12 @@ async function main() {
         maxAdmins: 2,
         maxDoctors: 5,
         maxPatients: 25,
-        features: JSON.stringify([
+        features: [
           'Everything in Free',
           'Lab work tracking',
           'Treatment history',
           'Priority email support',
-        ]),
+        ],
       },
     }),
     prisma.plan.upsert({
@@ -52,13 +52,13 @@ async function main() {
         maxAdmins: 5,
         maxDoctors: 10,
         maxPatients: 60,
-        features: JSON.stringify([
+        features: [
           'Everything in Basic',
           'Advanced analytics',
           'Custom branding',
           'API access',
           'Phone support',
-        ]),
+        ],
       },
     }),
   ])

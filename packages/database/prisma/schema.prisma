@@ -56,11 +56,13 @@ model Subscription {
   updatedAt            DateTime           @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  plan   Plan   @relation(fields: [planId], references: [id])
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
 
   @@unique([tenantId])
   @@index([planId])
   @@index([status])
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
   @@map("subscriptions")
 }
 
@@ -79,7 +81,9 @@ enum SubscriptionStatus {
 model Tenant {
   id        String   @id @default(cuid())
   name      String   // Clinic name
-  slug      String   @unique // URL-friendly identifier
+  /// URL-friendly identifier. Must be validated at application level
+  /// to contain only lowercase letters, numbers, and hyphens.
+  slug      String   @unique
   
   // Contact info
   email     String?
@@ -88,8 +92,10 @@ model Tenant {
   
   // Branding
   logo      String?  // URL to logo
+  /// IANA timezone identifier (e.g., "America/New_York", "Europe/London")
   timezone  String   @default("America/New_York")
-  currency  String   @default("USD")
+  /// ISO 4217 currency code (e.g., USD, EUR, GBP)
+  currency  String   @db.Char(3) @default("USD")
   
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -111,8 +117,11 @@ model User {
   id             String    @id @default(cuid())
   tenantId       String
   
+  /// Email address. Must be validated at application level for format.
   email          String
-  passwordHash   String
+  /// Hashed password using bcrypt/argon2. NEVER expose in API responses.
+  /// When querying users, always exclude this field from selections.
+  passwordHash   String    @db.VarChar(255)
   
   firstName      String
   lastName       String
@@ -134,8 +143,10 @@ model User {
   refreshTokens  RefreshToken[]
 
   @@unique([tenantId, email]) // Email unique per tenant
+  @@index([tenantId])
   @@index([email])
   @@index([role])
+  @@index([tenantId, role])
   @@index([isActive])
   @@map("users")
 }
@@ -150,7 +161,9 @@ enum UserRole {
 model RefreshToken {
   id        String   @id @default(cuid())
   userId    String
-  token     String   @unique
+  /// Stores a securely hashed refresh token, not the raw token.
+  /// Hash the token before storing and compare hashes on validation.
+  tokenHash String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
   
