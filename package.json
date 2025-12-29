@@ -3,7 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "description": "Dental Clinic Management System - Multi-tenant SaaS",
-  "keywords": ["dental", "clinic", "saas", "management"],
+  "keywords": [
+    "dental",
+    "clinic",
+    "saas",
+    "management"
+  ],
   "license": "MIT",
   "author": "Mike",
   "type": "module",

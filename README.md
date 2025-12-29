@@ -48,11 +48,11 @@ pnpm dev
 
 ## Planes de Suscripción
 
-| Plan | Admins | Doctores | Pacientes | Precio |
-|------|--------|----------|-----------|--------|
-| Gratis | 1 | 3 | 15 | $0/mes |
-| Básico | 2 | 5 | 25 | $5.99/mes |
-| Empresa | 5 | 10 | 60 | $11.99/mes |
+| Plan    | Admins | Doctores | Pacientes | Precio     |
+| ------- | ------ | -------- | --------- | ---------- |
+| Gratis  | 1      | 3        | 15        | $0/mes     |
+| Básico  | 2      | 5        | 25        | $5.99/mes  |
+| Empresa | 5      | 10       | 60        | $11.99/mes |
 
 ## Licencia
 
