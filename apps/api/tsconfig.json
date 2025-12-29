@@ -6,6 +6,15 @@
     "lib": ["ES2024"],
     "outDir": "./dist",
     "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"],
+      "@routes/*": ["./routes/*"],
+      "@middleware/*": ["./middleware/*"],
+      "@services/*": ["./services/*"],
+      "@utils/*": ["./utils/*"],
+      "@config/*": ["./config/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
