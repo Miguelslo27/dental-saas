@@ -2,7 +2,7 @@ import { Router, type IRouter } from 'express'
 import { z } from 'zod'
 import { prisma } from '@dental/database'
 
-const patientsRouter: IRouter = Router()
+const doctorsRouter: IRouter = Router()
 
 // Simple tenant extractor middleware (expects `x-tenant-id` header)
 function getTenantId(req: any) {
@@ -11,16 +11,23 @@ function getTenantId(req: any) {
   return tenantId
 }
 
-// Zod schemas / allowed fields
-const patientCreateSchema = z.object({
+// Zod schemas
+const doctorCreateSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.string().email().optional(),
   phone: z.string().optional(),
-  dob: z.string().optional(),
-  gender: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.any().optional(),
+  specialty: z.string().optional(),
+  licenseNumber: z.string().optional(),
+  workingDays: z.array(z.string()).optional(),
+  workingHours: z.object({
+    start: z.string(),
+    end: z.string(),
+  }).optional(),
+  consultingRoom: z.string().optional(),
+  avatar: z.string().url().optional(),
+  bio: z.string().optional(),
+  hourlyRate: z.number().positive().optional(),
 })
 
 const allowedUpdateFields = [
@@ -28,14 +35,18 @@ const allowedUpdateFields = [
   'lastName',
   'email',
   'phone',
-  'dob',
-  'gender',
-  'address',
-  'notes',
+  'specialty',
+  'licenseNumber',
+  'workingDays',
+  'workingHours',
+  'consultingRoom',
+  'avatar',
+  'bio',
+  'hourlyRate',
 ]
 
-// List patients (optional tenantId query)
-patientsRouter.get('/', async (req, res, next) => {
+// List doctors
+doctorsRouter.get('/', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req)
     if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
@@ -46,46 +57,49 @@ patientsRouter.get('/', async (req, res, next) => {
     const take = limit ? Math.min(parseInt(String(limit), 10) || 0, 100) : undefined
     const skip = offset ? Math.max(parseInt(String(offset), 10) || 0, 0) : undefined
 
-    const patients = await prisma.patient.findMany({ where, take, skip })
-    res.json(patients)
+    const doctors = await prisma.doctor.findMany({ where, take, skip })
+    res.json(doctors)
   } catch (e) {
     next(e)
   }
 })
 
-patientsRouter.get('/:id', async (req, res, next) => {
+// Get doctor by ID
+doctorsRouter.get('/:id', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req)
     if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
 
     const { id } = req.params
-    const patient = await prisma.patient.findUnique({ where: { id } })
-    if (!patient || patient.tenantId !== tenantId) {
+    const doctor = await prisma.doctor.findUnique({ where: { id } })
+    if (!doctor || doctor.tenantId !== tenantId) {
       return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
     }
-    res.json(patient)
+    res.json(doctor)
   } catch (e) {
     next(e)
   }
 })
 
-patientsRouter.post('/', async (req, res, next) => {
+// Create doctor
+doctorsRouter.post('/', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req)
     if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
 
-    const parse = patientCreateSchema.safeParse(req.body)
+    const parse = doctorCreateSchema.safeParse(req.body)
     if (!parse.success) return res.status(400).json({ success: false, error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors } })
 
     const data = { ...parse.data, tenantId }
-    const patient = await prisma.patient.create({ data })
-    res.status(201).json(patient)
+    const doctor = await prisma.doctor.create({ data })
+    res.status(201).json(doctor)
   } catch (e) {
     next(e)
   }
 })
 
-patientsRouter.put('/:id', async (req, res, next) => {
+// Update doctor
+doctorsRouter.put('/:id', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req)
     if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
@@ -103,30 +117,31 @@ patientsRouter.put('/:id', async (req, res, next) => {
       if (Object.prototype.hasOwnProperty.call(req.body, key)) data[key] = (req.body as any)[key]
     }
 
-    const existing = await prisma.patient.findUnique({ where: { id } })
+    const existing = await prisma.doctor.findUnique({ where: { id } })
     if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
 
-    const patient = await prisma.patient.update({ where: { id }, data })
-    res.json(patient)
+    const doctor = await prisma.doctor.update({ where: { id }, data })
+    res.json(doctor)
   } catch (e) {
     next(e)
   }
 })
 
-patientsRouter.delete('/:id', async (req, res, next) => {
+// Soft delete doctor
+doctorsRouter.delete('/:id', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req)
     if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
 
     const { id } = req.params
-    const existing = await prisma.patient.findUnique({ where: { id } })
+    const existing = await prisma.doctor.findUnique({ where: { id } })
     if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
 
-    const patient = await prisma.patient.update({ where: { id }, data: { isActive: false } })
-    res.json(patient)
+    const doctor = await prisma.doctor.update({ where: { id }, data: { isActive: false } })
+    res.json(doctor)
   } catch (e) {
     next(e)
   }
 })
 
-export { patientsRouter }
+export { doctorsRouter }

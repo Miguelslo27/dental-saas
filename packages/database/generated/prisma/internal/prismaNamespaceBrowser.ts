@@ -56,6 +56,7 @@ export const ModelName = {
   Tenant: 'Tenant',
   User: 'User',
   Patient: 'Patient',
+  Doctor: 'Doctor',
   RefreshToken: 'RefreshToken'
 } as const
 
@@ -164,6 +165,29 @@ export const PatientScalarFieldEnum = {
 } as const
 
 export type PatientScalarFieldEnum = (typeof PatientScalarFieldEnum)[keyof typeof PatientScalarFieldEnum]
+
+
+export const DoctorScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  phone: 'phone',
+  specialty: 'specialty',
+  licenseNumber: 'licenseNumber',
+  workingDays: 'workingDays',
+  workingHours: 'workingHours',
+  consultingRoom: 'consultingRoom',
+  avatar: 'avatar',
+  bio: 'bio',
+  hourlyRate: 'hourlyRate',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DoctorScalarFieldEnum = (typeof DoctorScalarFieldEnum)[keyof typeof DoctorScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {
