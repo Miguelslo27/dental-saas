@@ -104,6 +104,7 @@ model Tenant {
   subscription Subscription?
   users        User[]
   patients     Patient[]
+  doctors      Doctor[]
 
   @@index([slug])
   @@index([isActive])
@@ -179,6 +180,53 @@ model Patient {
   @@index([lastName])
   @@unique([tenantId, email])
   @@map("patients")
+}
+
+// ============================================================================
+// DOCTORS
+// ============================================================================
+
+model Doctor {
+  id             String   @id @default(cuid())
+  tenantId       String
+
+  firstName      String
+  lastName       String
+  email          String?
+  phone          String?
+  
+  /// Medical specialty (e.g., "General Dentistry", "Orthodontics")
+  specialty      String?
+  /// Professional license number
+  licenseNumber  String?
+  
+  /// Working days as JSON array (e.g., ["MON", "TUE", "WED"])
+  workingDays    Json     @default("[]")
+  /// Working hours as JSON (e.g., {"start": "09:00", "end": "18:00"})
+  workingHours   Json?
+  
+  /// Consultation room or office number
+  consultingRoom String?
+  
+  /// Profile photo URL
+  avatar         String?
+  /// Bio or professional summary
+  bio            String?  @db.Text
+  
+  /// Hourly rate for billing purposes
+  hourlyRate     Decimal? @db.Decimal(10, 2)
+
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([lastName])
+  @@unique([tenantId, email])
+  @@unique([tenantId, licenseNumber])
+  @@map("doctors")
 }
 
 enum UserRole {

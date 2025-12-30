@@ -1,12 +1,13 @@
-import express from 'express'
+import express, { type Express } from 'express'
 import cors from 'cors'
 import { healthRouter } from './routes/health.js'
 import { patientsRouter } from './routes/patients.js'
+import { doctorsRouter } from './routes/doctors.js'
 import { errorHandler } from './middleware/error-handler.js'
 import { logger } from './utils/logger.js'
 import { env } from './config/env.js'
 
-export const app = express()
+export const app: Express = express()
 
 // Middleware
 app.use(cors({ origin: env.CORS_ORIGIN }))
@@ -21,6 +22,7 @@ app.use((req, _res, next) => {
 // Routes
 app.use('/api/health', healthRouter)
 app.use('/api/patients', patientsRouter)
+app.use('/api/doctors', doctorsRouter)
 
 // 404 handler for unmapped routes
 app.use((_req, res) => {

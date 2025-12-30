@@ -241,6 +241,7 @@ export type TenantWhereInput = {
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
   users?: Prisma.UserListRelationFilter
   patients?: Prisma.PatientListRelationFilter
+  doctors?: Prisma.DoctorListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -259,6 +260,7 @@ export type TenantOrderByWithRelationInput = {
   subscription?: Prisma.SubscriptionOrderByWithRelationInput
   users?: Prisma.UserOrderByRelationAggregateInput
   patients?: Prisma.PatientOrderByRelationAggregateInput
+  doctors?: Prisma.DoctorOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -280,6 +282,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
   users?: Prisma.UserListRelationFilter
   patients?: Prisma.PatientListRelationFilter
+  doctors?: Prisma.DoctorListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -334,6 +337,7 @@ export type TenantCreateInput = {
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -352,6 +356,7 @@ export type TenantUncheckedCreateInput = {
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -370,6 +375,7 @@ export type TenantUpdateInput = {
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -388,6 +394,7 @@ export type TenantUncheckedUpdateInput = {
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -527,6 +534,20 @@ export type TenantUpdateOneRequiredWithoutPatientsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutPatientsInput, Prisma.TenantUpdateWithoutPatientsInput>, Prisma.TenantUncheckedUpdateWithoutPatientsInput>
 }
 
+export type TenantCreateNestedOneWithoutDoctorsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutDoctorsInput, Prisma.TenantUncheckedCreateWithoutDoctorsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutDoctorsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutDoctorsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutDoctorsInput, Prisma.TenantUncheckedCreateWithoutDoctorsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutDoctorsInput
+  upsert?: Prisma.TenantUpsertWithoutDoctorsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutDoctorsInput, Prisma.TenantUpdateWithoutDoctorsInput>, Prisma.TenantUncheckedUpdateWithoutDoctorsInput>
+}
+
 export type TenantCreateWithoutSubscriptionInput = {
   id?: string
   name: string
@@ -542,6 +563,7 @@ export type TenantCreateWithoutSubscriptionInput = {
   updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSubscriptionInput = {
@@ -559,6 +581,7 @@ export type TenantUncheckedCreateWithoutSubscriptionInput = {
   updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSubscriptionInput = {
@@ -592,6 +615,7 @@ export type TenantUpdateWithoutSubscriptionInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSubscriptionInput = {
@@ -609,6 +633,7 @@ export type TenantUncheckedUpdateWithoutSubscriptionInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutUsersInput = {
@@ -626,6 +651,7 @@ export type TenantCreateWithoutUsersInput = {
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -643,6 +669,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -676,6 +703,7 @@ export type TenantUpdateWithoutUsersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -693,6 +721,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutPatientsInput = {
@@ -710,6 +739,7 @@ export type TenantCreateWithoutPatientsInput = {
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutPatientsInput = {
@@ -727,6 +757,7 @@ export type TenantUncheckedCreateWithoutPatientsInput = {
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutPatientsInput = {
@@ -760,6 +791,7 @@ export type TenantUpdateWithoutPatientsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutPatientsInput = {
@@ -777,6 +809,95 @@ export type TenantUncheckedUpdateWithoutPatientsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutDoctorsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutDoctorsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutDoctorsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutDoctorsInput, Prisma.TenantUncheckedCreateWithoutDoctorsInput>
+}
+
+export type TenantUpsertWithoutDoctorsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutDoctorsInput, Prisma.TenantUncheckedUpdateWithoutDoctorsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutDoctorsInput, Prisma.TenantUncheckedCreateWithoutDoctorsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutDoctorsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutDoctorsInput, Prisma.TenantUncheckedUpdateWithoutDoctorsInput>
+}
+
+export type TenantUpdateWithoutDoctorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutDoctorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -787,11 +908,13 @@ export type TenantUncheckedUpdateWithoutPatientsInput = {
 export type TenantCountOutputType = {
   users: number
   patients: number
+  doctors: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | TenantCountOutputTypeCountUsersArgs
   patients?: boolean | TenantCountOutputTypeCountPatientsArgs
+  doctors?: boolean | TenantCountOutputTypeCountDoctorsArgs
 }
 
 /**
@@ -818,6 +941,13 @@ export type TenantCountOutputTypeCountPatientsArgs<ExtArgs extends runtime.Types
   where?: Prisma.PatientWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountDoctorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DoctorWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -835,6 +965,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   subscription?: boolean | Prisma.Tenant$subscriptionArgs<ExtArgs>
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   patients?: boolean | Prisma.Tenant$patientsArgs<ExtArgs>
+  doctors?: boolean | Prisma.Tenant$doctorsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -888,6 +1019,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   subscription?: boolean | Prisma.Tenant$subscriptionArgs<ExtArgs>
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   patients?: boolean | Prisma.Tenant$patientsArgs<ExtArgs>
+  doctors?: boolean | Prisma.Tenant$doctorsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -899,6 +1031,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
     users: Prisma.$UserPayload<ExtArgs>[]
     patients: Prisma.$PatientPayload<ExtArgs>[]
+    doctors: Prisma.$DoctorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1320,6 +1453,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   subscription<T extends Prisma.Tenant$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   users<T extends Prisma.Tenant$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   patients<T extends Prisma.Tenant$patientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$patientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  doctors<T extends Prisma.Tenant$doctorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$doctorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1813,6 +1947,30 @@ export type Tenant$patientsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PatientScalarFieldEnum | Prisma.PatientScalarFieldEnum[]
+}
+
+/**
+ * Tenant.doctors
+ */
+export type Tenant$doctorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Doctor
+   */
+  select?: Prisma.DoctorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Doctor
+   */
+  omit?: Prisma.DoctorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DoctorInclude<ExtArgs> | null
+  where?: Prisma.DoctorWhereInput
+  orderBy?: Prisma.DoctorOrderByWithRelationInput | Prisma.DoctorOrderByWithRelationInput[]
+  cursor?: Prisma.DoctorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DoctorScalarFieldEnum | Prisma.DoctorScalarFieldEnum[]
 }
 
 /**

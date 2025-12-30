@@ -43,6 +43,11 @@ export type User = Prisma.UserModel
  */
 export type Patient = Prisma.PatientModel
 /**
+ * Model Doctor
+ * 
+ */
+export type Doctor = Prisma.DoctorModel
+/**
  * Model RefreshToken
  * 
  */
