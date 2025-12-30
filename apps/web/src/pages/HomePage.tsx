@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 
 interface HealthResponse {
-  success: boolean
-  data: {
-    status: string
-    timestamp: string
-  }
+  status: string
+  timestamp: string
+  uptime?: number
 }
 
 export default function HomePage() {
@@ -20,7 +18,7 @@ export default function HomePage() {
         }
         return res.json()
       })
-      .then(setHealth)
+      .then((data: HealthResponse) => setHealth(data))
       .catch((err) => setError(err.message))
   }, [])
 
