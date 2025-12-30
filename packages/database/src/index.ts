@@ -1,4 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaClient } from '../generated/prisma/client.js'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 // Prevent multiple instances of Prisma Client in development
 declare global {
@@ -6,19 +8,25 @@ declare global {
   var prisma: PrismaClient | undefined
 }
 
-export const prisma =
-  globalThis.prisma ||
-  new PrismaClient({
+function createPrismaClient(): PrismaClient {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+  })
+
+  return new PrismaClient({
+    adapter,
     log:
       process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']
         : ['error'],
-    errorFormat: process.env.NODE_ENV === 'development' ? 'pretty' : 'minimal',
   })
+}
+
+export const prisma = globalThis.prisma || createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma
 }
 
 // Re-export Prisma types
-export * from '@prisma/client'
+export * from '../generated/prisma/client.js'

@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { healthRouter } from './routes/health.js'
+import { patientsRouter } from './routes/patients.js'
 import { errorHandler } from './middleware/error-handler.js'
 import { logger } from './utils/logger.js'
 import { env } from './config/env.js'
@@ -19,6 +20,7 @@ app.use((req, _res, next) => {
 
 // Routes
 app.use('/api/health', healthRouter)
+app.use('/api/patients', patientsRouter)
 
 // 404 handler for unmapped routes
 app.use((_req, res) => {

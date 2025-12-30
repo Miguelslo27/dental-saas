@@ -2,12 +2,12 @@
 // Multi-tenant architecture with row-level isolation
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================================================
@@ -103,6 +103,7 @@ model Tenant {
 
   subscription Subscription?
   users        User[]
+  patients     Patient[]
 
   @@index([slug])
   @@index([isActive])
@@ -149,6 +150,35 @@ model User {
   @@index([tenantId, role])
   @@index([isActive])
   @@map("users")
+}
+
+// ============================================================================
+// PATIENTS
+// ============================================================================
+
+model Patient {
+  id         String   @id @default(cuid())
+  tenantId   String
+
+  firstName  String
+  lastName   String
+  email      String?  
+  phone      String?
+  dob        DateTime?
+  gender     String?  @db.VarChar(20)
+  address    String?  @db.Text
+  notes      Json?
+
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([lastName])
+  @@unique([tenantId, email])
+  @@map("patients")
 }
 
 enum UserRole {
