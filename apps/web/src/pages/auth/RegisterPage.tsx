@@ -106,7 +106,7 @@ export function RegisterPage() {
             </div>
           )}
 
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-lg shadow-md border border-gray-200 p-6 space-y-4">
             <div>
               <label
                 htmlFor="tenantId"
