@@ -275,7 +275,7 @@ tenantsRouter.delete('/:id', async (req, res, next) => {
       where: { id },
       include: {
         _count: {
-          select: { users: true, patients: true, appointments: true },
+          select: { users: true, doctors: true, patients: true, appointments: true },
         },
       },
     })
@@ -297,6 +297,7 @@ tenantsRouter.delete('/:id', async (req, res, next) => {
         tenantId: id,
         tenantName: tenant.name,
         usersDeleted: tenant._count.users,
+        doctorsDeleted: tenant._count.doctors,
         patientsDeleted: tenant._count.patients,
         appointmentsDeleted: tenant._count.appointments,
       },

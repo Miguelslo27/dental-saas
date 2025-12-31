@@ -15,29 +15,29 @@ const LOCKOUT_DURATION = 15 * 60 * 1000 // 15 minutes
 const checkRateLimit = (ip: string): { allowed: boolean; retryAfter?: number } => {
   const now = Date.now()
   const attempts = setupAttempts.get(ip)
-  
+
   if (!attempts) {
     return { allowed: true }
   }
-  
+
   // Reset if lockout period has passed
   if (now - attempts.lastAttempt > LOCKOUT_DURATION) {
     setupAttempts.delete(ip)
     return { allowed: true }
   }
-  
+
   if (attempts.count >= MAX_ATTEMPTS) {
     const retryAfter = Math.ceil((LOCKOUT_DURATION - (now - attempts.lastAttempt)) / 1000)
     return { allowed: false, retryAfter }
   }
-  
+
   return { allowed: true }
 }
 
 const recordFailedAttempt = (ip: string): void => {
   const now = Date.now()
   const attempts = setupAttempts.get(ip)
-  
+
   if (attempts) {
     attempts.count++
     attempts.lastAttempt = now
@@ -71,9 +71,25 @@ const setupSchema = z.object({
 /**
  * GET /api/admin/setup
  * Check if super admin setup is available (no super admin exists yet)
+ * Rate limited to prevent information disclosure through repeated polling
  */
-setupRouter.get('/', async (_req, res, next) => {
+setupRouter.get('/', async (req, res, next) => {
   try {
+    // Apply rate limiting to prevent repeated polling
+    const clientIp = req.ip || req.socket.remoteAddress || 'unknown'
+    const rateLimit = checkRateLimit(clientIp)
+
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: {
+          message: `Too many requests. Please try again in ${rateLimit.retryAfter} seconds.`,
+          code: 'RATE_LIMITED',
+          retryAfter: rateLimit.retryAfter,
+        },
+      })
+    }
+
     const existingSuperAdmin = await prisma.user.findFirst({
       where: { role: 'SUPER_ADMIN' },
       select: { id: true },
@@ -103,7 +119,7 @@ setupRouter.post('/', async (req, res, next) => {
     // Rate limiting check
     const clientIp = req.ip || req.socket.remoteAddress || 'unknown'
     const rateLimit = checkRateLimit(clientIp)
-    
+
     if (!rateLimit.allowed) {
       return res.status(429).json({
         success: false,
@@ -161,7 +177,7 @@ setupRouter.post('/', async (req, res, next) => {
     if (setupKey !== expectedSetupKey) {
       // Record failed attempt for rate limiting
       recordFailedAttempt(clientIp)
-      
+
       return res.status(403).json({
         success: false,
         error: {
@@ -174,42 +190,82 @@ setupRouter.post('/', async (req, res, next) => {
     // Clear rate limit attempts on valid setup key
     clearAttempts(clientIp)
 
-    // Check if email already exists globally (super admin email must be unique across all users)
-    const existingUser = await prisma.user.findFirst({
-      where: { email },
-    })
+    // Hash password before transaction
+    const passwordHash = await hashPassword(password)
 
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        error: {
-          message: 'Email already registered. Super admin email must be globally unique.',
-          code: 'EMAIL_EXISTS',
+    // Use transaction to prevent TOCTOU race condition
+    // This ensures atomic check-and-create to prevent multiple superadmins
+    const superAdmin = await prisma.$transaction(async (tx) => {
+      // Double-check no super admin exists (inside transaction for atomicity)
+      const existingSuperAdminInTx = await tx.user.findFirst({
+        where: { role: 'SUPER_ADMIN' },
+        select: { id: true },
+      })
+
+      if (existingSuperAdminInTx) {
+        throw new Error('SUPER_ADMIN_EXISTS')
+      }
+
+      // Check if email already exists globally
+      const existingUser = await tx.user.findFirst({
+        where: { email },
+      })
+
+      if (existingUser) {
+        throw new Error('EMAIL_EXISTS')
+      }
+
+      // Create super admin user
+      return tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          firstName,
+          lastName,
+          role: 'SUPER_ADMIN',
+          tenantId: null, // Super admin has no tenant
+          emailVerified: true, // Auto-verify super admin
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          createdAt: true,
         },
       })
-    }
-
-    // Create super admin user
-    const passwordHash = await hashPassword(password)
-    const superAdmin = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        firstName,
-        lastName,
-        role: 'SUPER_ADMIN',
-        tenantId: null, // Super admin has no tenant
-        emailVerified: true, // Auto-verify super admin
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-      },
+    }).catch((error) => {
+      if (error.message === 'SUPER_ADMIN_EXISTS') {
+        return { error: 'SUPER_ADMIN_EXISTS' as const }
+      }
+      if (error.message === 'EMAIL_EXISTS') {
+        return { error: 'EMAIL_EXISTS' as const }
+      }
+      throw error
     })
+
+    // Handle transaction errors
+    if ('error' in superAdmin) {
+      if (superAdmin.error === 'SUPER_ADMIN_EXISTS') {
+        return res.status(403).json({
+          success: false,
+          error: {
+            message: 'Super admin already exists. This setup endpoint is disabled.',
+            code: 'SETUP_DISABLED',
+          },
+        })
+      }
+      if (superAdmin.error === 'EMAIL_EXISTS') {
+        return res.status(409).json({
+          success: false,
+          error: {
+            message: 'Email already registered. Super admin email must be globally unique.',
+            code: 'EMAIL_EXISTS',
+          },
+        })
+      }
+    }
 
     // Generate tokens
     const tokens = generateTokens({
