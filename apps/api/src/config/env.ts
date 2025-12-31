@@ -8,6 +8,11 @@ const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string().optional(),
   CORS_ORIGIN: z.string().default('*'),
+  
+  // JWT Configuration
+  JWT_SECRET: z.string().min(32).default('development-secret-change-in-production-min-32-chars'),
+  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 }).refine(
   (data) => {
     // Don't allow wildcard CORS in production
@@ -27,6 +32,14 @@ const parsed = envSchema.safeParse(process.env)
 if (!parsed.success) {
   console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors)
   process.exit(1)
+}
+
+// Warn about default JWT_SECRET in non-test environments
+if (
+  parsed.data.NODE_ENV !== 'test' &&
+  parsed.data.JWT_SECRET === 'development-secret-change-in-production-min-32-chars'
+) {
+  console.warn('⚠️  WARNING: Using default JWT_SECRET. Set a secure JWT_SECRET in production!')
 }
 
 export const env = parsed.data
