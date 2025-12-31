@@ -2,6 +2,7 @@ import express, { type Express } from 'express'
 import cors from 'cors'
 import { healthRouter } from './routes/health.js'
 import { authRouter } from './routes/auth.js'
+import { adminRouter } from './routes/admin/index.js'
 import { patientsRouter } from './routes/patients.js'
 import { doctorsRouter } from './routes/doctors.js'
 import { appointmentsRouter } from './routes/appointments.js'
@@ -25,6 +26,9 @@ app.use((req, _res, next) => {
 // Public routes
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
+
+// Admin routes (super admin only)
+app.use('/api/admin', adminRouter)
 
 // Protected routes (require authentication + tenant)
 app.use('/api/patients', requireAuthWithTenant, patientsRouter)

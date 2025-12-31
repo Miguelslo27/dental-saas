@@ -118,7 +118,8 @@ model Tenant {
 
 model User {
   id             String    @id @default(cuid())
-  tenantId       String
+  /// Nullable for SUPER_ADMIN users who don't belong to any tenant
+  tenantId       String?
   
   /// Email address. Must be validated at application level for format.
   email          String
@@ -142,10 +143,10 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  tenant         Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant         Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   refreshTokens  RefreshToken[]
 
-  @@unique([tenantId, email]) // Email unique per tenant
+  @@unique([tenantId, email]) // Email unique per tenant (nulls are distinct)
   @@index([tenantId])
   @@index([email])
   @@index([role])
@@ -292,10 +293,11 @@ enum AppointmentStatus {
 }
 
 enum UserRole {
-  OWNER   // Tenant owner, full access
-  ADMIN   // Administrative access
-  DOCTOR  // Can manage patients and appointments
-  STAFF   // Limited access
+  SUPER_ADMIN // Platform super administrator, no tenant
+  OWNER       // Tenant owner, full access
+  ADMIN       // Administrative access
+  DOCTOR      // Can manage patients and appointments
+  STAFF       // Limited access
 }
 
 model RefreshToken {

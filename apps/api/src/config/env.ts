@@ -17,6 +17,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32).default('development-secret-change-in-production-min-32-chars'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+
+  // Super Admin Setup (required for first-time superadmin creation)
+  SETUP_KEY: z.string().min(16),
 }).refine(
   (data) => {
     // Don't allow wildcard CORS in production

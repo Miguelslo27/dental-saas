@@ -34,6 +34,7 @@ export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof Appointm
 
 
 export const UserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
   OWNER: 'OWNER',
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
