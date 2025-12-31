@@ -98,7 +98,7 @@ export function requireAuthWithTenant(req: Request, res: Response, next: NextFun
 }
 
 /**
- * Role hierarchy for permission checks
+ * Role hierarchy for permission checks (tenant-scoped roles only)
  */
 export const ROLE_HIERARCHY = {
   OWNER: 4,
@@ -142,4 +142,41 @@ export function requireMinRole(minRole: keyof typeof ROLE_HIERARCHY) {
 
     next()
   }
+}
+
+/**
+ * Middleware that requires SUPER_ADMIN role.
+ * Super admins are platform-level administrators with no tenant.
+ * Must be used after requireAuth.
+ */
+export function requireSuperAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { message: 'Authentication required', code: 'UNAUTHENTICATED' },
+    })
+  }
+
+  if (req.user.role !== 'SUPER_ADMIN') {
+    return res.status(403).json({
+      success: false,
+      error: {
+        message: 'Super admin access required',
+        code: 'FORBIDDEN',
+      },
+    })
+  }
+
+  next()
+}
+
+/**
+ * Combined middleware: requireAuth + requireSuperAdmin
+ */
+export function requireAuthAsSuperAdmin(req: Request, res: Response, next: NextFunction) {
+  requireAuth(req, res, (err) => {
+    if (err) return next(err)
+    if (res.headersSent) return
+    requireSuperAdmin(req, res, next)
+  })
 }

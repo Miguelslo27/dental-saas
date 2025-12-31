@@ -136,7 +136,7 @@ authRouter.post('/register', async (req, res, next) => {
     // Generate tokens
     const tokens = generateTokens({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       email: user.email,
       role: user.role,
     })
@@ -222,7 +222,7 @@ authRouter.post('/login', async (req, res, next) => {
     // Generate tokens
     const tokens = generateTokens({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       email: user.email,
       role: user.role,
     })
@@ -319,7 +319,7 @@ authRouter.post('/refresh', async (req, res, next) => {
     // Generate new tokens (token rotation)
     const tokens = generateTokens({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       email: user.email,
       role: user.role,
     })
