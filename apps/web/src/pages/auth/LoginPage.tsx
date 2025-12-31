@@ -10,7 +10,7 @@ import { AxiosError } from 'axios'
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(1, 'La contraseña es requerida'),
-  tenantId: z.string().min(1, 'El ID del tenant es requerido'),
+  clinicSlug: z.string().min(1, 'El identificador de clínica es requerido'),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
@@ -29,7 +29,7 @@ export function LoginPage() {
     defaultValues: {
       email: '',
       password: '',
-      tenantId: '',
+      clinicSlug: '',
     },
   })
 
@@ -85,22 +85,22 @@ export function LoginPage() {
           <div className="rounded-lg shadow-md border border-gray-200 p-6 space-y-4">
             <div>
               <label
-                htmlFor="tenantId"
+                htmlFor="clinicSlug"
                 className="block text-sm font-medium text-gray-700"
               >
-                ID de Clínica (Tenant)
+                Identificador de Clínica
               </label>
               <input
-                {...register('tenantId')}
-                id="tenantId"
+                {...register('clinicSlug')}
+                id="clinicSlug"
                 type="text"
                 autoComplete="organization"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="clinic-xyz"
+                placeholder="mi-clinica"
               />
-              {errors.tenantId && (
+              {errors.clinicSlug && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.tenantId.message}
+                  {errors.clinicSlug.message}
                 </p>
               )}
             </div>

@@ -9,10 +9,14 @@ import { PASSWORD_REGEX } from '@/lib/constants'
 
 const registerSchema = z
   .object({
-    tenantId: z
+    clinicName: z
       .string()
-      .min(3, 'El ID del tenant debe tener al menos 3 caracteres')
-      .max(50, 'El ID del tenant no puede tener más de 50 caracteres')
+      .min(2, 'El nombre de la clínica debe tener al menos 2 caracteres')
+      .optional(),
+    clinicSlug: z
+      .string()
+      .min(3, 'El identificador debe tener al menos 3 caracteres')
+      .max(50, 'El identificador no puede tener más de 50 caracteres')
       .regex(
         /^[a-z0-9-]+$/,
         'Solo letras minúsculas, números y guiones permitidos'
@@ -49,7 +53,8 @@ export function RegisterPage() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      tenantId: '',
+      clinicName: '',
+      clinicSlug: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -109,25 +114,46 @@ export function RegisterPage() {
           <div className="rounded-lg shadow-md border border-gray-200 p-6 space-y-4">
             <div>
               <label
-                htmlFor="tenantId"
+                htmlFor="clinicName"
                 className="block text-sm font-medium text-gray-700"
               >
-                ID de Clínica (URL única)
+                Nombre de la Clínica
               </label>
               <input
-                {...register('tenantId')}
-                id="tenantId"
+                {...register('clinicName')}
+                id="clinicName"
                 type="text"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="mi-clinica"
+                placeholder="Clínica Dental Sonrisa"
               />
-              {errors.tenantId && (
+              {errors.clinicName && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.tenantId.message}
+                  {errors.clinicName.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="clinicSlug"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Identificador de Clínica (URL)
+              </label>
+              <input
+                {...register('clinicSlug')}
+                id="clinicSlug"
+                type="text"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="clinica-sonrisa"
+              />
+              {errors.clinicSlug && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.clinicSlug.message}
                 </p>
               )}
               <p className="mt-1 text-xs text-gray-500">
-                Este será el identificador único de tu clínica
+                Este será el identificador único de tu clínica en la URL
               </p>
             </div>
 
