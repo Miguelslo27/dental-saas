@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+// Note: dotenv is loaded in index.ts before this module is imported
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
