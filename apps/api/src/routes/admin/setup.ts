@@ -6,6 +6,50 @@ import { env } from '../../config/env.js'
 
 const setupRouter: IRouter = Router()
 
+// Simple in-memory rate limiting for setup endpoint
+// Tracks failed attempts by IP to prevent brute-force attacks on SETUP_KEY
+const setupAttempts = new Map<string, { count: number; lastAttempt: number }>()
+const MAX_ATTEMPTS = 5
+const LOCKOUT_DURATION = 15 * 60 * 1000 // 15 minutes
+
+const checkRateLimit = (ip: string): { allowed: boolean; retryAfter?: number } => {
+  const now = Date.now()
+  const attempts = setupAttempts.get(ip)
+  
+  if (!attempts) {
+    return { allowed: true }
+  }
+  
+  // Reset if lockout period has passed
+  if (now - attempts.lastAttempt > LOCKOUT_DURATION) {
+    setupAttempts.delete(ip)
+    return { allowed: true }
+  }
+  
+  if (attempts.count >= MAX_ATTEMPTS) {
+    const retryAfter = Math.ceil((LOCKOUT_DURATION - (now - attempts.lastAttempt)) / 1000)
+    return { allowed: false, retryAfter }
+  }
+  
+  return { allowed: true }
+}
+
+const recordFailedAttempt = (ip: string): void => {
+  const now = Date.now()
+  const attempts = setupAttempts.get(ip)
+  
+  if (attempts) {
+    attempts.count++
+    attempts.lastAttempt = now
+  } else {
+    setupAttempts.set(ip, { count: 1, lastAttempt: now })
+  }
+}
+
+const clearAttempts = (ip: string): void => {
+  setupAttempts.delete(ip)
+}
+
 // Password schema with strong requirements
 const passwordSchema = z
   .string()
@@ -52,9 +96,25 @@ setupRouter.get('/', async (_req, res, next) => {
  * This endpoint self-disables after the first successful creation.
  * 
  * Requires a SETUP_KEY environment variable to be set for security.
+ * Rate limited to prevent brute-force attacks on the SETUP_KEY.
  */
 setupRouter.post('/', async (req, res, next) => {
   try {
+    // Rate limiting check
+    const clientIp = req.ip || req.socket.remoteAddress || 'unknown'
+    const rateLimit = checkRateLimit(clientIp)
+    
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: {
+          message: `Too many failed attempts. Please try again in ${rateLimit.retryAfter} seconds.`,
+          code: 'RATE_LIMITED',
+          retryAfter: rateLimit.retryAfter,
+        },
+      })
+    }
+
     // Check if super admin already exists
     const existingSuperAdmin = await prisma.user.findFirst({
       where: { role: 'SUPER_ADMIN' },
@@ -99,6 +159,9 @@ setupRouter.post('/', async (req, res, next) => {
     }
 
     if (setupKey !== expectedSetupKey) {
+      // Record failed attempt for rate limiting
+      recordFailedAttempt(clientIp)
+      
       return res.status(403).json({
         success: false,
         error: {
@@ -108,16 +171,19 @@ setupRouter.post('/', async (req, res, next) => {
       })
     }
 
-    // Check if email already exists (even for non-super-admin users)
+    // Clear rate limit attempts on valid setup key
+    clearAttempts(clientIp)
+
+    // Check if email already exists globally (super admin email must be unique across all users)
     const existingUser = await prisma.user.findFirst({
-      where: { email, tenantId: null },
+      where: { email },
     })
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
         error: {
-          message: 'Email already registered',
+          message: 'Email already registered. Super admin email must be globally unique.',
           code: 'EMAIL_EXISTS',
         },
       })

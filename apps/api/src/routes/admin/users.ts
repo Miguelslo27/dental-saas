@@ -128,12 +128,14 @@ usersRouter.get('/:id', async (req, res, next) => {
   }
 })
 
+// Note: SUPER_ADMIN role changes are not allowed via this endpoint
+// Super admins can only be created through the dedicated setup endpoint
 const updateUserSchema = z.object({
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
   email: z.string().email().optional(),
   phone: z.string().optional().nullable(),
-  role: z.enum(['SUPER_ADMIN', 'OWNER', 'ADMIN', 'DOCTOR', 'STAFF']).optional(),
+  role: z.enum(['OWNER', 'ADMIN', 'DOCTOR', 'STAFF']).optional(),
 })
 
 /**
@@ -157,6 +159,14 @@ usersRouter.patch('/:id', async (req, res, next) => {
       return res.status(404).json({
         success: false,
         error: { message: 'User not found', code: 'NOT_FOUND' },
+      })
+    }
+
+    // Prevent modifying SUPER_ADMIN users (they can only be managed via setup)
+    if (user.role === 'SUPER_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        error: { message: 'Super admin users cannot be modified via this endpoint', code: 'SUPER_ADMIN_PROTECTED' },
       })
     }
 
@@ -192,7 +202,11 @@ usersRouter.patch('/:id', async (req, res, next) => {
       },
     })
 
-    res.json(updated)
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      user: updated,
+    })
   } catch (error) {
     next(error)
   }

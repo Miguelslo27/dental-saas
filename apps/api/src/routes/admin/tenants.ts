@@ -118,12 +118,24 @@ tenantsRouter.get('/:id', async (req, res, next) => {
   }
 })
 
+// Validate IANA timezone identifier
+const isValidIanaTimeZone = (tz: string): boolean => {
+  try {
+    new Intl.DateTimeFormat(undefined, { timeZone: tz })
+    return true
+  } catch {
+    return false
+  }
+}
+
 const updateTenantSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional().nullable(),
   phone: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
-  timezone: z.string().optional(),
+  timezone: z.string().refine((tz) => isValidIanaTimeZone(tz), {
+    message: 'Invalid timezone. Expected an IANA timezone identifier, e.g. "America/New_York".',
+  }).optional(),
   currency: z.string().length(3).optional(),
 })
 
@@ -241,10 +253,23 @@ tenantsRouter.post('/:id/activate', async (req, res, next) => {
 /**
  * DELETE /api/admin/tenants/:id
  * Delete a tenant (cascades to all related data)
+ * Requires ?confirm=true query parameter due to destructive nature
  */
 tenantsRouter.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params
+    const confirm = req.query.confirm as string | undefined
+
+    // Require explicit confirmation for destructive, cascading delete
+    if (confirm !== 'true') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Destructive operation not confirmed. To delete a tenant and all related data, call this endpoint with ?confirm=true.',
+          code: 'DESTRUCTIVE_OPERATION_NOT_CONFIRMED',
+        },
+      })
+    }
 
     const tenant = await prisma.tenant.findUnique({
       where: { id },
