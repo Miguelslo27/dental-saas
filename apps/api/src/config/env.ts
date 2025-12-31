@@ -8,6 +8,11 @@ const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string().optional(),
   CORS_ORIGIN: z.string().default('*'),
+  
+  // JWT Configuration
+  JWT_SECRET: z.string().min(32).default('development-secret-change-in-production-min-32-chars'),
+  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 }).refine(
   (data) => {
     // Don't allow wildcard CORS in production

@@ -1,10 +1,12 @@
 import express, { type Express } from 'express'
 import cors from 'cors'
 import { healthRouter } from './routes/health.js'
+import { authRouter } from './routes/auth.js'
 import { patientsRouter } from './routes/patients.js'
 import { doctorsRouter } from './routes/doctors.js'
 import { appointmentsRouter } from './routes/appointments.js'
 import { errorHandler } from './middleware/error-handler.js'
+import { requireAuthWithTenant } from './middleware/auth.js'
 import { logger } from './utils/logger.js'
 import { env } from './config/env.js'
 
@@ -20,11 +22,14 @@ app.use((req, _res, next) => {
   next()
 })
 
-// Routes
+// Public routes
 app.use('/api/health', healthRouter)
-app.use('/api/patients', patientsRouter)
-app.use('/api/doctors', doctorsRouter)
-app.use('/api/appointments', appointmentsRouter)
+app.use('/api/auth', authRouter)
+
+// Protected routes (require authentication + tenant)
+app.use('/api/patients', requireAuthWithTenant, patientsRouter)
+app.use('/api/doctors', requireAuthWithTenant, doctorsRouter)
+app.use('/api/appointments', requireAuthWithTenant, appointmentsRouter)
 
 // 404 handler for unmapped routes
 app.use((_req, res) => {
