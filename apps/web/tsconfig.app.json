@@ -24,6 +24,7 @@
       "@pages/*": ["./pages/*"],
       "@hooks/*": ["./hooks/*"],
       "@lib/*": ["./lib/*"],
+      "@stores/*": ["./stores/*"],
       "@assets/*": ["./assets/*"]
     },
 
