@@ -120,7 +120,8 @@ export interface RegisterPayload {
   password: string
   firstName: string
   lastName: string
-  tenantId: string
+  clinicSlug: string
+  clinicName?: string
 }
 
 export interface AuthResponse {

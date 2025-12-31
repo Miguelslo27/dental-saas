@@ -29,7 +29,11 @@ const registerSchema = z.object({
   password: passwordSchema,
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  tenantId: z.string().min(1),
+  // For new clinic registration
+  clinicName: z.string().min(2).optional(),
+  clinicSlug: z.string().min(3).max(50).regex(/^[a-z0-9-]+$/, {
+    message: 'Slug must contain only lowercase letters, numbers, and hyphens',
+  }),
 })
 
 const loginSchema = z.object({
@@ -74,20 +78,31 @@ authRouter.post('/register', async (req, res, next) => {
       })
     }
 
-    const { email, password, firstName, lastName, tenantId } = parse.data
+    const { email, password, firstName, lastName, clinicName, clinicSlug } = parse.data
 
-    // Verify tenant exists and is active
-    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } })
-    if (!tenant || !tenant.isActive) {
+    // Check if tenant with this slug exists
+    let tenant = await prisma.tenant.findUnique({ where: { slug: clinicSlug } })
+    let isNewTenant = false
+    
+    if (!tenant) {
+      // Create new tenant - user will be OWNER
+      isNewTenant = true
+      tenant = await prisma.tenant.create({
+        data: {
+          name: clinicName || `${firstName}'s Clinic`,
+          slug: clinicSlug,
+        },
+      })
+    } else if (!tenant.isActive) {
       return res.status(400).json({
         success: false,
-        error: { message: 'Invalid tenant', code: 'INVALID_TENANT' },
+        error: { message: 'This clinic is not active', code: 'TENANT_INACTIVE' },
       })
     }
 
     // Check if email already exists for this tenant
     const existingUser = await prisma.user.findUnique({
-      where: { tenantId_email: { tenantId, email } },
+      where: { tenantId_email: { tenantId: tenant.id, email } },
     })
     if (existingUser) {
       return res.status(409).json({
@@ -100,12 +115,12 @@ authRouter.post('/register', async (req, res, next) => {
     const passwordHash = await hashPassword(password)
     const user = await prisma.user.create({
       data: {
-        tenantId,
+        tenantId: tenant.id,
         email,
         passwordHash,
         firstName,
         lastName,
-        role: 'STAFF', // Default role
+        role: isNewTenant ? 'OWNER' : 'STAFF', // First user is OWNER, others are STAFF
       },
       select: {
         id: true,
