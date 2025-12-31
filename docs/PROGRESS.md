@@ -20,16 +20,19 @@
 - ✅ Endpoint `/api/admin/setup` (one-time, auto-disable)
 - ✅ Endpoints CRUD para tenants y users
 - ✅ Estadísticas de plataforma
+- ✅ Rate limiting en `/api/admin/setup` (5 intentos, 15 min lockout)
+- ✅ Confirmación `?confirm=true` para DELETE tenant
+- ✅ Validación de timezone (IANA)
+- ✅ Prevenir cambio de role a SUPER_ADMIN via PATCH
+- ✅ Validación global de email para superadmins
+- ✅ Respuestas JSON estandarizadas
 
-**Pendiente (comentarios Copilot):**
-- [ ] Rate limiting en `/api/admin/setup`
-- [ ] Confirmación `?confirm=true` para DELETE tenant
-- [ ] Validación de timezone (IANA)
-- [ ] Prevenir cambio de role a SUPER_ADMIN via PATCH
-- [ ] Audit logging para acciones de superadmin
-- [ ] Tests de integración para admin endpoints
-- [ ] Notificación email en password reset
-- [ ] Estandarizar formato de respuestas JSON
+**Movido a Backlog (ver MIGRATION_PLAN.md):**
+- Audit logging para acciones de superadmin
+- Tests de integración para admin endpoints
+- Notificación email al crear tenant
+- Paginación en endpoints de lista
+- Rate limiting con Redis (actual: in-memory)
 
 ---
 
@@ -39,15 +42,15 @@
 Crear el panel de administración frontend para el superadmin, separado del flujo de usuarios normales.
 
 ### Rutas a Implementar
-| Ruta | Descripción |
-|------|-------------|
-| `/admin/setup` | Página para crear el primer superadmin (one-time) |
-| `/admin/login` | Login exclusivo para superadmin |
-| `/admin/dashboard` | Dashboard con estadísticas de plataforma |
-| `/admin/tenants` | Lista y gestión de todas las clínicas |
-| `/admin/tenants/:id` | Detalle de clínica específica |
-| `/admin/users` | Lista y gestión de todos los usuarios |
-| `/admin/users/:id` | Detalle de usuario específico |
+| Ruta                 | Descripción                                       |
+| -------------------- | ------------------------------------------------- |
+| `/admin/setup`       | Página para crear el primer superadmin (one-time) |
+| `/admin/login`       | Login exclusivo para superadmin                   |
+| `/admin/dashboard`   | Dashboard con estadísticas de plataforma          |
+| `/admin/tenants`     | Lista y gestión de todas las clínicas             |
+| `/admin/tenants/:id` | Detalle de clínica específica                     |
+| `/admin/users`       | Lista y gestión de todos los usuarios             |
+| `/admin/users/:id`   | Detalle de usuario específico                     |
 
 ### Componentes Necesarios
 - `AdminLayout` - Layout específico para admin (sin navbar de clínica)
