@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuthStore, type User } from '@/stores/auth.store'
 import { authApi, type LoginPayload, type RegisterPayload } from '@/lib/api'
+import { ROLE_HIERARCHY } from '@/lib/constants'
 
 export function useAuth() {
   const navigate = useNavigate()
@@ -38,8 +39,13 @@ export function useAuth() {
         navigate('/')
         return response
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Error al iniciar sesión'
+        let message = 'Error al iniciar sesión'
+        if (err && typeof err === 'object' && 'response' in err) {
+          const axiosErr = err as { response?: { data?: { message?: string } } }
+          message = axiosErr.response?.data?.message || message
+        } else if (err instanceof Error) {
+          message = err.message
+        }
         setError(message)
         throw err
       }
@@ -66,8 +72,13 @@ export function useAuth() {
         navigate('/')
         return response
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Error al registrarse'
+        let message = 'Error al registrarse'
+        if (err && typeof err === 'object' && 'response' in err) {
+          const axiosErr = err as { response?: { data?: { message?: string } } }
+          message = axiosErr.response?.data?.message || message
+        } else if (err instanceof Error) {
+          message = err.message
+        }
         setError(message)
         throw err
       }
@@ -100,13 +111,7 @@ export function useAuth() {
   const hasMinRole = useCallback(
     (minRole: User['role']) => {
       if (!user) return false
-      const hierarchy: Record<User['role'], number> = {
-        OWNER: 4,
-        ADMIN: 3,
-        DOCTOR: 2,
-        STAFF: 1,
-      }
-      return hierarchy[user.role] >= hierarchy[minRole]
+      return ROLE_HIERARCHY[user.role] >= ROLE_HIERARCHY[minRole]
     },
     [user]
   )

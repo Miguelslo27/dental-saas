@@ -147,6 +147,7 @@ export function LoginPage() {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>
@@ -160,14 +161,15 @@ export function LoginPage() {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="text-sm">
+            {/* TODO: Implement forgot password functionality */}
+            {/* <div className="text-sm">
               <Link
                 to="/forgot-password"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
-            </div>
+            </div> */}
           </div>
 
           <div>

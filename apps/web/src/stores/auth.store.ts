@@ -95,7 +95,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     }),
     {
       name: 'dental-auth',
-      storage: createJSONStorage(() => localStorage),
+      // NOTE: Tokens are stored in sessionStorage, which is cleared when the tab is closed.
+      // Access tokens in Web Storage remain vulnerable to XSS; for stronger protection,
+      // consider storing refresh tokens in httpOnly cookies managed by the backend.
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,

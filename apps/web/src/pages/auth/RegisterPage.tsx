@@ -5,10 +5,7 @@ import { z } from 'zod'
 import { Link, Navigate } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
-import { AxiosError } from 'axios'
-
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+import { PASSWORD_REGEX } from '@/lib/constants'
 
 const registerSchema = z
   .object({
@@ -25,7 +22,7 @@ const registerSchema = z
       .string()
       .min(8, 'La contraseña debe tener al menos 8 caracteres')
       .regex(
-        passwordRegex,
+        PASSWORD_REGEX,
         'Debe incluir mayúscula, minúscula, número y carácter especial (@$!%*?&)'
       ),
     confirmPassword: z.string(),
@@ -72,9 +69,8 @@ export function RegisterPage() {
       const { confirmPassword: _, ...registerData } = data
       await registerUser(registerData)
     } catch (err) {
-      if (err instanceof AxiosError) {
-        console.error('Register error:', err.response?.data)
-      }
+      // Error is handled by the useAuth hook
+      console.error('Register error:', err)
     }
   }
 
@@ -223,6 +219,7 @@ export function RegisterPage() {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>
@@ -258,6 +255,11 @@ export function RegisterPage() {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={
+                    showConfirmPassword
+                      ? 'Ocultar contraseña de confirmación'
+                      : 'Mostrar contraseña de confirmación'
+                  }
                 >
                   {showConfirmPassword ? '🙈' : '👁️'}
                 </button>
@@ -308,11 +310,19 @@ export function RegisterPage() {
 
           <p className="text-center text-xs text-gray-500">
             Al registrarte, aceptas nuestros{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className="text-blue-600 hover:text-blue-500"
+            >
               Términos de Servicio
             </a>{' '}
             y{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className="text-blue-600 hover:text-blue-500"
+            >
               Política de Privacidad
             </a>
           </p>

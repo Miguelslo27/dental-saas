@@ -1,18 +1,12 @@
 import { Navigate, useLocation } from 'react-router'
 import { useAuthStore } from '@/stores/auth.store'
 import type { User } from '@/stores/auth.store'
+import { ROLE_HIERARCHY } from '@/lib/constants'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
   requiredRoles?: User['role'][]
   minRole?: User['role']
-}
-
-const ROLE_HIERARCHY: Record<User['role'], number> = {
-  OWNER: 4,
-  ADMIN: 3,
-  DOCTOR: 2,
-  STAFF: 1,
 }
 
 export function ProtectedRoute({
