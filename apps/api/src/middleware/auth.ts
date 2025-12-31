@@ -69,7 +69,7 @@ export function requireRole(...allowedRoles: string[]) {
 
 /**
  * Middleware that validates tenant from JWT matches request.
- * Automatically extracts tenantId from JWT instead of header.
+ * Stores tenantId in req.user (already there from requireAuth).
  * Must be used after requireAuth.
  */
 export function requireTenant(req: Request, res: Response, next: NextFunction) {
@@ -80,9 +80,8 @@ export function requireTenant(req: Request, res: Response, next: NextFunction) {
     })
   }
 
-  // Override any x-tenant-id header with the one from JWT
-  // This ensures tenant isolation through authentication
-  req.headers['x-tenant-id'] = req.user.tenantId
+  // tenantId is already in req.user from JWT - no need to mutate headers
+  // Routes should use req.user.tenantId instead of x-tenant-id header
 
   next()
 }

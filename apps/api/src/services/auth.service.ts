@@ -53,13 +53,16 @@ export function generateTokens(payload: TokenPayload): TokenPair {
 
 /**
  * Verify an access token
+ * @throws Error with descriptive message if token is invalid
  */
 export function verifyAccessToken(token: string): TokenPayload {
   const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload & { type?: string }
   
   // Make sure it's not a refresh token
   if (decoded.type === 'refresh') {
-    throw new Error('Invalid token type')
+    const error = new Error('Invalid token type: expected access token, got refresh token')
+    ;(error as any).code = 'INVALID_TOKEN_TYPE'
+    throw error
   }
   
   return decoded
@@ -67,12 +70,15 @@ export function verifyAccessToken(token: string): TokenPayload {
 
 /**
  * Verify a refresh token
+ * @throws Error with descriptive message if token is invalid
  */
 export function verifyRefreshToken(token: string): { userId: string } {
   const decoded = jwt.verify(token, env.JWT_SECRET) as { userId: string; type?: string }
   
   if (decoded.type !== 'refresh') {
-    throw new Error('Invalid token type')
+    const error = new Error('Invalid token type: expected refresh token')
+    ;(error as any).code = 'INVALID_TOKEN_TYPE'
+    throw error
   }
   
   return { userId: decoded.userId }
@@ -87,12 +93,12 @@ export function hashToken(token: string): string {
 
 /**
  * Parse expiry string to Date
+ * @throws Error if format is invalid
  */
 export function getExpiryDate(expiresIn: string): Date {
   const match = expiresIn.match(/^(\d+)([smhd])$/)
   if (!match) {
-    // Default to 7 days
-    return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    throw new Error(`Invalid expiresIn format: "${expiresIn}". Expected pattern "<number><unit>" where unit is one of s, m, h, d.`)
   }
 
   const value = parseInt(match[1], 10)

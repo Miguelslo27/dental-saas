@@ -5,6 +5,7 @@ import {
   hashPassword,
   verifyPassword,
   generateTokens,
+  verifyAccessToken,
   verifyRefreshToken,
   hashToken,
   getExpiryDate,
@@ -13,10 +14,19 @@ import { env } from '../config/env.js'
 
 const authRouter: IRouter = Router()
 
+// Password schema with strong requirements
+const passwordSchema = z
+  .string()
+  .min(8, { message: 'Password must be at least 8 characters long' })
+  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$/, {
+    message:
+      'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
+  })
+
 // Validation schemas
 const registerSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: passwordSchema,
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   tenantId: z.string().min(1),
@@ -31,6 +41,27 @@ const loginSchema = z.object({
 const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })
+
+// Maximum refresh tokens per user (cleanup old ones)
+const MAX_REFRESH_TOKENS_PER_USER = 5
+
+/**
+ * Clean up old refresh tokens for a user, keeping only the most recent ones
+ */
+async function cleanupOldRefreshTokens(userId: string): Promise<void> {
+  const tokens = await prisma.refreshToken.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true },
+  })
+
+  if (tokens.length > MAX_REFRESH_TOKENS_PER_USER) {
+    const tokensToDelete = tokens.slice(MAX_REFRESH_TOKENS_PER_USER)
+    await prisma.refreshToken.deleteMany({
+      where: { id: { in: tokensToDelete.map((t) => t.id) } },
+    })
+  }
+}
 
 // POST /api/auth/register
 authRouter.post('/register', async (req, res, next) => {
@@ -104,6 +135,9 @@ authRouter.post('/register', async (req, res, next) => {
       },
     })
 
+    // Clean up old tokens for this user
+    await cleanupOldRefreshTokens(user.id)
+
     // Update last login
     await prisma.user.update({
       where: { id: user.id },
@@ -111,11 +145,9 @@ authRouter.post('/register', async (req, res, next) => {
     })
 
     res.status(201).json({
-      success: true,
-      data: {
-        user,
-        ...tokens,
-      },
+      user,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     })
   } catch (e) {
     next(e)
@@ -173,6 +205,9 @@ authRouter.post('/login', async (req, res, next) => {
       },
     })
 
+    // Clean up old tokens for this user
+    await cleanupOldRefreshTokens(user.id)
+
     // Update last login
     await prisma.user.update({
       where: { id: user.id },
@@ -180,18 +215,16 @@ authRouter.post('/login', async (req, res, next) => {
     })
 
     res.json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          tenantId: user.tenantId,
-        },
-        ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        tenantId: user.tenantId,
       },
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     })
   } catch (e) {
     next(e)
@@ -211,10 +244,9 @@ authRouter.post('/refresh', async (req, res, next) => {
 
     const { refreshToken } = parse.data
 
-    // Verify the refresh token JWT
-    let payload: { userId: string }
+    // Verify the refresh token JWT is valid
     try {
-      payload = verifyRefreshToken(refreshToken)
+      verifyRefreshToken(refreshToken)
     } catch {
       return res.status(401).json({
         success: false,
@@ -229,7 +261,7 @@ authRouter.post('/refresh', async (req, res, next) => {
       include: { user: true },
     })
 
-    if (!storedToken || storedToken.userId !== payload.userId) {
+    if (!storedToken) {
       return res.status(401).json({
         success: false,
         error: { message: 'Invalid refresh token', code: 'INVALID_REFRESH_TOKEN' },
@@ -261,19 +293,21 @@ authRouter.post('/refresh', async (req, res, next) => {
       role: user.role,
     })
 
-    // Delete old refresh token and create new one
-    await prisma.refreshToken.delete({ where: { id: storedToken.id } })
-    await prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        tokenHash: hashToken(tokens.refreshToken),
-        expiresAt: getExpiryDate(env.JWT_REFRESH_EXPIRES_IN),
-      },
+    // Delete old refresh token and create new one atomically
+    await prisma.$transaction(async (tx) => {
+      await tx.refreshToken.delete({ where: { id: storedToken.id } })
+      await tx.refreshToken.create({
+        data: {
+          userId: user.id,
+          tokenHash: hashToken(tokens.refreshToken),
+          expiresAt: getExpiryDate(env.JWT_REFRESH_EXPIRES_IN),
+        },
+      })
     })
 
     res.json({
-      success: true,
-      data: tokens,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     })
   } catch (e) {
     next(e)
@@ -285,8 +319,10 @@ authRouter.post('/logout', async (req, res, next) => {
   try {
     const parse = refreshSchema.safeParse(req.body)
     if (!parse.success) {
-      // Even if no token provided, logout is "successful"
-      return res.json({ success: true })
+      // Logout without token is considered successful for idempotency.
+      // This allows clients to call logout even if they've lost the token,
+      // ensuring a consistent UX without revealing token existence.
+      return res.status(204).send()
     }
 
     const { refreshToken } = parse.data
@@ -297,7 +333,7 @@ authRouter.post('/logout', async (req, res, next) => {
       where: { tokenHash },
     })
 
-    res.json({ success: true })
+    res.status(204).send()
   } catch (e) {
     next(e)
   }
@@ -316,9 +352,6 @@ authRouter.get('/me', async (req, res, next) => {
     }
 
     const token = authHeader.slice(7)
-    
-    // Import here to avoid circular dependency
-    const { verifyAccessToken } = await import('../services/auth.service.js')
     
     let payload
     try {
@@ -362,10 +395,7 @@ authRouter.get('/me', async (req, res, next) => {
       })
     }
 
-    res.json({
-      success: true,
-      data: user,
-    })
+    res.json(user)
   } catch (e) {
     next(e)
   }

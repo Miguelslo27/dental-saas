@@ -34,4 +34,12 @@ if (!parsed.success) {
   process.exit(1)
 }
 
+// Warn about default JWT_SECRET in non-test environments
+if (
+  parsed.data.NODE_ENV !== 'test' &&
+  parsed.data.JWT_SECRET === 'development-secret-change-in-production-min-32-chars'
+) {
+  console.warn('⚠️  WARNING: Using default JWT_SECRET. Set a secure JWT_SECRET in production!')
+}
+
 export const env = parsed.data
