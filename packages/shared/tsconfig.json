@@ -6,10 +6,9 @@
     "lib": ["ES2024"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"],
-      "@types/*": ["./types/*"]
+      "@/*": ["./src/*"],
+      "@types/*": ["./src/types/*"]
     },
     "strict": true,
     "esModuleInterop": true,
