@@ -89,7 +89,7 @@ authRouter.post('/register', async (req, res, next) => {
       isNewTenant = true
       tenant = await prisma.tenant.create({
         data: {
-          name: clinicName || `${firstName}'s Clinic`,
+          name: clinicName || `${firstName} Clinic`,
           slug: clinicSlug,
         },
       })
@@ -184,10 +184,17 @@ authRouter.post('/login', async (req, res, next) => {
 
     // Find tenant by slug
     const tenant = await prisma.tenant.findUnique({ where: { slug: clinicSlug } })
-    if (!tenant || !tenant.isActive) {
+    if (!tenant) {
       return res.status(401).json({
         success: false,
         error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    if (!tenant.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'This clinic is not active', code: 'CLINIC_NOT_ACTIVE' },
       })
     }
 

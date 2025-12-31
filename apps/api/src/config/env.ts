@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-// Note: dotenv is loaded in index.ts before this module is imported
+// Note: In development, environment variables are loaded via tsx's --env-file flag.
+// In production (e.g., `node dist/index.js`), environment variables must already
+// be present in process.env; a .env file is not automatically loaded.
 
 const envSchema = z.object({
   NODE_ENV: z
