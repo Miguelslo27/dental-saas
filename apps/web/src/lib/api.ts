@@ -112,7 +112,7 @@ apiClient.interceptors.response.use(
 export interface LoginPayload {
   email: string
   password: string
-  tenantId: string
+  clinicSlug: string
 }
 
 export interface RegisterPayload {
