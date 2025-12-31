@@ -57,6 +57,7 @@ export const ModelName = {
   User: 'User',
   Patient: 'Patient',
   Doctor: 'Doctor',
+  Appointment: 'Appointment',
   RefreshToken: 'RefreshToken'
 } as const
 
@@ -188,6 +189,28 @@ export const DoctorScalarFieldEnum = {
 } as const
 
 export type DoctorScalarFieldEnum = (typeof DoctorScalarFieldEnum)[keyof typeof DoctorScalarFieldEnum]
+
+
+export const AppointmentScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  duration: 'duration',
+  status: 'status',
+  type: 'type',
+  notes: 'notes',
+  privateNotes: 'privateNotes',
+  cost: 'cost',
+  isPaid: 'isPaid',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {

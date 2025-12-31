@@ -101,10 +101,11 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  subscription Subscription?
-  users        User[]
-  patients     Patient[]
-  doctors      Doctor[]
+  subscription  Subscription?
+  users         User[]
+  patients      Patient[]
+  doctors       Doctor[]
+  appointments  Appointment[]
 
   @@index([slug])
   @@index([isActive])
@@ -175,6 +176,7 @@ model Patient {
   updatedAt  DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
 
   @@index([tenantId])
   @@index([lastName])
@@ -221,12 +223,72 @@ model Doctor {
   updatedAt      DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
 
   @@index([tenantId])
   @@index([lastName])
   @@unique([tenantId, email])
   @@unique([tenantId, licenseNumber])
   @@map("doctors")
+}
+
+// ============================================================================
+// APPOINTMENTS
+// ============================================================================
+
+model Appointment {
+  id          String            @id @default(cuid())
+  tenantId    String
+  patientId   String
+  doctorId    String
+
+  /// Appointment start date and time (stored in UTC)
+  startTime   DateTime
+  /// Appointment end date and time (stored in UTC)
+  endTime     DateTime
+  /// Duration in minutes (derived from start/end, stored for convenience)
+  duration    Int               @default(30)
+
+  status      AppointmentStatus @default(SCHEDULED)
+  
+  /// Type of appointment (e.g., "Checkup", "Cleaning", "Root Canal")
+  type        String?
+  /// Treatment or procedure notes
+  notes       String?           @db.Text
+  /// Private notes (not visible to patient)
+  privateNotes String?          @db.Text
+  
+  /// Cost of the appointment
+  cost        Decimal?          @db.Decimal(10, 2)
+  /// Whether payment has been received
+  isPaid      Boolean           @default(false)
+
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([startTime])
+  @@index([status])
+  @@index([tenantId, startTime])
+  @@index([doctorId, startTime])
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  SCHEDULED    // Confirmed appointment
+  CONFIRMED    // Patient confirmed attendance
+  IN_PROGRESS  // Currently happening
+  COMPLETED    // Successfully finished
+  CANCELLED    // Cancelled by patient or clinic
+  NO_SHOW      // Patient didn't show up
+  RESCHEDULED  // Moved to another time
 }
 
 enum UserRole {
