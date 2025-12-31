@@ -37,8 +37,7 @@ export function AdminTenantsPage() {
       })
       setData(response)
       setError(null)
-    } catch (err) {
-      console.error('Error fetching tenants:', err)
+    } catch (_err) {
       setError('Error al cargar las clínicas')
     } finally {
       setIsLoading(false)
@@ -64,8 +63,8 @@ export function AdminTenantsPage() {
         await adminTenantsApi.activate(tenant.id)
       }
       fetchTenants()
-    } catch (err) {
-      console.error('Error toggling tenant status:', err)
+    } catch (_err) {
+      setError('Error al cambiar el estado de la clínica')
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
@@ -81,8 +80,8 @@ export function AdminTenantsPage() {
     try {
       await adminTenantsApi.delete(tenant.id)
       fetchTenants()
-    } catch (err) {
-      console.error('Error deleting tenant:', err)
+    } catch (_err) {
+      setError('Error al eliminar la clínica')
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
@@ -241,29 +240,36 @@ export function AdminTenantsPage() {
                           </button>
                           
                           {openMenu === tenant.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
-                              <Link
-                                to={`/admin/tenants/${tenant.id}`}
-                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Eye className="h-4 w-4" />
-                                Ver detalles
-                              </Link>
-                              <button
-                                onClick={() => handleToggleStatus(tenant)}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Power className="h-4 w-4" />
-                                {tenant.isActive ? 'Suspender' : 'Activar'}
-                              </button>
-                              <button
-                                onClick={() => handleDelete(tenant)}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                Eliminar
-                              </button>
-                            </div>
+                            <>
+                              <div
+                                className="fixed inset-0 z-0"
+                                onClick={() => setOpenMenu(null)}
+                              />
+                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
+                                <Link
+                                  to={`/admin/tenants/${tenant.id}`}
+                                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                  onClick={() => setOpenMenu(null)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  Ver detalles
+                                </Link>
+                                <button
+                                  onClick={() => handleToggleStatus(tenant)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Power className="h-4 w-4" />
+                                  {tenant.isActive ? 'Suspender' : 'Activar'}
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(tenant)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Eliminar
+                                </button>
+                              </div>
+                            </>
                           )}
                         </div>
                       </td>

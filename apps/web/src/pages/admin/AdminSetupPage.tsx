@@ -57,8 +57,7 @@ export function AdminSetupPage() {
       try {
         const status = await adminSetupApi.checkStatus()
         setSetupAvailable(status.setupAvailable)
-      } catch (err) {
-        console.error('Error checking setup status:', err)
+      } catch (_err) {
         setError('Error al verificar el estado del sistema')
       } finally {
         setIsCheckingStatus(false)

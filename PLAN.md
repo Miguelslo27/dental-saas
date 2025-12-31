@@ -21,12 +21,22 @@ Panel de administración para gestionar la plataforma SaaS a nivel global:
 - [x] Crear página /admin/tenants
 - [x] Crear página /admin/users
 - [x] Integrar rutas en App.tsx
-- [ ] Verificar compilación y crear commit
-- [ ] Push y crear PR #14
+- [x] Verificar compilación y crear commit
+- [x] Push y crear PR #14
+- [x] Atender comentarios del review
 
 ---
 
 ## Mejoras Futuras / Backlog
+
+### De PR #14 (Super Admin Frontend)
+1. **Endpoint separado para login admin** - El login actual usa /auth/login y verifica rol en cliente. Crear endpoint /admin/auth/login que valide SUPER_ADMIN en servidor
+2. **Token refresh automático** - Implementar lógica de refresh en interceptor de axios cuando token expire
+3. **Componente FilterBar reutilizable** - Extraer filtros duplicados de TenantsPage y UsersPage en componente genérico
+4. **Componente Pagination reutilizable** - Extraer paginación duplicada en componente genérico
+5. **Confirmación modal custom** - Reemplazar window.confirm con modal estilizado para acciones destructivas
+6. **Mejorar seguridad de tokens** - Considerar encriptación de tokens en sessionStorage para panel admin
+7. **Renombrar variable data a tenantsData/usersData** - Nombres más descriptivos en componentes
 
 ### De PR #13 (Super Admin Backend)
 1. **Operaciones bulk más seguras** - Optimizar eliminación de tenants con muchos registros
@@ -41,7 +51,6 @@ Panel de administración para gestionar la plataforma SaaS a nivel global:
 10. **Tests E2E para panel admin** - Cubrir flujos críticos con Playwright
 
 ### Pendientes Generales
-- Implementar refresh token automático
 - Agregar confirmación de email para super admin
 - Implementar 2FA para super admin
 - Agregar dark mode toggle en panel admin

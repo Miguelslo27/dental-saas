@@ -38,6 +38,7 @@ export function AdminUsersPage() {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [resetPasswordModal, setResetPasswordModal] = useState<{ userId: string; email: string } | null>(null)
   const [newPassword, setNewPassword] = useState('')
+  const [passwordError, setPasswordError] = useState<string | null>(null)
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -51,8 +52,7 @@ export function AdminUsersPage() {
       })
       setData(response)
       setError(null)
-    } catch (err) {
-      console.error('Error fetching users:', err)
+    } catch (_err) {
       setError('Error al cargar los usuarios')
     } finally {
       setIsLoading(false)
@@ -78,8 +78,8 @@ export function AdminUsersPage() {
         await adminUsersApi.activate(user.id)
       }
       fetchUsers()
-    } catch (err) {
-      console.error('Error toggling user status:', err)
+    } catch (_err) {
+      setError('Error al cambiar el estado del usuario')
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
@@ -95,8 +95,8 @@ export function AdminUsersPage() {
     try {
       await adminUsersApi.delete(user.id)
       fetchUsers()
-    } catch (err) {
-      console.error('Error deleting user:', err)
+    } catch (_err) {
+      setError('Error al eliminar el usuario')
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
@@ -111,8 +111,9 @@ export function AdminUsersPage() {
       await adminUsersApi.resetPassword(resetPasswordModal.userId, newPassword)
       setResetPasswordModal(null)
       setNewPassword('')
-    } catch (err) {
-      console.error('Error resetting password:', err)
+      setPasswordError(null)
+    } catch (_err) {
+      setPasswordError('Error al resetear la contraseña')
     } finally {
       setActionLoading(null)
     }
@@ -299,39 +300,46 @@ export function AdminUsersPage() {
                           </button>
                           
                           {openMenu === user.id && user.role !== 'SUPER_ADMIN' && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
-                              <Link
-                                to={`/admin/users/${user.id}`}
-                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Eye className="h-4 w-4" />
-                                Ver detalles
-                              </Link>
-                              <button
-                                onClick={() => {
-                                  setResetPasswordModal({ userId: user.id, email: user.email })
-                                  setOpenMenu(null)
-                                }}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Key className="h-4 w-4" />
-                                Resetear contraseña
-                              </button>
-                              <button
-                                onClick={() => handleToggleStatus(user)}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Power className="h-4 w-4" />
-                                {user.isActive ? 'Suspender' : 'Activar'}
-                              </button>
-                              <button
-                                onClick={() => handleDelete(user)}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                Eliminar
-                              </button>
-                            </div>
+                            <>
+                              <div
+                                className="fixed inset-0 z-0"
+                                onClick={() => setOpenMenu(null)}
+                              />
+                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
+                                <Link
+                                  to={`/admin/users/${user.id}`}
+                                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                  onClick={() => setOpenMenu(null)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  Ver detalles
+                                </Link>
+                                <button
+                                  onClick={() => {
+                                    setResetPasswordModal({ userId: user.id, email: user.email })
+                                    setOpenMenu(null)
+                                  }}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Key className="h-4 w-4" />
+                                  Resetear contraseña
+                                </button>
+                                <button
+                                  onClick={() => handleToggleStatus(user)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Power className="h-4 w-4" />
+                                  {user.isActive ? 'Suspender' : 'Activar'}
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(user)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Eliminar
+                                </button>
+                              </div>
+                            </>
                           )}
                         </div>
                       </td>
@@ -374,26 +382,62 @@ export function AdminUsersPage() {
 
       {/* Reset Password Modal */}
       {resetPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => {
+            setResetPasswordModal(null)
+            setNewPassword('')
+            setPasswordError(null)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setResetPasswordModal(null)
+              setNewPassword('')
+              setPasswordError(null)
+            }
+          }}
+        >
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Resetear Contraseña
             </h3>
             <p className="text-sm text-gray-500 mb-4">
               Usuario: {resetPasswordModal.email}
             </p>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Nueva contraseña (mín. 8 caracteres)"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-            />
+            <div className="mb-4">
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value)
+                  setPasswordError(null)
+                }}
+                placeholder="Nueva contraseña (mín. 8 caracteres)"
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  newPassword.length > 0 && newPassword.length < 8
+                    ? 'border-red-300'
+                    : 'border-gray-200'
+                }`}
+                autoFocus
+              />
+              {newPassword.length > 0 && newPassword.length < 8 && (
+                <p className="text-sm text-red-600 mt-1">
+                  La contraseña debe tener al menos 8 caracteres
+                </p>
+              )}
+              {passwordError && (
+                <p className="text-sm text-red-600 mt-1">{passwordError}</p>
+              )}
+            </div>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => {
                   setResetPasswordModal(null)
                   setNewPassword('')
+                  setPasswordError(null)
                 }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >

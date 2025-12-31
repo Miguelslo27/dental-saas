@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router'
+import { Routes, Route, Navigate } from 'react-router'
 import HomePage from '@pages/HomePage'
 import LoginPage from '@pages/auth/LoginPage'
 import RegisterPage from '@pages/auth/RegisterPage'
@@ -27,6 +27,7 @@ function App() {
       
       {/* Protected admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="tenants" element={<AdminTenantsPage />} />
         <Route path="users" element={<AdminUsersPage />} />
