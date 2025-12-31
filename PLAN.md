@@ -1,40 +1,776 @@
-# Super Admin Panel - Plan de Desarrollo
+# 🦷 Plan de Migración: Dental Flutter → React/Node.js/PostgreSQL (SaaS)
 
-## ✅ Fase Completada: PR #14 - Super Admin Frontend Panel (Merged)
+## Descripción del Proyecto
 
-### Objetivos Logrados
-Panel de administración para gestionar la plataforma SaaS a nivel global:
-- ✅ Setup inicial del super administrador
-- ✅ Login separado del flujo de tenants
-- ✅ Dashboard con estadísticas de la plataforma
-- ✅ Gestión de tenants (crear, suspender, eliminar)
-- ✅ Gestión de usuarios (ver, suspender, reset password)
-
-### Microtareas Completadas
-
-- [x] Crear admin store (Zustand) para autenticación
-- [x] Crear servicio API para endpoints de admin
-- [x] Crear AdminLayout con navegación
-- [x] Crear página /admin/setup
-- [x] Crear página /admin/login
-- [x] Crear página /admin/dashboard
-- [x] Crear página /admin/tenants
-- [x] Crear página /admin/users
-- [x] Integrar rutas en App.tsx
-- [x] Verificar compilación y crear commit
-- [x] Push y crear PR #14
-- [x] Atender comentarios del review
-- [x] **Merge PR #14** ✅
+**Nombre:** Dental Clinic Management System (SaaS)  
+**Versión Original:** Flutter + Dart + PocketBase  
+**Versión Destino:** React + Node.js + PostgreSQL (Multi-tenant SaaS)  
+**Fecha de Inicio:** 29 de Diciembre, 2025  
+**Autor:** Mike  
 
 ---
 
-## Próxima Fase: Por Definir
+## 🚀 Modelo de Negocio SaaS
 
-*Pendiente de asignación por Mike*
+### Planes de Suscripción
+
+| Característica      | 🆓 Gratis  | 💼 Básico  | 🏢 Empresa             |
+| ------------------- | --------- | --------- | --------------------- |
+| **Precio**          | $0/mes    | $5.99/mes | $11.99/mes            |
+| **Administradores** | 1         | 2         | 5                     |
+| **Doctores**        | 3         | 5         | 10                    |
+| **Pacientes**       | 15        | 25        | 60                    |
+| **Almacenamiento**  | 100MB     | 1GB       | 5GB                   |
+| **Soporte**         | Comunidad | Email     | Prioritario           |
+| **Backups**         | Manual    | Diarios   | Diarios + Exportación |
+| **Reportes**        | Básicos   | Completos | Completos + Custom    |
+
+### Arquitectura Multi-Tenant
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        DENTAL SaaS                                │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │  Tenant A   │  │  Tenant B   │  │  Tenant C   │  ...         │
+│  │  (Clínica1) │  │  (Clínica2) │  │  (Clínica3) │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│         │                │                │                      │
+│         ▼                ▼                ▼                      │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Base de Datos Compartida                     │   │
+│  │         (Row-level isolation por tenant_id)               │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Resumen del Proyecto Original
+
+Dental es una aplicación de gestión para clínicas dentales con las siguientes características:
+- Gestión de pacientes (datos demográficos, historial dental)
+- Gestión de citas (calendario, notas pre/post operatorias, prescripciones)
+- Gestión de doctores (días de trabajo, permisos)
+- Trabajos de laboratorio (seguimiento, pagos)
+- Gastos y recibos
+- Estadísticas y dashboards
+- Sistema de permisos y roles (admin/user)
+- Soporte multi-idioma
+- Backups
+- Fotos adjuntas a citas
+- Generación de PDFs (prescripciones)
+- Sincronización offline/online
+
+---
+
+## Stack Tecnológico
+
+### Frontend
+- **Framework:** React 19 (última versión estable) con TypeScript
+- **Build Tool:** Vite 6+
+- **Estado:** Zustand
+- **UI Library:** Shadcn/ui + Tailwind CSS 4
+- **Routing:** React Router v7
+- **Forms:** React Hook Form + Zod
+- **Calendario:** FullCalendar
+- **Charts:** Recharts
+- **HTTP Client:** Axios + TanStack Query (React Query)
+- **Pagos:** Stripe.js
+
+### Backend
+- **Runtime:** Node.js 22 LTS
+- **Framework:** Express.js 5 con TypeScript
+- **ORM:** Prisma 6
+- **Autenticación:** JWT + bcrypt
+- **Validación:** Zod
+- **Upload de archivos:** Multer + S3 compatible
+- **Pagos:** Stripe SDK
+- **Emails:** Nodemailer + plantillas React Email
+- **Documentación API:** Swagger/OpenAPI
+- **Jobs/Queue:** BullMQ (para emails, backups, etc.)
+
+### Base de Datos
+- **RDBMS:** PostgreSQL 16+
+- **Migraciones:** Prisma Migrate
+- **Cache:** Redis (para sesiones, rate limiting, queues)
+
+### DevOps
+- **Contenedores:** Docker + Docker Compose
+- **Testing:** Vitest + React Testing Library
+- **Linting:** ESLint 9 + Prettier
+- **CI/CD:** GitHub Actions
+
+---
+
+## PRs Completados
+
+### PR #1-12: Configuración Base y Autenticación ✅
+- ✅ Setup inicial del monorepo
+- ✅ Docker Compose (PostgreSQL + Redis)
+- ✅ Prisma schema con multi-tenancy
+- ✅ API Express con TypeScript
+- ✅ Autenticación JWT (login, registro, refresh tokens)
+- ✅ RBAC con roles (OWNER, ADMIN, DOCTOR, STAFF)
+- ✅ Frontend React con Tailwind + Shadcn/ui
+- ✅ Páginas de login/registro con clinicSlug
+- ✅ Conexión a base de datos corregida
+
+### PR #13: Super Admin Backend API ✅
+- ✅ Role `SUPER_ADMIN` añadido al enum
+- ✅ `tenantId` opcional para superadmins
+- ✅ Middleware `requireSuperAdmin`
+- ✅ Endpoint `/api/admin/setup` (one-time, auto-disable)
+- ✅ Endpoints CRUD para tenants y users
+- ✅ Estadísticas de plataforma
+- ✅ Rate limiting en `/api/admin/setup` (5 intentos, 15 min lockout)
+- ✅ Confirmación `?confirm=true` para DELETE tenant
+- ✅ Validación de timezone (IANA)
+- ✅ Prevenir cambio de role a SUPER_ADMIN via PATCH
+- ✅ Validación global de email para superadmins
+- ✅ Respuestas JSON estandarizadas
+
+### PR #14: Super Admin Frontend Panel ✅
+- ✅ Admin store (Zustand) para autenticación con sessionStorage
+- ✅ Servicio API para endpoints de admin
+- ✅ AdminLayout con navegación sidebar
+- ✅ Página /admin/setup (creación one-time del superadmin)
+- ✅ Página /admin/login (login exclusivo para superadmin)
+- ✅ Página /admin/dashboard (estadísticas de plataforma)
+- ✅ Página /admin/tenants (gestión de clínicas)
+- ✅ Página /admin/users (gestión de usuarios)
+- ✅ Rutas integradas en App.tsx
+- ✅ Index route redirect /admin → /admin/dashboard
+- ✅ Error feedback al usuario (sin console.error)
+- ✅ Backdrop para cerrar dropdowns
+
+---
+
+## Notas Técnicas: Super Admin
+
+### Seguridad del Super Admin
+1. **Sin seed file**: Las credenciales nunca van al repositorio
+2. **SETUP_KEY**: Variable de entorno requerida para crear superadmin
+3. **Auto-disable**: El endpoint de setup se deshabilita después del primer uso
+4. **Rutas separadas**: `/admin/*` completamente separado de `/:clinicSlug/*`
+
+### Variables de Entorno Requeridas
+```env
+# Super Admin Setup
+SETUP_KEY="tu-clave-secreta-de-16-caracteres-minimo"
+```
+
+### Flujo de Setup del Super Admin
+1. Configurar `SETUP_KEY` en `.env`
+2. Navegar a `/admin/setup`
+3. Completar formulario con setupKey + credenciales
+4. El endpoint se auto-deshabilita
+5. Login via `/admin/login`
+
+---
+
+## Fases del Proyecto
+
+---
+
+## 📦 FASE 0: Configuración del Proyecto ✅ COMPLETADA
+**Rama:** `feature/initial-setup`  
+**Estado:** Completada (PRs #1, #2, #3)
+
+### Tarea 0.1: Crear estructura del monorepo ✅
+- [x] 0.1.1: Crear carpeta raíz del proyecto (`dental-saas`)
+- [x] 0.1.2: Inicializar workspace con pnpm
+- [x] 0.1.3: Crear estructura de carpetas (`/apps/api`, `/apps/web`, `/packages/shared`, `/packages/database`)
+- [x] 0.1.4: Configurar pnpm-workspace.yaml
+- [x] 0.1.5: Crear .gitignore global
+- [x] 0.1.6: Crear README.md del proyecto
+- [x] 0.1.7: Configurar Turborepo para monorepo
+
+### Tarea 0.2: Configurar Backend (Node.js 22 LTS) ✅
+- [x] 0.2.1: Inicializar proyecto Node.js con TypeScript en `/apps/api`
+- [x] 0.2.2: Instalar dependencias core (express@5, typescript, prisma, zod)
+- [x] 0.2.3: Configurar tsconfig.json con ES2024
+- [x] 0.2.4: Configurar ESLint 9 flat config y Prettier
+- [x] 0.2.5: Crear estructura de carpetas (src/routes, src/controllers, src/services, src/middleware)
+- [x] 0.2.6: Configurar scripts de package.json (dev, build, start)
+
+### Tarea 0.3: Configurar Frontend (React 19) ✅
+- [x] 0.3.1: Crear app React 19 con Vite 6 + TypeScript en `/apps/web`
+- [x] 0.3.2: Instalar y configurar Tailwind CSS 4
+- [x] 0.3.3: Instalar y configurar Shadcn/ui
+- [x] 0.3.4: Configurar ESLint 9 y Prettier
+- [x] 0.3.5: Crear estructura de carpetas (src/components, src/pages, src/hooks, src/stores, src/api)
+- [x] 0.3.6: Configurar React Router v7
+
+### Tarea 0.4: Configurar Base de Datos y Cache ✅
+- [x] 0.4.1: Crear docker-compose.yml con PostgreSQL + Redis
+- [x] 0.4.2: Crear package `/packages/database` para Prisma
+- [x] 0.4.3: Inicializar Prisma en /packages/database
+- [x] 0.4.4: Crear schema.prisma inicial vacío
+- [x] 0.4.5: Configurar variables de entorno (.env.example)
+
+### Tarea 0.5: Configurar Docker para desarrollo ✅
+- [x] 0.5.1: Crear Dockerfile para API
+- [x] 0.5.2: Crear Dockerfile para Web
+- [x] 0.5.3: Actualizar docker-compose.yml con servicios de desarrollo
+- [x] 0.5.4: Documentar comandos de desarrollo en README
+
+---
+
+## 📦 FASE 1: Core Multi-Tenant y Modelos Base ✅ COMPLETADA
+**Rama:** `feature/multi-tenant-core`  
+**Estado:** Completada (PRs #4, #5, #6, #7, #8)
+
+### Tarea 1.1: Definir Schema de Prisma - Core SaaS ✅
+- [x] 1.1.1: Crear modelo Plan
+- [x] 1.1.2: Crear modelo Tenant
+- [x] 1.1.3: Crear modelo Subscription
+- [x] 1.1.4: Crear modelo User con tenantId
+- [x] 1.1.5: Crear modelo PaymentMethod
+- [x] 1.1.6: Crear modelo Invoice
+- [x] 1.1.7: Crear seed de planes iniciales (free, basic, enterprise)
+
+### Tarea 1.2: Definir Schema de Prisma - Entidades de Negocio ✅
+- [x] 1.2.1: Crear modelo Doctor con tenantId
+- [x] 1.2.2: Crear modelo Patient con tenantId
+- [x] 1.2.3: Crear modelo Appointment con tenantId
+- [x] 1.2.4: Crear modelo AppointmentImage con tenantId
+- [x] 1.2.5: Crear tabla de unión AppointmentDoctor
+- [x] 1.2.6: Crear modelo Labwork con tenantId
+- [x] 1.2.7: Crear modelo Expense con tenantId
+- [x] 1.2.8: Crear modelo TenantSetting
+- [x] 1.2.9: Crear modelo UserPermission
+- [x] 1.2.10: Crear modelo AuditLog
+- [x] 1.2.11: Crear modelo Backup
+- [x] 1.2.12: Ejecutar primera migración de Prisma
+
+### Tarea 1.3: Crear servidor Express básico con Multi-Tenant ✅
+- [x] 1.3.1: Crear app.ts con configuración de Express 5
+- [x] 1.3.2: Configurar CORS con whitelist
+- [x] 1.3.3: Configurar middleware de JSON parsing
+- [x] 1.3.4: Crear middleware de error handling global
+- [x] 1.3.5: Crear health check endpoint (/api/health)
+- [x] 1.3.6: Configurar logger (pino)
+- [x] 1.3.7: Crear middleware de extracción de tenant
+- [x] 1.3.8: Crear middleware de inyección de tenantId en Prisma queries
+
+### Tarea 1.4: Crear utilidades base ✅
+- [x] 1.4.1: Crear cliente Prisma singleton con tenant isolation
+- [x] 1.4.2: Crear cliente Redis
+- [x] 1.4.3: Crear tipos compartidos en /packages/shared
+- [x] 1.4.4: Crear helpers de respuesta API
+- [x] 1.4.5: Crear esquemas Zod base para validación
+- [x] 1.4.6: Crear servicio de verificación de límites de plan
+
+### Tarea 1.5: CRUD de Entidades Base (API) ✅
+- [x] 1.5.1: Crear CRUD completo de Patient (/api/patients) - PR #6
+- [x] 1.5.2: Crear CRUD completo de Doctor (/api/doctors) - PR #7
+- [x] 1.5.3: Crear CRUD completo de Appointment (/api/appointments) - PR #8
+
+---
+
+## 📦 FASE 2: Registro de Tenants y Autenticación 🔄 EN PROGRESO
+**Rama:** `feature/authentication`  
+**Estado:** Backend Auth completado (PRs #9-12), Super Admin completado (PRs #13-14)
+
+### Tarea 2.1: Backend - Registro de Tenants (Onboarding) ⏳
+- [ ] 2.1.1: Crear endpoint POST /api/tenants/register
+- [ ] 2.1.2: Crear servicio de generación de slug único para tenant
+- [ ] 2.1.3: Crear endpoint GET /api/tenants/check-slug/:slug
+- [ ] 2.1.4: Crear email de bienvenida con React Email
+- [ ] 2.1.5: Configurar BullMQ para envío de emails asíncrono
+- [ ] 2.1.6: Crear job de envío de email de bienvenida
+
+### Tarea 2.2: Backend - Autenticación ✅ (PR #9)
+- [x] 2.2.1: Instalar bcrypt y jsonwebtoken
+- [x] 2.2.2: Crear servicio de hash de contraseñas (bcrypt 12 rounds)
+- [x] 2.2.3: Crear servicio de generación/verificación JWT
+- [x] 2.2.4: Crear endpoint POST /api/auth/login
+- [x] 2.2.5: Crear endpoint POST /api/auth/refresh-token
+- [x] 2.2.6: Crear endpoint GET /api/auth/me
+- [ ] 2.2.7: Crear endpoint POST /api/auth/forgot-password
+- [ ] 2.2.8: Crear endpoint POST /api/auth/reset-password
+- [x] 2.2.9: Crear middleware de autenticación
+- [x] 2.2.10: Crear middleware de autorización por rol (OWNER/ADMIN/DOCTOR/STAFF)
+- [ ] 2.2.11: Implementar rate limiting con Redis
+
+### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ⏳
+- [ ] 2.3.1: Crear endpoint GET /api/users (admin only)
+- [ ] 2.3.2: Crear endpoint GET /api/users/:id
+- [ ] 2.3.3: Crear endpoint POST /api/users
+- [ ] 2.3.4: Crear endpoint PUT /api/users/:id
+- [ ] 2.3.5: Crear endpoint DELETE /api/users/:id
+- [ ] 2.3.6: Crear endpoint PUT /api/users/:id/permissions
+- [ ] 2.3.7: Crear middleware de verificación de límites
+
+### Tarea 2.4: Frontend - Landing Page y Registro ⏳
+- [ ] 2.4.1: Crear layout de landing page
+- [ ] 2.4.2: Crear página de pricing con los 3 planes
+- [ ] 2.4.3: Crear formulario de registro de tenant
+- [ ] 2.4.4: Crear página de confirmación de registro
+- [ ] 2.4.5: Implementar flujo de onboarding inicial
+
+### Tarea 2.5: Frontend - Autenticación ⏳
+- [ ] 2.5.1: Crear página de Login
+- [ ] 2.5.2: Crear página de Forgot Password
+- [ ] 2.5.3: Crear página de Reset Password
+- [ ] 2.5.4: Crear store de autenticación (Zustand)
+- [ ] 2.5.5: Crear hook useAuth
+- [ ] 2.5.6: Crear componente ProtectedRoute
+- [ ] 2.5.7: Crear interceptor de Axios para tokens
+- [ ] 2.5.8: Implementar refresh token automático
+- [ ] 2.5.9: Crear página de perfil de usuario
+
+### Tarea 2.6: Super Admin ✅ (PRs #13, #14)
+- [x] 2.6.1: Backend - Role SUPER_ADMIN y middleware
+- [x] 2.6.2: Backend - Endpoint /api/admin/setup (one-time)
+- [x] 2.6.3: Backend - CRUD de tenants y users
+- [x] 2.6.4: Backend - Estadísticas de plataforma
+- [x] 2.6.5: Frontend - Admin store y API service
+- [x] 2.6.6: Frontend - AdminLayout con sidebar
+- [x] 2.6.7: Frontend - Páginas setup, login, dashboard, tenants, users
+
+---
+
+## 📦 FASE 3: Gestión de Doctores (con límites de plan)
+**Rama:** `feature/doctors-management`  
+**Duración estimada:** 2 días
+
+### Tarea 3.1: Backend - CRUD Doctores
+- [ ] 3.1.1: Crear esquemas Zod para Doctor
+- [ ] 3.1.2: Crear servicio DoctorService con tenant isolation
+- [ ] 3.1.3: Crear middleware de verificación de límite de doctores por plan
+- [ ] 3.1.4: Crear endpoint GET /api/doctors
+- [ ] 3.1.5: Crear endpoint GET /api/doctors/:id
+- [ ] 3.1.6: Crear endpoint POST /api/doctors
+- [ ] 3.1.7: Crear endpoint PUT /api/doctors/:id
+- [ ] 3.1.8: Crear endpoint DELETE /api/doctors/:id (soft delete)
+- [ ] 3.1.9: Crear endpoint PUT /api/doctors/:id/restore
+- [ ] 3.1.10: Crear endpoint GET /api/doctors/count
+
+### Tarea 3.2: Frontend - Gestión de Doctores
+- [ ] 3.2.1: Crear store de doctores
+- [ ] 3.2.2: Crear hooks para doctores
+- [ ] 3.2.3: Crear página de listado de doctores
+- [ ] 3.2.4: Crear componente DoctorCard
+- [ ] 3.2.5: Crear componente de formulario Doctor
+- [ ] 3.2.6: Crear modal de confirmación de eliminación
+- [ ] 3.2.7: Implementar búsqueda y filtros
+- [ ] 3.2.8: Crear componente DoctorPicker
+- [ ] 3.2.9: Mostrar mensaje de upgrade cuando se alcanza el límite
+
+---
+
+## 📦 FASE 4: Gestión de Pacientes (con límites de plan)
+**Rama:** `feature/patients-management`  
+**Duración estimada:** 3 días
+
+### Tarea 4.1: Backend - CRUD Pacientes
+- [ ] 4.1.1: Crear esquemas Zod para Patient
+- [ ] 4.1.2: Crear servicio PatientService con tenant isolation
+- [ ] 4.1.3: Crear middleware de verificación de límite de pacientes
+- [ ] 4.1.4: Crear endpoint GET /api/patients (paginado)
+- [ ] 4.1.5: Crear endpoint GET /api/patients/:id
+- [ ] 4.1.6: Crear endpoint POST /api/patients
+- [ ] 4.1.7: Crear endpoint PUT /api/patients/:id
+- [ ] 4.1.8: Crear endpoint DELETE /api/patients/:id
+- [ ] 4.1.9: Crear endpoint GET /api/patients/:id/appointments
+- [ ] 4.1.10: Crear endpoint PUT /api/patients/:id/teeth-chart
+- [ ] 4.1.11: Crear endpoint GET /api/patients/count
+
+### Tarea 4.2: Frontend - Gestión de Pacientes
+- [ ] 4.2.1: Crear store de pacientes
+- [ ] 4.2.2: Crear hooks para pacientes
+- [ ] 4.2.3: Crear página de listado de pacientes
+- [ ] 4.2.4: Crear componente PatientCard
+- [ ] 4.2.5: Crear formulario de Patient
+- [ ] 4.2.6: Crear componente de tags input
+- [ ] 4.2.7: Crear vista de detalle de paciente
+- [ ] 4.2.8: Implementar búsqueda y filtros
+- [ ] 4.2.9: Crear componente PatientPicker
+- [ ] 4.2.10: Mostrar mensaje de upgrade
+
+### Tarea 4.3: Dental Chart
+- [ ] 4.3.1: Crear componente visual DentalChart
+- [ ] 4.3.2: Implementar selección de dientes
+- [ ] 4.3.3: Implementar notas por diente
+- [ ] 4.3.4: Integrar en vista de paciente
+
+---
+
+## 📦 FASE 5: Gestión de Citas (con límites de storage)
+**Rama:** `feature/appointments-management`  
+**Duración estimada:** 4 días
+
+### Tarea 5.1: Backend - CRUD Citas
+- [ ] 5.1.1: Crear esquemas Zod para Appointment
+- [ ] 5.1.2: Crear servicio AppointmentService
+- [ ] 5.1.3: Crear endpoint GET /api/appointments
+- [ ] 5.1.4: Crear endpoint GET /api/appointments/:id
+- [ ] 5.1.5: Crear endpoint POST /api/appointments
+- [ ] 5.1.6: Crear endpoint PUT /api/appointments/:id
+- [ ] 5.1.7: Crear endpoint DELETE /api/appointments/:id
+- [ ] 5.1.8: Crear endpoint PUT /api/appointments/:id/mark-done
+- [ ] 5.1.9: Crear endpoint GET /api/appointments/calendar
+- [ ] 5.1.10: Crear endpoint GET /api/appointments/by-doctor/:doctorId
+
+### Tarea 5.2: Backend - Imágenes de Citas
+- [ ] 5.2.1: Configurar Multer para uploads
+- [ ] 5.2.2: Crear servicio de almacenamiento (S3)
+- [ ] 5.2.3: Crear servicio de tracking de storage por tenant
+- [ ] 5.2.4: Crear middleware de verificación de límite de storage
+- [ ] 5.2.5: Crear endpoint POST /api/appointments/:id/images
+- [ ] 5.2.6: Crear endpoint DELETE /api/appointments/:id/images/:imageId
+- [ ] 5.2.7: Crear endpoint GET /api/appointments/:id/images
+- [ ] 5.2.8: Crear endpoint GET /api/storage/usage
+
+### Tarea 5.3: Frontend - Vista de Calendario
+- [ ] 5.3.1: Instalar y configurar FullCalendar
+- [ ] 5.3.2: Crear página de calendario
+- [ ] 5.3.3: Implementar vista mensual
+- [ ] 5.3.4: Implementar vista semanal
+- [ ] 5.3.5: Implementar navegación entre fechas
+- [ ] 5.3.6: Mostrar citas en el calendario
+- [ ] 5.3.7: Filtrar por doctor
+
+### Tarea 5.4: Frontend - CRUD de Citas
+- [ ] 5.4.1: Crear store de citas
+- [ ] 5.4.2: Crear hooks para citas
+- [ ] 5.4.3: Crear formulario de cita
+- [ ] 5.4.4: Crear componente AppointmentCard
+- [ ] 5.4.5: Crear vista de detalle de cita
+- [ ] 5.4.6: Implementar upload de imágenes
+- [ ] 5.4.7: Implementar galería de imágenes
+- [ ] 5.4.8: Crear componente de prescripciones
+
+---
+
+## 📦 FASE 6: Trabajos de Laboratorio y Gastos
+**Rama:** `feature/labworks-expenses`  
+**Duración estimada:** 2 días
+
+### Tarea 6.1: Backend - Labworks
+- [ ] 6.1.1: Crear esquemas Zod para Labwork
+- [ ] 6.1.2: Crear servicio LabworkService
+- [ ] 6.1.3: Crear endpoints CRUD /api/labworks
+- [ ] 6.1.4: Crear endpoint de estadísticas de labworks
+
+### Tarea 6.2: Backend - Expenses
+- [ ] 6.2.1: Crear esquemas Zod para Expense
+- [ ] 6.2.2: Crear servicio ExpenseService
+- [ ] 6.2.3: Crear endpoints CRUD /api/expenses
+- [ ] 6.2.4: Crear endpoint de estadísticas de gastos
+
+### Tarea 6.3: Frontend - Labworks
+- [ ] 6.3.1: Crear store de labworks
+- [ ] 6.3.2: Crear página de listado de labworks
+- [ ] 6.3.3: Crear formulario de labwork
+- [ ] 6.3.4: Implementar filtros por estado de pago
+
+### Tarea 6.4: Frontend - Expenses
+- [ ] 6.4.1: Crear store de expenses
+- [ ] 6.4.2: Crear página de listado de expenses
+- [ ] 6.4.3: Crear formulario de expense
+- [ ] 6.4.4: Implementar tags y filtros
+
+---
+
+## 📦 FASE 7: Estadísticas y Dashboard
+**Rama:** `feature/statistics-dashboard`  
+**Duración estimada:** 2 días
+
+### Tarea 7.1: Backend - Endpoints de Estadísticas
+- [ ] 7.1.1: Crear endpoint GET /api/stats/overview
+- [ ] 7.1.2: Crear endpoint GET /api/stats/revenue
+- [ ] 7.1.3: Crear endpoint GET /api/stats/appointments
+- [ ] 7.1.4: Crear endpoint GET /api/stats/patients-growth
+- [ ] 7.1.5: Crear endpoint GET /api/stats/doctors-performance
+- [ ] 7.1.6: Crear middleware para restringir reportes según plan
+
+### Tarea 7.2: Frontend - Dashboard
+- [ ] 7.2.1: Crear página de dashboard
+- [ ] 7.2.2: Crear componente de tarjetas de resumen
+- [ ] 7.2.3: Crear gráfico de ingresos (Recharts)
+- [ ] 7.2.4: Crear gráfico de citas
+- [ ] 7.2.5: Crear widget de próximas citas
+- [ ] 7.2.6: Crear widget de pagos pendientes
+- [ ] 7.2.7: Crear widget de uso del plan
+- [ ] 7.2.8: Mostrar features bloqueados con CTA de upgrade
+
+---
+
+## 📦 FASE 8: Suscripciones y Pagos (Stripe)
+**Rama:** `feature/billing-stripe`  
+**Duración estimada:** 3-4 días
+
+### Tarea 8.1: Backend - Integración Stripe
+- [ ] 8.1.1: Instalar Stripe SDK
+- [ ] 8.1.2: Crear servicio StripeService
+- [ ] 8.1.3: Crear endpoint POST /api/billing/create-checkout-session
+- [ ] 8.1.4: Crear endpoint POST /api/billing/create-portal-session
+- [ ] 8.1.5: Crear endpoint POST /api/billing/webhook
+- [ ] 8.1.6: Implementar handler para subscription.created
+- [ ] 8.1.7: Implementar handler para subscription.updated
+- [ ] 8.1.8: Implementar handler para subscription.deleted
+- [ ] 8.1.9: Implementar handler para invoice.paid
+- [ ] 8.1.10: Implementar handler para invoice.payment_failed
+- [ ] 8.1.11: Crear endpoint GET /api/billing/subscription
+- [ ] 8.1.12: Crear endpoint GET /api/billing/invoices
+- [ ] 8.1.13: Crear job para emails de recordatorio de pago
+
+### Tarea 8.2: Backend - Gestión de Límites por Plan
+- [ ] 8.2.1: Crear servicio PlanLimitsService
+- [ ] 8.2.2: Implementar método canAddDoctor(tenantId)
+- [ ] 8.2.3: Implementar método canAddPatient(tenantId)
+- [ ] 8.2.4: Implementar método canAddAdmin(tenantId)
+- [ ] 8.2.5: Implementar método canUploadFile(tenantId, fileSize)
+- [ ] 8.2.6: Implementar método getCurrentUsage(tenantId)
+- [ ] 8.2.7: Crear cron job para verificar suscripciones vencidas
+
+### Tarea 8.3: Frontend - Billing
+- [ ] 8.3.1: Crear página de billing/suscripción
+- [ ] 8.3.2: Mostrar plan actual y uso
+- [ ] 8.3.3: Crear componente de comparación de planes
+- [ ] 8.3.4: Implementar botón de upgrade con Stripe Checkout
+- [ ] 8.3.5: Implementar botón de acceso a Stripe Customer Portal
+- [ ] 8.3.6: Mostrar historial de facturas
+- [ ] 8.3.7: Crear banners de advertencia cuando se acercan los límites
+- [ ] 8.3.8: Crear modal de bloqueo cuando se exceden los límites
+
+---
+
+## 📦 FASE 9: Configuración del Tenant (Settings)
+**Rama:** `feature/settings`  
+**Duración estimada:** 1-2 días
+
+### Tarea 9.1: Backend - Settings del Tenant
+- [ ] 9.1.1: Crear endpoints CRUD /api/settings
+- [ ] 9.1.2: Implementar settings por defecto al crear tenant
+- [ ] 9.1.3: Crear endpoint PUT /api/tenant/profile
+
+### Tarea 9.2: Frontend - Página de Settings
+- [ ] 9.2.1: Crear página de configuración del tenant
+- [ ] 9.2.2: Implementar configuración de moneda
+- [ ] 9.2.3: Implementar footer de prescripciones
+- [ ] 9.2.4: Implementar configuración de teléfono
+- [ ] 9.2.5: Implementar selector de idioma
+- [ ] 9.2.6: Implementar configuración de formato de fecha
+- [ ] 9.2.7: Crear sección de gestión de usuarios del tenant
+- [ ] 9.2.8: Crear sección de perfil del tenant
+
+---
+
+## 📦 FASE 10: Backups (con restricciones por plan)
+**Rama:** `feature/backups`  
+**Duración estimada:** 1-2 días
+
+### Tarea 10.1: Backend - Backups
+- [ ] 10.1.1: Crear servicio de backup de datos del tenant
+- [ ] 10.1.2: Crear endpoint POST /api/backups/create
+- [ ] 10.1.3: Crear endpoint GET /api/backups
+- [ ] 10.1.4: Crear endpoint GET /api/backups/:id/download
+- [ ] 10.1.5: Crear endpoint POST /api/backups/:id/restore
+- [ ] 10.1.6: Crear endpoint DELETE /api/backups/:id
+- [ ] 10.1.7: Crear cron job para backups automáticos
+- [ ] 10.1.8: Crear cron job para limpiar backups expirados
+
+### Tarea 10.2: Frontend - Gestión de Backups
+- [ ] 10.2.1: Crear sección de backups en settings
+- [ ] 10.2.2: Implementar lista de backups
+- [ ] 10.2.3: Implementar crear backup manual
+- [ ] 10.2.4: Implementar descargar backup
+- [ ] 10.2.5: Implementar restaurar backup
+
+---
+
+## 📦 FASE 11: Generación de PDFs
+**Rama:** `feature/pdf-generation`  
+**Duración estimada:** 1 día
+
+### Tarea 11.1: Backend - Generación de PDFs
+- [ ] 11.1.1: Instalar librería de PDF
+- [ ] 11.1.2: Crear servicio de generación de PDF
+- [ ] 11.1.3: Crear endpoint GET /api/prescriptions/:appointmentId/pdf
+- [ ] 11.1.4: Crear template de prescripción con branding del tenant
+
+### Tarea 11.2: Frontend - Descarga de PDFs
+- [ ] 11.2.1: Implementar botón de descarga de prescripción
+- [ ] 11.2.2: Implementar preview de prescripción
+
+---
+
+## 📦 FASE 12: Internacionalización (i18n)
+**Rama:** `feature/i18n`  
+**Duración estimada:** 1-2 días
+
+### Tarea 12.1: Configurar i18n
+- [ ] 12.1.1: Instalar react-i18next
+- [ ] 12.1.2: Configurar i18n
+- [ ] 12.1.3: Extraer strings del proyecto original
+- [ ] 12.1.4: Crear archivo de traducción inglés
+- [ ] 12.1.5: Crear archivo de traducción español
+- [ ] 12.1.6: Crear archivo de traducción árabe
+
+### Tarea 12.2: Implementar i18n
+- [ ] 12.2.1: Reemplazar strings hardcodeados
+- [ ] 12.2.2: Implementar selector de idioma
+- [ ] 12.2.3: Implementar soporte RTL (árabe)
+
+---
+
+## 📦 FASE 13: Landing Page y Marketing
+**Rama:** `feature/landing-page`  
+**Duración estimada:** 2 días
+
+### Tarea 13.1: Landing Page
+- [ ] 13.1.1: Crear hero section
+- [ ] 13.1.2: Crear sección de features
+- [ ] 13.1.3: Crear sección de pricing con los 3 planes
+- [ ] 13.1.4: Crear sección de testimonios
+- [ ] 13.1.5: Crear sección de FAQ
+- [ ] 13.1.6: Crear footer con links legales
+- [ ] 13.1.7: Optimizar para SEO
+
+### Tarea 13.2: Páginas Legales
+- [ ] 13.2.1: Crear página de Términos de Servicio
+- [ ] 13.2.2: Crear página de Política de Privacidad
+- [ ] 13.2.3: Crear página de Política de Cookies
+
+---
+
+## 📦 FASE 14: Testing
+**Rama:** `feature/testing`  
+**Duración estimada:** 2-3 días
+
+### Tarea 14.1: Tests de Backend
+- [ ] 14.1.1: Configurar Vitest para backend
+- [ ] 14.1.2: Crear tests de autenticación
+- [ ] 14.1.3: Crear tests de registro de tenant
+- [ ] 14.1.4: Crear tests de límites de plan
+- [ ] 14.1.5: Crear tests de CRUD con tenant isolation
+- [ ] 14.1.6: Crear tests de webhooks de Stripe
+
+### Tarea 14.2: Tests de Frontend
+- [ ] 14.2.1: Configurar Vitest + React Testing Library
+- [ ] 14.2.2: Crear tests de componentes principales
+- [ ] 14.2.3: Crear tests de hooks
+- [ ] 14.2.4: Crear tests de flujos de usuario
+
+---
+
+## 📦 FASE 15: Documentación y Deploy
+**Rama:** `feature/docs-deploy`  
+**Duración estimada:** 2 días
+
+### Tarea 15.1: Documentación
+- [ ] 15.1.1: Documentar API con Swagger/OpenAPI
+- [ ] 15.1.2: Crear documentación de instalación
+- [ ] 15.1.3: Crear documentación de configuración
+- [ ] 15.1.4: Crear guía de usuario
+
+### Tarea 15.2: Preparar para Producción
+- [ ] 15.2.1: Crear Dockerfile de producción para API
+- [ ] 15.2.2: Crear Dockerfile de producción para Web
+- [ ] 15.2.3: Crear docker-compose de producción
+- [ ] 15.2.4: Configurar variables de entorno de producción
+- [ ] 15.2.5: Configurar CI/CD con GitHub Actions
+- [ ] 15.2.6: Configurar Stripe en modo producción
+- [ ] 15.2.7: Configurar dominio y SSL
+- [ ] 15.2.8: Configurar monitoreo (Sentry para errores)
+
+---
+
+## Estimación Total
+
+| Fase      | Descripción                        | Duración Estimada |
+| --------- | ---------------------------------- | ----------------- |
+| Fase 0    | Configuración del Proyecto         | ✅ Completada     |
+| Fase 1    | Core Multi-Tenant y Modelos        | ✅ Completada     |
+| Fase 2    | Registro de Tenants y Auth         | 🔄 En progreso    |
+| Fase 3    | Gestión de Doctores                | 2 días            |
+| Fase 4    | Gestión de Pacientes               | 3 días            |
+| Fase 5    | Gestión de Citas                   | 4 días            |
+| Fase 6    | Labworks y Expenses                | 2 días            |
+| Fase 7    | Estadísticas y Dashboard           | 2 días            |
+| Fase 8    | **Suscripciones y Pagos (Stripe)** | 3-4 días          |
+| Fase 9    | Settings del Tenant                | 1-2 días          |
+| Fase 10   | Backups                            | 1-2 días          |
+| Fase 11   | PDFs                               | 1 día             |
+| Fase 12   | i18n                               | 1-2 días          |
+| Fase 13   | **Landing Page y Marketing**       | 2 días            |
+| Fase 14   | Testing                            | 2-3 días          |
+| Fase 15   | Docs y Deploy                      | 2 días            |
+| **TOTAL** |                                    | **~32-40 días**   |
+
+---
+
+## Arquitectura de Seguridad Multi-Tenant
+
+### Principios de Aislamiento
+
+1. **Row-Level Security**: Todas las queries incluyen `WHERE tenant_id = ?`
+2. **Middleware de Tenant**: Extrae `tenantId` del JWT y lo inyecta en el contexto
+3. **Prisma Extension**: Automáticamente filtra por tenant en todas las operaciones
+4. **Validación de Límites**: Antes de crear recursos, se verifica el plan
+
+### Ejemplo de Prisma Extension para Tenant Isolation
+
+```typescript
+const prismaWithTenant = (tenantId: string) => {
+  return prisma.$extends({
+    query: {
+      $allModels: {
+        async findMany({ args, query }) {
+          args.where = { ...args.where, tenantId };
+          return query(args);
+        },
+        async create({ args, query }) {
+          args.data = { ...args.data, tenantId };
+          return query(args);
+        },
+        // ... otros métodos
+      },
+    },
+  });
+};
+```
+
+---
+
+## Notas Importantes
+
+1. **Migración de Datos:** Si hay datos existentes en PocketBase, se necesitará crear un script de migración. Cada dataset importado creará un nuevo tenant.
+
+2. **Funcionalidad Offline:** Para la versión web SaaS, el offline no es prioritario. Se puede considerar PWA con Service Workers en una fase futura.
+
+3. **Multi-Tenancy:** Se usa "shared database, shared schema" con row-level isolation por `tenant_id`. Es más económico y escalable para SaaS.
+
+4. **Stripe:** Se recomienda usar Stripe Checkout para pagos y Stripe Customer Portal para gestión de suscripciones. Minimiza el trabajo de desarrollo.
+
+5. **Subdominios vs Paths:** 
+   - Opción A: `clinica1.dental.app` (requiere wildcard SSL)
+   - Opción B: `app.dental.app/clinica1` (más simple)
+   - Recomendación: Empezar con Opción B, migrar a A si es necesario.
+
+6. **Rate Limiting:** Implementar rate limiting por tenant para evitar abuso del plan gratuito.
+
+7. **Audit Log:** Importante para compliance y debugging en entorno multi-tenant.
+
+---
+
+## Leyenda de Estado
+
+- [ ] Pendiente
+- [x] Completado
+- 🔄 En progreso
+- ⏸️ Pausado
+- ❌ Cancelado
 
 ---
 
 ## Mejoras Futuras / Backlog
+
+> Items identificados en PR reviews para implementar en futuros PRs
 
 ### De PR #14 (Super Admin Frontend)
 1. **Endpoint separado para login admin** - El login actual usa /auth/login y verifica rol en cliente. Crear endpoint /admin/auth/login que valide SUPER_ADMIN en servidor
@@ -46,18 +782,41 @@ Panel de administración para gestionar la plataforma SaaS a nivel global:
 7. **Renombrar variable data a tenantsData/usersData** - Nombres más descriptivos en componentes
 
 ### De PR #13 (Super Admin Backend)
-1. **Operaciones bulk más seguras** - Optimizar eliminación de tenants con muchos registros
-2. **Mejorar manejo de errores en cascada** - Capturar errores específicos de cada operación
-3. **Índices de base de datos** - Agregar índices en queries frecuentes
-4. **Logging de auditoría** - Registrar todas las acciones administrativas
-5. **Soft delete para tenants** - En lugar de borrar, marcar como eliminados
-6. **Exportar datos de tenant** - Funcionalidad de backup antes de eliminar
-7. **Dashboard con métricas en tiempo real** - WebSocket para actualizaciones live
-8. **Paginación del lado servidor** - Para listados grandes de usuarios/tenants
-9. **Filtros avanzados** - Por fecha de creación, tipo de plan, etc.
-10. **Tests E2E para panel admin** - Cubrir flujos críticos con Playwright
+8. **Operaciones bulk más seguras** - Optimizar eliminación de tenants con muchos registros
+9. **Mejorar manejo de errores en cascada** - Capturar errores específicos de cada operación
+10. **Índices de base de datos** - Agregar índices en queries frecuentes
 
-### Pendientes Generales
-- Agregar confirmación de email para super admin
-- Implementar 2FA para super admin
-- Agregar dark mode toggle en panel admin
+### 🧪 Testing (Alta Prioridad)
+11. **Tests unitarios para admin routes** - Tests para /api/admin/setup, /api/admin/tenants, /api/admin/users, rate limiting
+12. **Tests E2E para panel admin** - Cubrir flujos críticos con Playwright
+
+### 📧 Notificaciones
+13. **Email de bienvenida al crear tenant** - Notificar al owner cuando se crea su clínica, incluir credenciales o link de activación
+
+### 📝 Auditoría
+14. **Audit logging para acciones de superadmin** - Tabla AuditLog, registrar creación/modificación/eliminación de tenants y usuarios
+
+### 📄 Paginación
+15. **Paginación en endpoints de lista** - GET /api/admin/tenants y /api/admin/users con ?page=1&limit=20
+
+### ✅ Validación Adicional
+16. **Validación ISO 4217 para currency** - Validar códigos de moneda (USD, EUR, MXN, etc.)
+
+### 🔒 Seguridad
+17. **Rate limiting con Redis** - Actual: in-memory. Futuro: Redis para persistencia y escalabilidad
+18. **Confirmación de email para super admin**
+19. **2FA para super admin**
+
+### 📊 Optimización
+20. **Optimizar endpoint de stats** - Considerar vistas materializadas o caching
+21. **Dashboard con métricas en tiempo real** - WebSocket para actualizaciones live
+22. **Filtros avanzados** - Por fecha de creación, tipo de plan, etc.
+23. **Soft delete para tenants** - En lugar de borrar, marcar como eliminados
+24. **Exportar datos de tenant** - Funcionalidad de backup antes de eliminar
+
+### 🎨 UI/UX
+25. **Dark mode toggle en panel admin**
+
+---
+
+*Última actualización: 31 de Diciembre, 2025*
