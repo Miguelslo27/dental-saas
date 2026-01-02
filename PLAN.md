@@ -797,6 +797,684 @@ const prismaWithTenant = (tenantId: string) => {
 
 ---
 
+## 🧪 Estrategia de Testing por Fase
+
+### Convenciones Generales
+
+| Tipo de Test | Ubicación | Naming | Herramienta |
+|--------------|-----------|--------|-------------|
+| **Unitarios API** | `apps/api/src/**/*.test.ts` | `*.test.ts` | Vitest |
+| **Integración API** | `apps/api/src/**/*.integration.test.ts` | `*.integration.test.ts` | Vitest + Supertest |
+| **Unitarios Web** | `apps/web/src/**/*.test.tsx` | `*.test.tsx` | Vitest + React Testing Library |
+| **E2E** | `apps/web/e2e/*.spec.ts` | `*.spec.ts` | Playwright |
+
+### Comandos de Testing
+
+```bash
+# API
+pnpm --filter @dental/api test              # Todos los tests
+pnpm --filter @dental/api test:unit         # Solo unitarios
+pnpm --filter @dental/api test:integration  # Solo integración
+
+# Web
+pnpm --filter @dental/web test              # Unitarios
+pnpm --filter @dental/web test:e2e          # E2E con Playwright
+
+# Monorepo completo
+pnpm test                                   # Todos los tests de todos los packages
+```
+
+---
+
+### FASE 0: Configuración del Proyecto ✅
+
+#### Tests Unitarios
+- [ ] Configuración de Vitest funciona en api y web
+- [ ] Helper functions de respuesta API
+- [ ] Validación de esquemas Zod base
+
+#### Tests de Integración
+- [ ] Health check endpoint `/api/health` retorna 200
+- [ ] Conexión a PostgreSQL exitosa
+- [ ] Conexión a Redis exitosa
+
+#### Tests E2E
+- [ ] App React carga sin errores
+- [ ] Rutas base funcionan
+
+---
+
+### FASE 1: Core Multi-Tenant y Modelos Base ✅
+
+#### Tests Unitarios
+```
+apps/api/src/
+├── services/
+│   ├── prisma.service.test.ts       # Singleton, tenant isolation
+│   ├── redis.service.test.ts        # Conexión y operaciones básicas
+│   └── plan-limits.service.test.ts  # Verificación de límites
+├── middleware/
+│   ├── tenant.middleware.test.ts    # Extracción de tenant del JWT
+│   └── error-handler.test.ts        # Manejo de errores
+└── utils/
+    ├── api-response.test.ts         # Helpers de respuesta
+    └── validators.test.ts           # Esquemas Zod
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+├── patients.integration.test.ts
+│   ├── GET /api/patients - Lista pacientes del tenant
+│   ├── GET /api/patients - NO lista pacientes de otro tenant
+│   ├── POST /api/patients - Crea con tenantId correcto
+│   ├── PUT /api/patients/:id - Solo edita del mismo tenant
+│   └── DELETE /api/patients/:id - Solo elimina del mismo tenant
+├── doctors.integration.test.ts
+│   └── (misma estructura que patients)
+└── appointments.integration.test.ts
+    └── (misma estructura que patients)
+```
+
+#### Tests E2E
+- N/A (no hay UI para esta fase)
+
+---
+
+### FASE 2: Registro de Tenants y Autenticación
+
+#### Tests Unitarios
+```
+apps/api/src/
+├── services/
+│   ├── auth.service.test.ts
+│   │   ├── hashPassword() genera hash válido
+│   │   ├── verifyPassword() valida correctamente
+│   │   ├── generateAccessToken() genera JWT válido
+│   │   ├── generateRefreshToken() genera token de refresco
+│   │   └── verifyToken() valida y decodifica JWT
+│   └── email.service.test.ts
+│       ├── sendWelcomeEmail() llama a Resend con params correctos
+│       └── Maneja errores de Resend gracefully
+├── middleware/
+│   ├── auth.middleware.test.ts
+│   │   ├── Rechaza request sin token
+│   │   ├── Rechaza token expirado
+│   │   ├── Rechaza token inválido
+│   │   └── Añade user al request con token válido
+│   └── rbac.middleware.test.ts
+│       ├── requireRole() valida roles correctamente
+│       └── requirePermission() valida permisos
+└── routes/
+    └── auth.routes.test.ts
+        └── Validación de schemas (email, password strength)
+```
+
+```
+apps/web/src/
+├── stores/
+│   └── auth.store.test.ts
+│       ├── login() guarda tokens y user
+│       ├── logout() limpia estado
+│       └── isAuthenticated computed correcto
+├── hooks/
+│   └── useAuth.test.ts
+│       └── Retorna estado y métodos correctos
+└── components/
+    └── ProtectedRoute.test.tsx
+        ├── Redirige a login si no autenticado
+        └── Renderiza children si autenticado
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+├── auth.integration.test.ts
+│   ├── POST /api/auth/register
+│   │   ├── Crea tenant, user y subscription
+│   │   ├── Rechaza email duplicado
+│   │   ├── Rechaza slug duplicado
+│   │   └── Valida campos requeridos
+│   ├── POST /api/auth/login
+│   │   ├── Retorna tokens con credenciales válidas
+│   │   ├── Rechaza password incorrecto
+│   │   ├── Rechaza email no existente
+│   │   └── Incluye user info sin passwordHash
+│   ├── POST /api/auth/refresh-token
+│   │   ├── Genera nuevo access token
+│   │   ├── Rechaza refresh token inválido
+│   │   └── Rechaza refresh token expirado
+│   ├── GET /api/auth/me
+│   │   ├── Retorna user autenticado
+│   │   └── Rechaza sin autenticación
+│   └── POST /api/auth/forgot-password
+│       ├── Envía email si usuario existe
+│       └── No revela si email no existe (seguridad)
+└── admin.integration.test.ts
+    ├── POST /api/admin/setup
+    │   ├── Crea super admin con SETUP_KEY válido
+    │   ├── Rechaza SETUP_KEY inválido
+    │   └── Se auto-deshabilita después del primer uso
+    ├── GET /api/admin/tenants
+    │   ├── Solo accesible por SUPER_ADMIN
+    │   └── Lista todos los tenants
+    └── GET /api/admin/stats
+        └── Retorna estadísticas de plataforma
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+├── auth.spec.ts
+│   ├── Usuario puede registrar nueva clínica
+│   ├── Usuario puede hacer login
+│   ├── Usuario puede hacer logout
+│   ├── Muestra error con credenciales inválidas
+│   ├── Redirige a login en rutas protegidas
+│   └── Refresh token funciona automáticamente
+└── admin.spec.ts
+    ├── Super admin puede completar setup inicial
+    ├── Super admin puede hacer login
+    ├── Super admin ve dashboard con stats
+    ├── Super admin puede listar tenants
+    └── Super admin puede crear/editar/eliminar tenants
+```
+
+---
+
+### FASE 3: Gestión de Doctores
+
+#### Tests Unitarios
+```
+apps/api/src/
+├── services/
+│   └── doctor.service.test.ts
+│       ├── create() valida límites de plan
+│       ├── findAll() filtra por tenant
+│       └── delete() es soft delete
+└── middleware/
+    └── plan-limits.middleware.test.ts
+        └── Rechaza cuando se excede límite de doctores
+```
+
+```
+apps/web/src/
+├── stores/
+│   └── doctors.store.test.ts
+├── components/
+│   ├── DoctorCard.test.tsx
+│   ├── DoctorForm.test.tsx
+│   └── DoctorPicker.test.tsx
+└── pages/
+    └── DoctorsPage.test.tsx
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── doctors.integration.test.ts
+    ├── GET /api/doctors - Lista solo doctores del tenant
+    ├── POST /api/doctors - Respeta límite de plan
+    ├── POST /api/doctors - Rechaza al exceder límite
+    ├── PUT /api/doctors/:id - Solo edita del mismo tenant
+    ├── DELETE /api/doctors/:id - Soft delete
+    └── PUT /api/doctors/:id/restore - Restaura doctor
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── doctors.spec.ts
+    ├── Usuario puede ver lista de doctores
+    ├── Usuario puede crear doctor
+    ├── Usuario puede editar doctor
+    ├── Usuario puede eliminar doctor
+    ├── Muestra mensaje de upgrade al alcanzar límite
+    └── Búsqueda y filtros funcionan
+```
+
+---
+
+### FASE 4: Gestión de Pacientes
+
+#### Tests Unitarios
+```
+apps/api/src/
+├── services/
+│   └── patient.service.test.ts
+│       ├── create() valida límites de plan
+│       ├── findAll() soporta paginación
+│       └── updateTeethChart() guarda JSON válido
+```
+
+```
+apps/web/src/
+├── components/
+│   ├── PatientCard.test.tsx
+│   ├── PatientForm.test.tsx
+│   ├── DentalChart.test.tsx
+│   │   ├── Renderiza 32 dientes
+│   │   ├── Selección de diente funciona
+│   │   └── Guarda notas por diente
+│   └── PatientPicker.test.tsx
+└── pages/
+    └── PatientDetailPage.test.tsx
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── patients.integration.test.ts
+    ├── GET /api/patients - Paginación funciona
+    ├── GET /api/patients - Búsqueda por nombre
+    ├── POST /api/patients - Respeta límite de plan
+    ├── GET /api/patients/:id/appointments - Lista citas del paciente
+    └── PUT /api/patients/:id/teeth-chart - Guarda chart dental
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── patients.spec.ts
+    ├── Usuario puede ver lista de pacientes
+    ├── Usuario puede crear paciente
+    ├── Usuario puede ver detalle de paciente
+    ├── Usuario puede editar chart dental
+    ├── Paginación funciona correctamente
+    └── Muestra mensaje de upgrade al alcanzar límite
+```
+
+---
+
+### FASE 5: Gestión de Citas
+
+#### Tests Unitarios
+```
+apps/api/src/
+├── services/
+│   ├── appointment.service.test.ts
+│   │   ├── create() asocia doctores correctamente
+│   │   ├── markAsDone() actualiza estado
+│   │   └── getCalendarData() formatea para FullCalendar
+│   └── storage.service.test.ts
+│       ├── uploadImage() guarda en S3
+│       ├── deleteImage() elimina de S3
+│       └── getUsage() calcula storage usado
+```
+
+```
+apps/web/src/
+├── components/
+│   ├── Calendar.test.tsx
+│   │   ├── Renderiza FullCalendar
+│   │   ├── Vista mensual funciona
+│   │   ├── Vista semanal funciona
+│   │   └── Navegación entre fechas
+│   ├── AppointmentForm.test.tsx
+│   ├── AppointmentCard.test.tsx
+│   └── ImageGallery.test.tsx
+└── hooks/
+    └── useCalendar.test.ts
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+├── appointments.integration.test.ts
+│   ├── GET /api/appointments/calendar - Formato correcto
+│   ├── POST /api/appointments - Crea con múltiples doctores
+│   ├── PUT /api/appointments/:id/mark-done - Actualiza estado
+│   └── GET /api/appointments/by-doctor/:id - Filtra por doctor
+└── appointment-images.integration.test.ts
+    ├── POST /api/appointments/:id/images - Upload funciona
+    ├── POST /api/appointments/:id/images - Rechaza al exceder storage
+    ├── DELETE /api/appointments/:id/images/:imageId - Elimina imagen
+    └── GET /api/storage/usage - Retorna uso correcto
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── appointments.spec.ts
+    ├── Usuario puede ver calendario
+    ├── Usuario puede crear cita desde calendario
+    ├── Usuario puede ver detalle de cita
+    ├── Usuario puede subir imágenes
+    ├── Usuario puede marcar cita como completada
+    └── Filtro por doctor funciona
+```
+
+---
+
+### FASE 6: Labworks y Expenses
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+├── labwork.service.test.ts
+│   └── getStats() calcula totales correctamente
+└── expense.service.test.ts
+    └── getByCategory() agrupa por categoría
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+├── labworks.integration.test.ts
+│   ├── CRUD básico funciona
+│   └── Filtro por estado de pago
+└── expenses.integration.test.ts
+    ├── CRUD básico funciona
+    └── Filtro por tags
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── labworks-expenses.spec.ts
+    ├── Usuario puede gestionar labworks
+    └── Usuario puede gestionar gastos
+```
+
+---
+
+### FASE 7: Estadísticas y Dashboard
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+└── stats.service.test.ts
+    ├── getOverview() calcula métricas
+    ├── getRevenue() agrupa por período
+    └── Respeta restricciones de plan
+```
+
+```
+apps/web/src/components/
+├── StatCard.test.tsx
+├── RevenueChart.test.tsx
+└── UpcomingAppointments.test.tsx
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── stats.integration.test.ts
+    ├── GET /api/stats/overview - Retorna métricas
+    ├── GET /api/stats/revenue - Datos de ingresos
+    └── Bloquea reportes avanzados en plan gratuito
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── dashboard.spec.ts
+    ├── Dashboard carga con datos
+    ├── Gráficos se renderizan
+    └── CTA de upgrade visible en plan gratuito
+```
+
+---
+
+### FASE 8: Suscripciones y Pagos (Stripe)
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+├── stripe.service.test.ts
+│   ├── createCheckoutSession() genera URL válida
+│   ├── createPortalSession() genera URL válida
+│   └── constructEvent() valida webhook signature
+└── plan-limits.service.test.ts
+    ├── canAddDoctor() verifica límites
+    ├── canAddPatient() verifica límites
+    └── getCurrentUsage() retorna uso actual
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── billing.integration.test.ts
+    ├── POST /api/billing/create-checkout-session
+    │   └── Genera sesión de Stripe (mock)
+    ├── POST /api/billing/webhook
+    │   ├── subscription.created actualiza DB
+    │   ├── subscription.updated cambia plan
+    │   ├── subscription.deleted cancela suscripción
+    │   └── Rechaza signature inválida
+    └── GET /api/billing/subscription
+        └── Retorna suscripción actual
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── billing.spec.ts
+    ├── Usuario ve plan actual
+    ├── Usuario puede iniciar upgrade (redirect a Stripe)
+    ├── Usuario ve historial de facturas
+    └── Banner de advertencia aparece al acercarse a límites
+```
+
+**Nota:** Para E2E de Stripe, usar Stripe CLI en modo test o mocks.
+
+---
+
+### FASE 9: Settings del Tenant
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+└── settings.service.test.ts
+    └── getDefaults() retorna valores por defecto
+```
+
+```
+apps/web/src/pages/
+└── SettingsPage.test.tsx
+    └── Formularios de configuración
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── settings.integration.test.ts
+    ├── GET /api/settings - Retorna config del tenant
+    ├── PUT /api/settings - Actualiza config
+    └── PUT /api/tenant/profile - Actualiza perfil
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── settings.spec.ts
+    ├── Usuario puede cambiar moneda
+    ├── Usuario puede cambiar idioma
+    └── Usuario puede actualizar perfil de clínica
+```
+
+---
+
+### FASE 10: Backups
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+└── backup.service.test.ts
+    ├── createBackup() genera archivo JSON
+    ├── restoreBackup() importa datos
+    └── Respeta restricciones de plan
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── backups.integration.test.ts
+    ├── POST /api/backups/create - Crea backup
+    ├── GET /api/backups/:id/download - Descarga backup
+    ├── POST /api/backups/:id/restore - Restaura
+    └── Plan gratuito: solo manual
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── backups.spec.ts
+    ├── Usuario puede crear backup manual
+    ├── Usuario puede descargar backup
+    └── Plan Enterprise ve backups automáticos
+```
+
+---
+
+### FASE 11: PDFs
+
+#### Tests Unitarios
+```
+apps/api/src/services/
+└── pdf.service.test.ts
+    ├── generatePrescription() genera PDF válido
+    └── Incluye branding del tenant
+```
+
+#### Tests de Integración
+```
+apps/api/src/routes/
+└── prescriptions.integration.test.ts
+    └── GET /api/prescriptions/:id/pdf - Retorna PDF
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── prescriptions.spec.ts
+    └── Usuario puede descargar prescripción PDF
+```
+
+---
+
+### FASE 12: i18n
+
+#### Tests Unitarios
+```
+apps/web/src/
+├── i18n/
+│   └── i18n.test.ts
+│       ├── Carga traducciones correctamente
+│       └── Fallback a inglés funciona
+└── components/
+    └── LanguageSelector.test.tsx
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── i18n.spec.ts
+    ├── Cambia idioma a español
+    ├── Cambia idioma a árabe (RTL)
+    └── Preferencia persiste en localStorage
+```
+
+---
+
+### FASE 13: Landing Page
+
+#### Tests Unitarios
+```
+apps/web/src/components/landing/
+├── Hero.test.tsx
+├── PricingTable.test.tsx
+└── FAQ.test.tsx
+```
+
+#### Tests E2E
+```
+apps/web/e2e/
+└── landing.spec.ts
+    ├── Landing page carga correctamente
+    ├── Pricing muestra 3 planes
+    ├── CTA de registro funciona
+    └── Links legales funcionan
+```
+
+---
+
+### Matriz de Cobertura Objetivo
+
+| Fase | Unitarios | Integración | E2E | Cobertura Objetivo |
+|------|-----------|-------------|-----|-------------------|
+| 0 - Setup | 5 | 3 | 2 | 80% |
+| 1 - Multi-Tenant | 15 | 12 | - | 85% |
+| 2 - Auth | 25 | 20 | 10 | 90% |
+| 3 - Doctores | 10 | 6 | 6 | 85% |
+| 4 - Pacientes | 15 | 8 | 8 | 85% |
+| 5 - Citas | 20 | 12 | 10 | 85% |
+| 6 - Labworks | 8 | 6 | 4 | 80% |
+| 7 - Dashboard | 10 | 5 | 4 | 80% |
+| 8 - Stripe | 15 | 10 | 5 | 85% |
+| 9 - Settings | 5 | 4 | 4 | 80% |
+| 10 - Backups | 8 | 5 | 3 | 80% |
+| 11 - PDFs | 3 | 2 | 1 | 75% |
+| 12 - i18n | 5 | - | 3 | 80% |
+| 13 - Landing | 5 | - | 4 | 75% |
+
+### CI/CD Pipeline
+
+```yaml
+# .github/workflows/test.yml
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: dental_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d dental_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/dental_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-for-ci
+      JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-ci
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      
+      - run: pnpm install
+      - run: pnpm db:generate
+      - run: pnpm db:migrate:deploy
+      - run: pnpm test
+      - run: pnpm test:e2e
+
+      - uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+```
+
+---
+
 ## Notas Importantes
 
 1. **Migración de Datos:** Si hay datos existentes en PocketBase, se necesitará crear un script de migración. Cada dataset importado creará un nuevo tenant.
