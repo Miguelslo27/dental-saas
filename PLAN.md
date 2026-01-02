@@ -144,6 +144,23 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Error feedback al usuario (sin console.error)
 - ✅ Backdrop para cerrar dropdowns
 
+### PR #15: Fix tsconfig baseUrl deprecation ✅
+- ✅ Eliminado `baseUrl` de tsconfig (apps/api, apps/web, packages/shared)
+- ✅ Actualizado `paths` para usar rutas relativas desde el directorio del tsconfig
+
+### PR #16: Add missing lucide-react dependency ✅
+- ✅ Añadida dependencia `lucide-react` faltante en apps/web
+- ✅ Corregido error de Vite "Failed to resolve import lucide-react"
+
+### PR #17: Coolify Deployment Guide ✅
+- ✅ Documentación completa para deployment en Coolify (`docs/COOLIFY-DEPLOYMENT.md`)
+- ✅ Dockerfiles multi-stage para API y Web
+- ✅ Docker Compose de producción
+- ✅ Configuración Nginx con headers de seguridad (CSP, Referrer-Policy, Permissions-Policy)
+- ✅ Variables de entorno y generación de secrets
+- ✅ Guía paso a paso para configurar servicios en Coolify
+- ✅ Sección de troubleshooting
+
 ---
 
 ## Notas Técnicas: Super Admin
@@ -274,12 +291,55 @@ SETUP_KEY="tu-clave-secreta-de-16-caracteres-minimo"
 **Estado:** Backend Auth completado (PRs #9-12), Super Admin completado (PRs #13-14)
 
 ### Tarea 2.1: Backend - Registro de Tenants (Onboarding) ⏳
-- [ ] 2.1.1: Crear endpoint POST /api/tenants/register
-- [ ] 2.1.2: Crear servicio de generación de slug único para tenant
-- [ ] 2.1.3: Crear endpoint GET /api/tenants/check-slug/:slug
-- [ ] 2.1.4: Crear email de bienvenida con React Email
-- [ ] 2.1.5: Configurar BullMQ para envío de emails asíncrono
-- [ ] 2.1.6: Crear job de envío de email de bienvenida
+**Nota:** El endpoint `/api/auth/register` ya existe y crea tenants automáticamente. Esta tarea se enfoca en mejorarlo y añadir emails.
+
+#### Dependencias a instalar:
+```bash
+pnpm add resend @react-email/components
+```
+
+#### Archivos a crear/modificar:
+- `src/services/email.service.ts` - Cliente Resend + funciones de envío
+- `src/emails/WelcomeEmail.tsx` - Template React Email de bienvenida
+- `src/emails/index.ts` - Barrel export de templates
+- `src/routes/tenants.ts` - Nuevo router para gestión de tenants
+- `.env` - Añadir `RESEND_API_KEY` y `EMAIL_FROM`
+
+#### Subtareas:
+- [ ] 2.1.1: Instalar dependencias (resend, @react-email/components)
+- [ ] 2.1.2: Crear servicio de email (`src/services/email.service.ts`)
+  - Inicializar cliente Resend con API key desde env
+  - Función `sendWelcomeEmail(to, firstName, clinicName, loginUrl)`
+  - Manejo de errores y logging
+- [ ] 2.1.3: Crear template de bienvenida (`src/emails/WelcomeEmail.tsx`)
+  - Usar componentes de @react-email/components (Html, Container, Text, Button, etc.)
+  - Props: firstName, clinicName, loginUrl
+  - Diseño profesional con logo y branding
+- [ ] 2.1.4: Crear endpoint GET /api/tenants/check-slug/:slug
+  - Verificar disponibilidad de slug
+  - Retornar { available: boolean, suggestions?: string[] }
+- [ ] 2.1.5: Modificar POST /api/auth/register para enviar email de bienvenida
+  - Llamar a `sendWelcomeEmail()` después de crear usuario (async, no bloquea respuesta)
+  - Log de error si falla el envío (no afecta registro)
+- [ ] 2.1.6: Añadir variables de entorno
+  - `RESEND_API_KEY` - API key de Resend
+  - `EMAIL_FROM` - Dirección de envío (ej: "Dental SaaS <noreply@tudominio.com>")
+
+#### Notas técnicas - Resend:
+- SDK: `npm install resend`
+- Uso básico:
+  ```typescript
+  import { Resend } from 'resend';
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: 'Dental <noreply@dental.com>',
+    to: ['user@email.com'],
+    subject: 'Welcome!',
+    react: WelcomeEmail({ firstName: 'John' }), // o html: '<p>...</p>'
+  });
+  ```
+- Para desarrollo: usar `onboarding@resend.dev` como from (no requiere dominio verificado)
+- React Email se renderiza a HTML automáticamente por Resend
 
 ### Tarea 2.2: Backend - Autenticación ✅ (PR #9)
 - [x] 2.2.1: Instalar bcrypt y jsonwebtoken
