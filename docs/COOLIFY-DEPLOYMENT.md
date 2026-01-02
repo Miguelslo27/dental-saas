@@ -107,6 +107,8 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    # NOTA DE SEGURIDAD: La password será visible en `docker inspect`.
+    # Para producción de alto riesgo, considerar usar Redis ACL o secrets de Docker.
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
     volumes:
       - redis_data:/data
@@ -291,8 +293,11 @@ COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 
 # Install production dependencies only
+# NOTA: En monorepos pnpm, --prod puede fallar al resolver dependencias internas.
+# Si hay errores de módulos faltantes, usar: pnpm install --frozen-lockfile (sin --prod)
 RUN pnpm install --prod --frozen-lockfile
 
 # Create non-root user
@@ -387,7 +392,11 @@ server {
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
+    # Content-Security-Policy - Ajustar según las necesidades del frontend
+    # (puede requerir 'unsafe-inline' para algunos frameworks CSS-in-JS)
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self';" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 
     # Cache static assets
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
@@ -444,7 +453,7 @@ git push origin main
    - Version: `16-alpine`
    - Database: `dental_saas`
    - Username: `dental`
-   - Password: (generar)
+   - Password: `<GENERATE>`
 3. **Deploy**
 4. Copiar la **connection string interna**
 
@@ -453,7 +462,7 @@ git push origin main
 2. Configurar:
    - Name: `dental-redis`
    - Version: `7-alpine`
-   - Password: (generar)
+   - Password: `<GENERATE>`
 3. **Deploy**
 4. Copiar la **connection string interna**
 
