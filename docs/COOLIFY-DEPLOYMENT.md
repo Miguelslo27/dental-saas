@@ -144,11 +144,11 @@ openssl rand -hex 16
 ```bash
 POSTGRES_DB=dental_saas
 POSTGRES_USER=dental
-POSTGRES_PASSWORD=K8x2mNp9QrStUvWxYz3B5C7D9F2H4J6L
-REDIS_PASSWORD=M3nP5qR7sT9uV2wX4yZ6a8B0c2D4e6F8
-JWT_SECRET=aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5s
-JWT_REFRESH_SECRET=T7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9k
-SETUP_KEY=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD_HERE
+REDIS_PASSWORD=YOUR_REDIS_PASSWORD_HERE
+JWT_SECRET=<REPLACE_WITH_STRONG_JWT_SECRET>
+JWT_REFRESH_SECRET=<REPLACE_WITH_STRONG_JWT_REFRESH_SECRET>
+SETUP_KEY=<REPLACE_WITH_SETUP_KEY>
 CORS_ORIGIN=https://dental.example.com
 VITE_API_URL=https://api.dental.example.com
 ```
@@ -176,6 +176,8 @@ After deployment, configure domains for each service:
    - Add domain with correct port
    - Enable **SSL** (auto Let's Encrypt)
    - Enable **Force HTTPS**
+
+> **Note:** Make sure your DNS A records (see next section) have fully propagated and that SSL certificates are successfully issued before enabling **Force HTTPS**. Enabling Force HTTPS too early can cause users to see certificate or connection errors if they visit the site before certificate provisioning is complete.
 
 ### DNS Configuration
 
@@ -364,9 +366,8 @@ curl -I https://your-domain.com
 # SSH into Coolify server
 docker exec -it <api-container-name> sh
 
-# Run migrations manually
-cd /app/packages/database
-./node_modules/.bin/prisma migrate deploy
+# Run migrations manually (from container shell)
+cd /app/packages/database && npx prisma migrate deploy
 ```
 
 ### View Container Logs
@@ -411,7 +412,7 @@ docker logs <container-name> --tail 100 -f
 |--------|-------------|------------|
 | Compose file | `docker-compose.dev.yml` | `docker-compose.yml` |
 | Ports exposed | Yes (5432, 6379) | No (internal only) |
-| Default creds | Yes (`dentalpassword`) | No (env vars required) |
+| Default creds | Yes (`dentalpassword`) | No (must be provided) |
 | Container names | Yes (`dental-postgres`) | No (Coolify manages) |
 
 ---
