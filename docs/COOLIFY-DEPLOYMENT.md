@@ -81,27 +81,14 @@ SSH access to your Coolify server allows you to:
 - Delete volumes manually when needed
 - Run maintenance commands
 
-### 1. Generate SSH Key in Coolify
-
-<!-- TODO: Document the exact steps to generate a key in Coolify UI -->
-<!-- 
-Steps:
-1. Go to Coolify → Security → Private Keys
-2. Click "Add New Private Key"
-3. Generate or paste your key
-4. Copy the private key content
--->
-
-> **Note:** Document the key generation process in Coolify UI here.
-
-### 2. Generate an API Token in Coolify
+### 1. Generate an API Token in Coolify
 
 1. Go to **Coolify → Settings → API Keys**
 2. Click **"Create New API Token"**
 3. Give it a descriptive name (e.g., "local-dev")
 4. Copy the generated token (it will only be shown once)
 
-### 3. Save the Private Key Locally
+### 2. Save the Private Key Locally
 
 ```bash
 # Create directory for Coolify SSH keys
@@ -120,7 +107,7 @@ ssh-keygen -l -f ~/.ssh/coolify/id_rsa
 # 256 SHA256:xxxxx... phpseclib-generated-key (ED25519)
 ```
 
-### 4. Configure Environment Variables
+### 3. Configure Environment Variables
 
 Add these to your `~/.zshrc` or `~/.bashrc`:
 
@@ -173,12 +160,12 @@ docker stats
 
 ### Troubleshooting SSH
 
-| Issue | Solution |
-|-------|----------|
+| Issue                                    | Solution                                                                                                                               |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key |
-| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa` |
-| `Connection refused` | Check the server IP and that port 22 is open |
-| `Host key verification failed` | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts` |
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa`                                                                                                  |
+| `Connection refused`                     | Check the server IP and that port 22 is open                                                                                           |
+| `Host key verification failed`           | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts`                                                                              |
 
 ---
 
