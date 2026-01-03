@@ -36,8 +36,8 @@ dental-saas/
 # Instalar dependencias
 pnpm install
 
-# Iniciar servicios (PostgreSQL + Redis) - usa docker-compose.dev.yml
-docker compose -f docker-compose.dev.yml up -d
+# Iniciar servicios (MySQL + Redis)
+docker compose up -d
 
 # Ejecutar migraciones
 pnpm --filter @dental/database db:migrate
