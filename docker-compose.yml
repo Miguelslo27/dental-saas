@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-dental_preview}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-preview_password_not_for_production}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_v2:/var/lib/postgresql/data
     networks:
       - dental-network
     healthcheck:
@@ -99,5 +99,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  postgres_data_v2:
   redis_data:
