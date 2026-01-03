@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router'
 import { adminUsersApi, type AdminUser, type UsersListResponse } from '@/lib/admin-api'
 import {
-  Users,
   Search,
   ChevronLeft,
   ChevronRight,

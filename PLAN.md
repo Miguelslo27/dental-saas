@@ -161,6 +161,20 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Guía paso a paso para configurar servicios en Coolify
 - ✅ Sección de troubleshooting
 
+### PR #18: Testing Strategy ✅
+- ✅ Estrategia de testing completa para las 14 fases del proyecto
+- ✅ Convenciones de naming y ubicación de tests
+- ✅ Matriz de cobertura objetivo por fase
+- ✅ Configuración CI/CD Pipeline para GitHub Actions
+
+### PR #19: Coolify Production Files 🔄 (En progreso)
+- ✅ `docker-compose.prod.yml` creado
+- ✅ `apps/api/Dockerfile` con multi-stage build
+- ✅ `apps/web/Dockerfile` con nginx
+- ✅ `apps/web/nginx.conf` con headers de seguridad
+- [ ] Validar build local con Docker
+- [ ] Crear PR y mergear
+
 ---
 
 ## Notas Técnicas: Super Admin
