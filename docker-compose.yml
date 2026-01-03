@@ -1,4 +1,4 @@
-# docker-compose.prod.yml
+# docker-compose.yml - default production configuration for Coolify
 services:
   postgres:
     image: postgres:16-alpine
@@ -17,6 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -30,6 +31,8 @@ services:
         "${REDIS_PASSWORD}",
         "--appendonly",
         "yes",
+        "--appendfsync",
+        "everysec",
       ]
     environment:
       # Use REDISCLI_AUTH to avoid exposing password in command line arguments
