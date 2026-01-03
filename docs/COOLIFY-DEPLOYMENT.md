@@ -94,7 +94,14 @@ Steps:
 
 > **Note:** Document the key generation process in Coolify UI here.
 
-### 2. Save the Private Key Locally
+### 2. Generate an API Token in Coolify
+
+1. Go to **Coolify → Settings → API Keys**
+2. Click **"Create New API Token"**
+3. Give it a descriptive name (e.g., "local-dev")
+4. Copy the generated token (it will only be shown once)
+
+### 3. Save the Private Key Locally
 
 ```bash
 # Create directory for Coolify SSH keys
@@ -113,7 +120,7 @@ ssh-keygen -l -f ~/.ssh/coolify/id_rsa
 # 256 SHA256:xxxxx... phpseclib-generated-key (ED25519)
 ```
 
-### 3. Configure Environment Variables
+### 4. Configure Environment Variables
 
 Add these to your `~/.zshrc` or `~/.bashrc`:
 
@@ -125,6 +132,7 @@ export COOLIFY_API_URL="https://your-coolify-domain.com/api/v1"
 # Coolify SSH Configuration
 export COOLIFY_SSH_USER="root"
 export COOLIFY_SSH_HOST="your-server-ip"  # e.g., 72.60.6.218
+# Optional: only needed if not using the default SSH agent
 export COOLIFY_SSH_KEY_PATH="$HOME/.ssh/coolify/id_rsa"
 ```
 
