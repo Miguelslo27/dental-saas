@@ -1,57 +1,91 @@
+# docker-compose.prod.yml
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: dental-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-dental_saas}
-      POSTGRES_USER: ${POSTGRES_USER:-dental}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dentalpassword}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - dental-network
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-dental} -d ${POSTGRES_DB:-dental_saas}",
-        ]
+      # NOTE: Ensure POSTGRES_USER and POSTGRES_DB are set in your .env file
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
 
   redis:
     image: redis:7-alpine
-    container_name: dental-redis
     restart: unless-stopped
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-redispassword}
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - dental-network
+    # SECURITY NOTE: The password will be visible in `docker inspect`.
+    # For high-risk production environments, consider using Redis ACLs or Docker secrets.
     command:
       [
         "redis-server",
         "--requirepass",
-        "${REDIS_PASSWORD:-redispassword}",
+        "${REDIS_PASSWORD}",
         "--appendonly",
         "yes",
-        "--appendfsync",
-        "everysec",
       ]
+    environment:
+      # Use REDISCLI_AUTH to avoid exposing password in command line arguments
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - dental-network
     healthcheck:
-      test:
-        ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispassword}", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # CORS_ORIGIN must match the public URL of the frontend in production.
+      # Expected format: "https://example.com" (no trailing slash).
+      # Do NOT use localhost values (e.g. http://localhost:3000) in production.
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      SETUP_KEY: ${SETUP_KEY}
+    # NOTE: Port 3000 is exposed for direct API access.
+    # In production with a reverse proxy, you may remove this and use internal network only.
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - dental-network
+
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+    depends_on:
+      - api
+    networks:
+      - dental-network
 
 networks:
   dental-network:
