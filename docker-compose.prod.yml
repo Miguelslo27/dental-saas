@@ -12,6 +12,7 @@ services:
     networks:
       - dental-network
     healthcheck:
+      # NOTE: Ensure POSTGRES_USER and POSTGRES_DB are set in your .env file
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
@@ -20,15 +21,25 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    # NOTA DE SEGURIDAD: La password será visible en `docker inspect`.
-    # Para producción de alto riesgo, considerar usar Redis ACL o secrets de Docker.
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
+    # SECURITY NOTE: The password will be visible in `docker inspect`.
+    # For high-risk production environments, consider using Redis ACLs or Docker secrets.
+    command:
+      [
+        "redis-server",
+        "--requirepass",
+        "${REDIS_PASSWORD}",
+        "--appendonly",
+        "yes",
+      ]
+    environment:
+      # Use REDISCLI_AUTH to avoid exposing password in command line arguments
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     networks:
       - dental-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,10 +54,15 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # CORS_ORIGIN must match the public URL of the frontend in production.
+      # Expected format: "https://example.com" (no trailing slash).
+      # Do NOT use localhost values (e.g. http://localhost:3000) in production.
       CORS_ORIGIN: ${CORS_ORIGIN}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       SETUP_KEY: ${SETUP_KEY}
+    # NOTE: Port 3000 is exposed for direct API access.
+    # In production with a reverse proxy, you may remove this and use internal network only.
     ports:
       - "3000:3000"
     depends_on:
@@ -65,7 +81,7 @@ services:
         VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:8080"
     depends_on:
       - api
     networks:

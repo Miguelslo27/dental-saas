@@ -23,8 +23,9 @@ COPY --from=deps /app/packages/database/node_modules ./packages/database/node_mo
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client (DATABASE_URL is required by prisma.config.ts but not used for generate)
 WORKDIR /app/packages/database
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN pnpm db:generate
 
 # Build shared package
@@ -57,8 +58,8 @@ COPY --from=builder /app/pnpm-workspace.yaml ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
 # Install production dependencies only
-# NOTA: En monorepos pnpm, --prod puede fallar al resolver dependencias internas.
-# Si hay errores de módulos faltantes, usar: pnpm install --frozen-lockfile (sin --prod)
+# NOTE: In pnpm monorepos, --prod can fail to resolve internal dependencies.
+# If you see missing module errors, use: pnpm install --frozen-lockfile (without --prod)
 RUN pnpm install --prod --frozen-lockfile
 
 # Create non-root user
@@ -69,5 +70,5 @@ USER api
 WORKDIR /app/apps/api
 EXPOSE 3000
 
-# Run migrations and start
-CMD ["sh", "-c", "cd /app/packages/database && npx prisma migrate deploy && cd /app/apps/api && node dist/index.js"]
+# Run migrations and start (using local prisma binary, with error handling)
+CMD ["sh", "-c", "set -e; cd /app/packages/database; ./node_modules/.bin/prisma migrate deploy; cd /app/apps/api; exec node dist/index.js"]
