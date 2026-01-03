@@ -81,18 +81,12 @@ SSH access to your Coolify server allows you to:
 - Delete volumes manually when needed
 - Run maintenance commands
 
-### 1. Generate SSH Key in Coolify
+### 1. Generate an API Token in Coolify
 
-<!-- TODO: Document the exact steps to generate a key in Coolify UI -->
-<!-- 
-Steps:
-1. Go to Coolify → Security → Private Keys
-2. Click "Add New Private Key"
-3. Generate or paste your key
-4. Copy the private key content
--->
-
-> **Note:** Document the key generation process in Coolify UI here.
+1. Go to **Coolify → Settings → API Keys**
+2. Click **"Create New API Token"**
+3. Give it a descriptive name (e.g., "local-dev")
+4. Copy the generated token (it will only be shown once)
 
 ### 2. Save the Private Key Locally
 
@@ -125,6 +119,7 @@ export COOLIFY_API_URL="https://your-coolify-domain.com/api/v1"
 # Coolify SSH Configuration
 export COOLIFY_SSH_USER="root"
 export COOLIFY_SSH_HOST="your-server-ip"  # e.g., 72.60.6.218
+# Optional: only needed if not using the default SSH agent
 export COOLIFY_SSH_KEY_PATH="$HOME/.ssh/coolify/id_rsa"
 ```
 
@@ -165,12 +160,12 @@ docker stats
 
 ### Troubleshooting SSH
 
-| Issue | Solution |
-|-------|----------|
+| Issue                                    | Solution                                                                                                                               |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key |
-| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa` |
-| `Connection refused` | Check the server IP and that port 22 is open |
-| `Host key verification failed` | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts` |
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa`                                                                                                  |
+| `Connection refused`                     | Check the server IP and that port 22 is open                                                                                           |
+| `Host key verification failed`           | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts`                                                                              |
 
 ---
 
