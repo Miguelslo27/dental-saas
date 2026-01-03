@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router'
 import { adminUsersApi, type AdminUser, type UsersListResponse } from '@/lib/admin-api'
 import {
-  Users,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -278,11 +277,11 @@ export function AdminUsersPage() {
                       <td className="px-6 py-4 text-gray-500">
                         {user.lastLoginAt
                           ? new Date(user.lastLoginAt).toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
                           : 'Nunca'}
                       </td>
                       <td className="px-6 py-4">
@@ -298,7 +297,7 @@ export function AdminUsersPage() {
                               <MoreVertical className="h-4 w-4 text-gray-400" />
                             )}
                           </button>
-                          
+
                           {openMenu === user.id && user.role !== 'SUPER_ADMIN' && (
                             <>
                               <div
@@ -416,11 +415,10 @@ export function AdminUsersPage() {
                   setPasswordError(null)
                 }}
                 placeholder="Nueva contraseña (mín. 8 caracteres)"
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  newPassword.length > 0 && newPassword.length < 8
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${newPassword.length > 0 && newPassword.length < 8
                     ? 'border-red-300'
                     : 'border-gray-200'
-                }`}
+                  }`}
                 autoFocus
               />
               {newPassword.length > 0 && newPassword.length < 8 && (

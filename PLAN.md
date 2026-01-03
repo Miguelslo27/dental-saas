@@ -161,6 +161,21 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Guía paso a paso para configurar servicios en Coolify
 - ✅ Sección de troubleshooting
 
+### PR #18: Testing Strategy ✅
+- ✅ Estrategia de testing completa para las 14 fases del proyecto
+- ✅ Convenciones de naming y ubicación de tests
+- ✅ Matriz de cobertura objetivo por fase
+- ✅ Configuración CI/CD Pipeline para GitHub Actions
+
+### PR #19: Coolify Production Files ✅
+- ✅ `docker-compose.prod.yml` creado
+- ✅ `apps/api/Dockerfile` con multi-stage build
+- ✅ `apps/web/Dockerfile` con nginx
+- ✅ `apps/web/nginx.conf` con headers de seguridad
+- ✅ Build local validado (API y Web)
+- ✅ Fix import no usado en AdminUsersPage.tsx
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/19
+
 ---
 
 ## Notas Técnicas: Super Admin
@@ -744,9 +759,9 @@ pnpm add resend @react-email/components
 
 | Fase      | Descripción                        | Duración Estimada |
 | --------- | ---------------------------------- | ----------------- |
-| Fase 0    | Configuración del Proyecto         | ✅ Completada     |
-| Fase 1    | Core Multi-Tenant y Modelos        | ✅ Completada     |
-| Fase 2    | Registro de Tenants y Auth         | 🔄 En progreso    |
+| Fase 0    | Configuración del Proyecto         | ✅ Completada      |
+| Fase 1    | Core Multi-Tenant y Modelos        | ✅ Completada      |
+| Fase 2    | Registro de Tenants y Auth         | 🔄 En progreso     |
 | Fase 3    | Gestión de Doctores                | 2 días            |
 | Fase 4    | Gestión de Pacientes               | 3 días            |
 | Fase 5    | Gestión de Citas                   | 4 días            |
@@ -801,12 +816,12 @@ const prismaWithTenant = (tenantId: string) => {
 
 ### Convenciones Generales
 
-| Tipo de Test | Ubicación | Naming | Herramienta |
-|--------------|-----------|--------|-------------|
-| **Unitarios API** | `apps/api/src/**/*.test.ts` | `*.test.ts` | Vitest |
-| **Integración API** | `apps/api/src/**/*.integration.test.ts` | `*.integration.test.ts` | Vitest + Supertest |
-| **Unitarios Web** | `apps/web/src/**/*.test.tsx` | `*.test.tsx` | Vitest + React Testing Library |
-| **E2E** | `apps/web/e2e/*.spec.ts` | `*.spec.ts` | Playwright |
+| Tipo de Test        | Ubicación                               | Naming                  | Herramienta                    |
+| ------------------- | --------------------------------------- | ----------------------- | ------------------------------ |
+| **Unitarios API**   | `apps/api/src/**/*.test.ts`             | `*.test.ts`             | Vitest                         |
+| **Integración API** | `apps/api/src/**/*.integration.test.ts` | `*.integration.test.ts` | Vitest + Supertest             |
+| **Unitarios Web**   | `apps/web/src/**/*.test.tsx`            | `*.test.tsx`            | Vitest + React Testing Library |
+| **E2E**             | `apps/web/e2e/*.spec.ts`                | `*.spec.ts`             | Playwright                     |
 
 ### Comandos de Testing
 
@@ -1401,22 +1416,22 @@ apps/web/e2e/
 
 ### Matriz de Cobertura Objetivo
 
-| Fase | Unitarios | Integración | E2E | Cobertura Objetivo |
-|------|-----------|-------------|-----|-------------------|
-| 0 - Setup | 5 | 3 | 2 | 80% |
-| 1 - Multi-Tenant | 15 | 12 | - | 85% |
-| 2 - Auth | 25 | 20 | 10 | 90% |
-| 3 - Doctores | 10 | 6 | 6 | 85% |
-| 4 - Pacientes | 15 | 8 | 8 | 85% |
-| 5 - Citas | 20 | 12 | 10 | 85% |
-| 6 - Labworks | 8 | 6 | 4 | 80% |
-| 7 - Dashboard | 10 | 5 | 4 | 80% |
-| 8 - Stripe | 15 | 10 | 5 | 85% |
-| 9 - Settings | 5 | 4 | 4 | 80% |
-| 10 - Backups | 8 | 5 | 3 | 80% |
-| 11 - PDFs | 3 | 2 | 1 | 75% |
-| 12 - i18n | 5 | - | 3 | 80% |
-| 13 - Landing | 5 | - | 4 | 75% |
+| Fase             | Unitarios | Integración | E2E | Cobertura Objetivo |
+| ---------------- | --------- | ----------- | --- | ------------------ |
+| 0 - Setup        | 5         | 3           | 2   | 80%                |
+| 1 - Multi-Tenant | 15        | 12          | -   | 85%                |
+| 2 - Auth         | 25        | 20          | 10  | 90%                |
+| 3 - Doctores     | 10        | 6           | 6   | 85%                |
+| 4 - Pacientes    | 15        | 8           | 8   | 85%                |
+| 5 - Citas        | 20        | 12          | 10  | 85%                |
+| 6 - Labworks     | 8         | 6           | 4   | 80%                |
+| 7 - Dashboard    | 10        | 5           | 4   | 80%                |
+| 8 - Stripe       | 15        | 10          | 5   | 85%                |
+| 9 - Settings     | 5         | 4           | 4   | 80%                |
+| 10 - Backups     | 8         | 5           | 3   | 80%                |
+| 11 - PDFs        | 3         | 2           | 1   | 75%                |
+| 12 - i18n        | 5         | -           | 3   | 80%                |
+| 13 - Landing     | 5         | -           | 4   | 75%                |
 
 ### CI/CD Pipeline
 

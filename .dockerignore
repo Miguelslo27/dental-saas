@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs  
+dist
+**/dist
+build
+**/build
+.next
+.nuxt
+
+# Development files
+.git
+.gitignore
+.env.local
+.env.development
+.env.test
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+coverage
+**/coverage
+
+# Documentation (keep README for context)
+docs
+CHANGELOG.md
+LICENSE.md
+
+# Misc
+.turbo
+.eslintcache
+.prettierignore
+store-graphics
+arts
