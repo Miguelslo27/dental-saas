@@ -19,9 +19,10 @@ FROM base AS builder
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
+# NOTE: Using stage index (1) instead of name due to Coolify ARG injection issues
+COPY --from=1 /app/node_modules ./node_modules
+COPY --from=1 /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=1 /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY . .
 
 # Build shared package
@@ -41,7 +42,8 @@ FROM nginx:alpine AS runner
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built files
-COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+# NOTE: Using stage index (2) instead of name due to Coolify ARG injection issues
+COPY --from=2 /app/apps/web/dist /usr/share/nginx/html
 
 # Configure for non-root user on port 8080
 RUN chown -R nginx:nginx /usr/share/nginx/html && \

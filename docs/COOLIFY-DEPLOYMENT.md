@@ -44,12 +44,12 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-| Service | Technology | Internal Port | Exposed |
-|---------|------------|---------------|---------|
-| **web** | nginx + React | 8080 | Via Traefik |
-| **api** | Node.js + Express | 3000 | Via Traefik |
-| **postgres** | PostgreSQL 16 | 5432 | No |
-| **redis** | Redis 7 | 6379 | No |
+| Service      | Technology        | Internal Port | Exposed     |
+| ------------ | ----------------- | ------------- | ----------- |
+| **web**      | nginx + React     | 8080          | Via Traefik |
+| **api**      | Node.js + Express | 3000          | Via Traefik |
+| **postgres** | PostgreSQL 16     | 5432          | No          |
+| **redis**    | Redis 7           | 6379          | No          |
 
 > **Important:** Coolify uses Traefik as its reverse proxy. Services should NOT expose ports directly in `docker-compose.yml`. Traefik routes traffic based on domain configuration.
 
@@ -161,9 +161,9 @@ VITE_API_URL=https://api.dental.example.com
 
 After deployment, configure domains for each service:
 
-| Service | Domain | Port |
-|---------|--------|------|
-| **web** | `your-domain.com` | `8080` |
+| Service | Domain                | Port   |
+| ------- | --------------------- | ------ |
+| **web** | `your-domain.com`     | `8080` |
 | **api** | `api.your-domain.com` | `3000` |
 
 ### Steps in Coolify UI:
@@ -392,28 +392,28 @@ docker logs <container-name> --tail 100 -f
 
 ### Production Files
 
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | Production config (Coolify default) |
-| `apps/api/Dockerfile` | API multi-stage build |
-| `apps/web/Dockerfile` | Web multi-stage build |
-| `apps/web/nginx.conf` | nginx for SPA routing |
-| `.dockerignore` | Excludes node_modules, .git, etc. |
+| File                  | Purpose                             |
+| --------------------- | ----------------------------------- |
+| `docker-compose.yml`  | Production config (Coolify default) |
+| `apps/api/Dockerfile` | API multi-stage build               |
+| `apps/web/Dockerfile` | Web multi-stage build               |
+| `apps/web/nginx.conf` | nginx for SPA routing               |
+| `.dockerignore`       | Excludes node_modules, .git, etc.   |
 
 ### Development Files
 
-| File | Purpose |
-|------|---------|
+| File                     | Purpose                        |
+| ------------------------ | ------------------------------ |
 | `docker-compose.dev.yml` | Development with exposed ports |
 
 ### Key Differences: Dev vs Prod
 
-| Aspect | Development | Production |
-|--------|-------------|------------|
-| Compose file | `docker-compose.dev.yml` | `docker-compose.yml` |
-| Ports exposed | Yes (5432, 6379) | No (internal only) |
-| Default creds | Yes (`dentalpassword`) | No (must be provided) |
-| Container names | Yes (`dental-postgres`) | No (Coolify manages) |
+| Aspect          | Development              | Production            |
+| --------------- | ------------------------ | --------------------- |
+| Compose file    | `docker-compose.dev.yml` | `docker-compose.yml`  |
+| Ports exposed   | Yes (5432, 6379)         | No (internal only)    |
+| Default creds   | Yes (`dentalpassword`)   | No (must be provided) |
+| Container names | Yes (`dental-postgres`)  | No (Coolify manages)  |
 
 ---
 

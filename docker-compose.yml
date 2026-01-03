@@ -1,19 +1,23 @@
 # docker-compose.yml - default production configuration for Coolify
+#
+# NOTE: Default values are provided for preview deployments.
+# Production deployments MUST override these via Coolify environment variables.
 services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Defaults for preview deployments (override in Coolify for production)
+      POSTGRES_DB: ${POSTGRES_DB:-dental_preview}
+      POSTGRES_USER: ${POSTGRES_USER:-dental_preview}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-preview_password_not_for_production}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - dental-network
     healthcheck:
-      # NOTE: Ensure POSTGRES_USER and POSTGRES_DB are set in your .env file
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      # Uses default values if env vars not set (for preview deployments)
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dental_preview} -d ${POSTGRES_DB:-dental_preview}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +32,7 @@ services:
       [
         "redis-server",
         "--requirepass",
-        "${REDIS_PASSWORD}",
+        "${REDIS_PASSWORD:-preview_redis_password}",
         "--appendonly",
         "yes",
         "--appendfsync",
@@ -36,7 +40,7 @@ services:
       ]
     environment:
       # Use REDISCLI_AUTH to avoid exposing password in command line arguments
-      REDISCLI_AUTH: ${REDIS_PASSWORD}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:-preview_redis_password}
     volumes:
       - redis_data:/data
     networks:
@@ -55,15 +59,16 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # Defaults for preview deployments (override in Coolify for production)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:-preview_redis_password}@redis:6379
       # CORS_ORIGIN must match the public URL of the frontend in production.
       # Expected format: "https://example.com" (no trailing slash).
       # Do NOT use localhost values (e.g. http://localhost:3000) in production.
-      CORS_ORIGIN: ${CORS_ORIGIN}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      SETUP_KEY: ${SETUP_KEY}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      JWT_SECRET: ${JWT_SECRET:-preview_jwt_secret_not_for_production_use}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-preview_refresh_secret_not_for_production}
+      SETUP_KEY: ${SETUP_KEY:-preview_setup_key}
     # NOTE: Coolify handles routing via its reverse proxy (Traefik).
     # Do not expose ports directly - use Coolify's domain configuration instead.
     depends_on:
@@ -79,7 +84,8 @@ services:
       context: .
       dockerfile: ./apps/web/Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        # Default empty allows build; Coolify injects actual URL for production
+        VITE_API_URL: ${VITE_API_URL:-}
     restart: unless-stopped
     # NOTE: Coolify handles routing via its reverse proxy (Traefik).
     # Do not expose ports directly - use Coolify's domain configuration instead.
