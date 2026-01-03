@@ -64,10 +64,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       SETUP_KEY: ${SETUP_KEY}
-    # NOTE: Port 3000 is exposed for direct API access.
-    # In production with a reverse proxy, you may remove this and use internal network only.
-    ports:
-      - "3000:3000"
+    # NOTE: Coolify handles routing via its reverse proxy (Traefik).
+    # Do not expose ports directly - use Coolify's domain configuration instead.
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,8 +81,8 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
-    ports:
-      - "80:8080"
+    # NOTE: Coolify handles routing via its reverse proxy (Traefik).
+    # Do not expose ports directly - use Coolify's domain configuration instead.
     depends_on:
       - api
     networks:
