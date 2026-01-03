@@ -17,7 +17,11 @@ services:
       - dental-network
     healthcheck:
       # Uses default values if env vars not set (for preview deployments)
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dental_preview} -d ${POSTGRES_DB:-dental_preview}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-dental_preview} -d ${POSTGRES_DB:-dental_preview}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

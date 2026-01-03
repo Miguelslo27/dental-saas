@@ -6,12 +6,13 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 
 1. [Architecture Overview](#architecture-overview)
 2. [Prerequisites](#prerequisites)
-3. [Quick Start](#quick-start)
-4. [Environment Variables](#environment-variables)
-5. [Domain Configuration](#domain-configuration)
-6. [Step-by-Step Deployment](#step-by-step-deployment)
-7. [Post-Deployment Checklist](#post-deployment-checklist)
-8. [Troubleshooting](#troubleshooting)
+3. [SSH Access Setup](#ssh-access-setup)
+4. [Quick Start](#quick-start)
+5. [Environment Variables](#environment-variables)
+6. [Domain Configuration](#domain-configuration)
+7. [Step-by-Step Deployment](#step-by-step-deployment)
+8. [Post-Deployment Checklist](#post-deployment-checklist)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -61,6 +62,7 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 - [ ] Coolify v4+ installed and running
 - [ ] Domain pointing to server IP (A record)
 - [ ] Subdomain for API (e.g., `api.your-domain.com`)
+- [ ] SSH Private Key configured (see [SSH Access Setup](#ssh-access-setup))
 
 ### Repository files (already included)
 - [x] `docker-compose.yml` - Production configuration
@@ -69,6 +71,106 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 - [x] `apps/web/Dockerfile` - Web multi-stage build
 - [x] `apps/web/nginx.conf` - nginx configuration
 - [x] `.dockerignore` - Build exclusions
+
+---
+
+## SSH Access Setup
+
+SSH access to your Coolify server allows you to:
+- Debug containers directly (`docker logs`, `docker exec`)
+- Delete volumes manually when needed
+- Run maintenance commands
+
+### 1. Generate SSH Key in Coolify
+
+<!-- TODO: Document the exact steps to generate a key in Coolify UI -->
+<!-- 
+Steps:
+1. Go to Coolify → Security → Private Keys
+2. Click "Add New Private Key"
+3. Generate or paste your key
+4. Copy the private key content
+-->
+
+> **Note:** Document the key generation process in Coolify UI here.
+
+### 2. Save the Private Key Locally
+
+```bash
+# Create directory for Coolify SSH keys
+mkdir -p ~/.ssh/coolify
+
+# Create the private key file
+# Paste the private key content from Coolify
+nano ~/.ssh/coolify/id_rsa
+
+# Set correct permissions (REQUIRED - SSH rejects keys with wrong permissions)
+chmod 600 ~/.ssh/coolify/id_rsa
+
+# Verify the key is valid
+ssh-keygen -l -f ~/.ssh/coolify/id_rsa
+# Should output something like:
+# 256 SHA256:xxxxx... phpseclib-generated-key (ED25519)
+```
+
+### 3. Configure Environment Variables
+
+Add these to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+# Coolify API Configuration
+export COOLIFY_TOKEN="your-api-token-here"
+export COOLIFY_API_URL="https://your-coolify-domain.com/api/v1"
+
+# Coolify SSH Configuration
+export COOLIFY_SSH_USER="root"
+export COOLIFY_SSH_HOST="your-server-ip"  # e.g., 72.60.6.218
+export COOLIFY_SSH_KEY_PATH="$HOME/.ssh/coolify/id_rsa"
+```
+
+Reload your shell:
+```bash
+source ~/.zshrc
+```
+
+### 4. Test the Connection
+
+```bash
+ssh -i "$COOLIFY_SSH_KEY_PATH" "$COOLIFY_SSH_USER@$COOLIFY_SSH_HOST" "echo 'SSH Connected!'"
+```
+
+### 5. Useful SSH Commands
+
+Once connected, you can run Docker commands directly:
+
+```bash
+# List all containers
+docker ps -a
+
+# View logs for a specific container
+docker logs <container-name> --tail 100
+
+# Execute a command inside a container
+docker exec -it <container-name> sh
+
+# List volumes
+docker volume ls
+
+# Delete a specific volume (CAUTION: data loss)
+docker volume rm <volume-name>
+
+# View container resource usage
+docker stats
+```
+
+### Troubleshooting SSH
+
+| Issue | Solution |
+|-------|----------|
+| `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key |
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa` |
+| `Connection refused` | Check the server IP and that port 22 is open |
+| `Host key verification failed` | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts` |
 
 ---
 
