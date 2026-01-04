@@ -53,6 +53,7 @@ COPY --from=2 /app/apps/api/package.json ./apps/api/
 COPY --from=2 /app/packages/database/generated ./packages/database/generated
 COPY --from=2 /app/packages/database/package.json ./packages/database/
 COPY --from=2 /app/packages/database/prisma ./packages/database/prisma
+COPY --from=2 /app/packages/database/prisma.config.ts ./packages/database/
 COPY --from=2 /app/packages/shared/dist ./packages/shared/dist
 COPY --from=2 /app/packages/shared/package.json ./packages/shared/
 COPY --from=2 /app/package.json ./
