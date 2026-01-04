@@ -6,13 +6,14 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 
 1. [Architecture Overview](#architecture-overview)
 2. [Prerequisites](#prerequisites)
-3. [SSH Access Setup](#ssh-access-setup)
-4. [Quick Start](#quick-start)
-5. [Environment Variables](#environment-variables)
-6. [Domain Configuration](#domain-configuration)
-7. [Step-by-Step Deployment](#step-by-step-deployment)
-8. [Post-Deployment Checklist](#post-deployment-checklist)
-9. [Troubleshooting](#troubleshooting)
+3. [Coolify API Setup](#coolify-api-setup)
+4. [SSH Access Setup](#ssh-access-setup)
+5. [Quick Start](#quick-start)
+6. [Environment Variables](#environment-variables)
+7. [Domain Configuration](#domain-configuration)
+8. [Step-by-Step Deployment](#step-by-step-deployment)
+9. [Post-Deployment Checklist](#post-deployment-checklist)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -74,6 +75,34 @@ This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Com
 
 ---
 
+## Coolify API Setup
+
+The Coolify API allows you to automate deployments, check application status, and manage resources programmatically.
+
+### Generate an API Token
+
+1. Go to **Coolify → Settings → API Keys**
+2. Click **"Create New API Token"**
+3. Give it a descriptive name (e.g., "local-dev")
+4. Copy the generated token (it will only be shown once)
+
+### Configure API Environment Variables
+
+Add these to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+export COOLIFY_TOKEN="your-api-token-here"
+export COOLIFY_API_URL="https://your-coolify-domain.com/api/v1"
+```
+
+### Test the API
+
+```bash
+curl -H "Authorization: Bearer $COOLIFY_TOKEN" "$COOLIFY_API_URL/applications"
+```
+
+---
+
 ## SSH Access Setup
 
 SSH access to your Coolify server allows you to:
@@ -81,18 +110,11 @@ SSH access to your Coolify server allows you to:
 - Delete volumes manually when needed
 - Run maintenance commands
 
-### 1. Generate SSH Key in Coolify
+### 1. Obtain SSH Private Key from Coolify
 
-<!-- TODO: Document the exact steps to generate a key in Coolify UI -->
-<!-- 
-Steps:
-1. Go to Coolify → Security → Private Keys
-2. Click "Add New Private Key"
-3. Generate or paste your key
-4. Copy the private key content
--->
-
-> **Note:** Document the key generation process in Coolify UI here.
+1. Go to **Coolify → Security → Private Keys**
+2. Select or create a key assigned to your server
+3. Copy the private key content
 
 ### 2. Save the Private Key Locally
 
@@ -113,18 +135,15 @@ ssh-keygen -l -f ~/.ssh/coolify/id_rsa
 # 256 SHA256:xxxxx... phpseclib-generated-key (ED25519)
 ```
 
-### 3. Configure Environment Variables
+### 3. Configure SSH Environment Variables
 
 Add these to your `~/.zshrc` or `~/.bashrc`:
 
 ```bash
-# Coolify API Configuration
-export COOLIFY_TOKEN="your-api-token-here"
-export COOLIFY_API_URL="https://your-coolify-domain.com/api/v1"
-
 # Coolify SSH Configuration
 export COOLIFY_SSH_USER="root"
 export COOLIFY_SSH_HOST="your-server-ip"  # e.g., 72.60.6.218
+# Path to the SSH private key used for Coolify connections
 export COOLIFY_SSH_KEY_PATH="$HOME/.ssh/coolify/id_rsa"
 ```
 
@@ -165,12 +184,12 @@ docker stats
 
 ### Troubleshooting SSH
 
-| Issue | Solution |
-|-------|----------|
+| Issue                                    | Solution                                                                                                                               |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key |
-| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa` |
-| `Connection refused` | Check the server IP and that port 22 is open |
-| `Host key verification failed` | Run `ssh-keyscan $COOLIFY_SSH_HOST >> ~/.ssh/known_hosts` |
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa`                                                                                                  |
+| `Connection refused`                     | Check the server IP and that port 22 is open                                                                                           |
+| `Host key verification failed`           | Use `ssh-keyscan $COOLIFY_SSH_HOST` to get the host key, verify its fingerprint via a trusted channel, then add it to `~/.ssh/known_hosts` if it matches |
 
 ---
 
