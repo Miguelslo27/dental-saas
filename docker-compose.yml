@@ -82,6 +82,7 @@ services:
         condition: service_healthy
     networks:
       - dental-network
+      - coolify
 
   web:
     build:
@@ -97,10 +98,13 @@ services:
       - api
     networks:
       - dental-network
+      - coolify
 
 networks:
   dental-network:
     driver: bridge
+  coolify:
+    external: true
 
 volumes:
   postgres_data_v2:
