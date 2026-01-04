@@ -199,6 +199,9 @@ importers:
       prisma:
         specifier: 7.2.0
         version: 7.2.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
     devDependencies:
       '@types/node':
         specifier: ^25.0.3
@@ -206,9 +209,6 @@ importers:
       '@types/pg':
         specifier: ^8.16.0
         version: 8.16.0
-      tsx:
-        specifier: ^4.20.3
-        version: 4.21.0
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
