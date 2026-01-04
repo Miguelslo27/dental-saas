@@ -184,11 +184,11 @@ docker stats
 
 ### Troubleshooting SSH
 
-| Issue                                    | Solution                                                                                                                               |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key |
-| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa`                                                                                                  |
-| `Connection refused`                     | Check the server IP and that port 22 is open                                                                                           |
+| Issue                                    | Solution                                                                                                                                                 |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Permission denied (publickey,password)` | The public key is not registered on the server. Verify the key is assigned to the server in Coolify → Servers → [Server] → Private Key                   |
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Run `chmod 600 ~/.ssh/coolify/id_rsa`                                                                                                                    |
+| `Connection refused`                     | Check the server IP and that port 22 is open                                                                                                             |
 | `Host key verification failed`           | Use `ssh-keyscan $COOLIFY_SSH_HOST` to get the host key, verify its fingerprint via a trusted channel, then add it to `~/.ssh/known_hosts` if it matches |
 
 ---
