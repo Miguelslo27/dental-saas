@@ -69,8 +69,9 @@ COPY --from=2 /app/pnpm-lock.yaml ./
 # If you see missing module errors, use: pnpm install --frozen-lockfile (without --prod)
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy startup script
+# Copy startup script and make it executable
 COPY --from=2 /app/apps/api/scripts/wait-for-db.sh /app/scripts/wait-for-db.sh
+RUN chmod +x /app/scripts/wait-for-db.sh
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
@@ -82,4 +83,4 @@ EXPOSE 3000
 
 # Run migrations and start with retry logic for database connection
 # Waits up to 30 seconds for PostgreSQL to be ready before running migrations
-CMD ["/app/scripts/wait-for-db.sh"]
+CMD ["sh", "/app/scripts/wait-for-db.sh"]
