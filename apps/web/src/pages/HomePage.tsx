@@ -3,6 +3,8 @@ import { Link } from 'react-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAuth } from '@/hooks/useAuth'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 interface HealthResponse {
   status: string
   timestamp: string
@@ -16,7 +18,7 @@ export default function HomePage() {
   const { logout } = useAuth()
 
   useEffect(() => {
-    fetch('/api/health')
+    fetch(`${API_URL}/api/health`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Request failed with status ${res.status}`)
