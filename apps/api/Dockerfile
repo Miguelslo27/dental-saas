@@ -69,6 +69,9 @@ COPY --from=2 /app/pnpm-lock.yaml ./
 # If you see missing module errors, use: pnpm install --frozen-lockfile (without --prod)
 RUN pnpm install --prod --frozen-lockfile
 
+# Copy startup script
+COPY --from=2 /app/apps/api/scripts/wait-for-db.sh /app/scripts/wait-for-db.sh
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 api
@@ -77,5 +80,6 @@ USER api
 WORKDIR /app/apps/api
 EXPOSE 3000
 
-# Run migrations and start (using local prisma binary, with error handling)
-CMD ["sh", "-c", "set -e; cd /app/packages/database; ./node_modules/.bin/prisma migrate deploy; cd /app/apps/api; exec node dist/index.js"]
+# Run migrations and start with retry logic for database connection
+# Waits up to 30 seconds for PostgreSQL to be ready before running migrations
+CMD ["/app/scripts/wait-for-db.sh"]
