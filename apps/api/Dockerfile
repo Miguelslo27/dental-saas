@@ -77,25 +77,5 @@ USER api
 WORKDIR /app/apps/api
 EXPOSE 3000
 
-# Run migrations and start with retry logic for database connection
-# Waits up to 30 seconds for postgres to be ready before running migrations
-CMD ["sh", "-c", "\
-  set -e; \
-  echo 'Waiting for PostgreSQL...'; \
-  max_retries=30; \
-  count=0; \
-  until node -e \"const url = new URL(process.env.DATABASE_URL); const net = require('net'); const s = new net.Socket(); s.setTimeout(1000); s.connect(parseInt(url.port), url.hostname, () => { s.destroy(); process.exit(0); }); s.on('error', () => process.exit(1)); s.on('timeout', () => { s.destroy(); process.exit(1); });\" 2>/dev/null; do \
-    count=$((count + 1)); \
-    if [ $count -ge $max_retries ]; then \
-      echo 'Failed to connect to PostgreSQL after 30 seconds'; \
-      exit 1; \
-    fi; \
-    echo \"Attempt $count/$max_retries - PostgreSQL not ready, waiting...\"; \
-    sleep 1; \
-  done; \
-  echo 'PostgreSQL is ready!'; \
-  cd /app/packages/database; \
-  ./node_modules/.bin/prisma migrate deploy; \
-  cd /app/apps/api; \
-  exec node dist/index.js \
-"]
+# Run migrations and start (using local prisma binary, with error handling)
+CMD ["sh", "-c", "set -e; cd /app/packages/database; ./node_modules/.bin/prisma migrate deploy; cd /app/apps/api; exec node dist/index.js"]
