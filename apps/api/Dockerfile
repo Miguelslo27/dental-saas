@@ -29,6 +29,9 @@ WORKDIR /app/packages/database
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN pnpm db:generate
 
+# Build database package
+RUN pnpm build
+
 # Build shared package
 WORKDIR /app/packages/shared
 RUN pnpm build
@@ -50,6 +53,7 @@ ENV NODE_ENV=production
 # NOTE: Using stage index (2) instead of name due to Coolify ARG injection issues
 COPY --from=2 /app/apps/api/dist ./apps/api/dist
 COPY --from=2 /app/apps/api/package.json ./apps/api/
+COPY --from=2 /app/packages/database/dist ./packages/database/dist
 COPY --from=2 /app/packages/database/generated ./packages/database/generated
 COPY --from=2 /app/packages/database/package.json ./packages/database/
 COPY --from=2 /app/packages/database/prisma ./packages/database/prisma
