@@ -1572,4 +1572,88 @@ jobs:
 
 ---
 
-*Última actualización: 31 de Diciembre, 2025*
+## 🚨 Coolify Deployment - Estado Actual y Problemas Conocidos
+
+### Última Sesión: 4 de Enero, 2026
+
+#### PRs Mergeados para Deployment
+- **PR #25**: Documentación SSH setup
+- **PR #26**: DATABASE_URL fix (superseded)
+- **PR #27**: tsx como runtime dependency
+- **PR #28**: Database package exports fix
+- **PR #29**: Coolify network para Traefik routing
+- **PR #30**: Renombrar volumen postgres
+- **PR #31**: PostgreSQL wait loop antes de migraciones
+- **PR #32**: Fix wait-for-db.sh con sh interpreter
+
+#### Descubrimientos Importantes
+
+1. **Coolify trunca env vars largas (64+ chars)**
+   - Coolify inserta newlines en variables de entorno mayores a 64 caracteres
+   - **Solución**: Usar passwords de 32 caracteres en formato hex (sin caracteres especiales)
+
+2. **Volumen de PostgreSQL retiene credenciales anteriores**
+   - Si el volumen fue creado con credenciales X, cambiar las env vars no actualiza las credenciales en la DB
+   - **Solución**: Eliminar el volumen y recrear desde cero
+
+3. **Wait-for-db script necesario**
+   - `depends_on` con healthcheck NO garantiza que Postgres esté listo para conexiones
+   - **Solución**: Script `apps/api/scripts/wait-for-db.sh` con retry loop de 30 segundos
+
+4. **Node.js entrypoint ejecuta .sh como Node**
+   - El entrypoint de Node.js Alpine intenta ejecutar scripts .sh como módulos Node
+   - **Solución**: Usar `CMD ["sh", "/app/scripts/wait-for-db.sh"]` explícitamente
+
+#### 🔴 BLOQUEADOR: Error P1000 Persistente
+
+**Estado**: SIN RESOLVER
+
+**Síntomas**:
+- API container se reinicia constantemente con `P1000: Authentication failed`
+- Credenciales en API y Postgres son IDÉNTICAS (verificado con `docker inspect`)
+- Conexión directa con `psql` FUNCIONA
+- `prisma migrate deploy` FUNCIONA cuando se ejecuta manualmente con las mismas env vars
+- El error SOLO ocurre cuando Coolify orquesta el container
+
+**Hipótesis descartadas**:
+- ❌ Credenciales diferentes entre containers
+- ❌ Newlines en DATABASE_URL (verificado con xxd)
+- ❌ Volumen con credenciales antiguas (eliminado múltiples veces)
+- ❌ Postgres no listo (wait-for-db confirma "PostgreSQL is ready!" antes del error)
+- ❌ Permisos del script (verificado -rwxr-xr-x)
+- ❌ Network issues (psql conecta perfectamente)
+
+**Próximos pasos a investigar**:
+1. Comparar el docker-compose.yml generado por Coolify vs el del repo
+2. Verificar si Coolify modifica alguna variable durante el startup
+3. Revisar si hay algo específico en cómo Coolify pasa env vars a docker-compose
+4. Considerar usar un healthcheck más robusto que verifique autenticación real, no solo TCP
+5. Probar deployment manual con docker-compose sin Coolify
+
+#### Variables de Entorno Actuales (Coolify)
+```ini
+SERVICE_FQDN_API=fc0sw484kgwgowkw84coss8g.72.60.6.218.sslip.io
+SERVICE_FQDN_WEB=pcoo0wwkwsg88ssss04w0kow.72.60.6.218.sslip.io
+CORS_ORIGIN=http://pcoo0wwkwsg88ssss04w0kow.72.60.6.218.sslip.io
+JWT_SECRET=2009e0b8af972b6fd94bed13a0056aee93a0a95a5d14cf3bbb57b445d9e4088d
+JWT_REFRESH_SECRET=d2ba0a690c09badfaf22dbeec1165d5f871c0fe0ba9275f72b44d0dad2ba22c1
+POSTGRES_DB=dental_saas
+POSTGRES_PASSWORD=1872cc83764437d27d14033d96780451
+POSTGRES_USER=dental_admin
+REDIS_PASSWORD=473bce739d61dc9bc8490503117f2f1c
+SETUP_KEY=841589a8b062d7d87476e40614186bf7
+VITE_API_URL=http://fc0sw484kgwgowkw84coss8g.72.60.6.218.sslip.io
+```
+
+#### Acceso SSH al Servidor
+```bash
+export COOLIFY_TOKEN="1|TzunUOOuBVLLGpmBUjRmVg6EgiKYai9gPgDxTNqB86ed5fe5"
+export COOLIFY_API_URL="https://cool.deminut.com.uy/api/v1"
+export COOLIFY_SSH_USER="root"
+export COOLIFY_SSH_HOST="72.60.6.218"
+export COOLIFY_SSH_KEY_PATH="$HOME/.ssh/coolify/id_rsa"
+```
+
+---
+
+*Última actualización: 4 de Enero, 2026*
