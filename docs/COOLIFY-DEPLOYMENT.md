@@ -238,6 +238,14 @@ SETUP_KEY=<generate-32-char-secret>
 CORS_ORIGIN=https://your-domain.com
 
 # =============================================
+# EMAIL (Resend) - OPTIONAL
+# =============================================
+# Get your API key from https://resend.com
+# If not configured, emails will be skipped silently
+RESEND_API_KEY=<your-resend-api-key>
+EMAIL_FROM=Dental SaaS <noreply@your-verified-domain.com>
+
+# =============================================
 # FRONTEND (Build-time)
 # =============================================
 # API URL for frontend to call
@@ -272,6 +280,8 @@ JWT_REFRESH_SECRET=<REPLACE_WITH_STRONG_JWT_REFRESH_SECRET>
 SETUP_KEY=<REPLACE_WITH_SETUP_KEY>
 CORS_ORIGIN=https://dental.example.com
 VITE_API_URL=https://api.dental.example.com
+RESEND_API_KEY=<OPTIONAL_RESEND_API_KEY>
+EMAIL_FROM=Dental SaaS <noreply@dental.example.com>
 ```
 
 ---

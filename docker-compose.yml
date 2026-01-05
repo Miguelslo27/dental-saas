@@ -74,6 +74,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:-preview_jwt_secret_not_for_production_use}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-preview_refresh_secret_not_for_production}
       SETUP_KEY: ${SETUP_KEY:-preview_setup_key}
+      # Email (Resend) - optional, emails will be skipped if not configured
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-Dental SaaS <onboarding@resend.dev>}
     # NOTE: Coolify handles routing via its reverse proxy (Traefik).
     # Do not expose ports directly - use Coolify's domain configuration instead.
     depends_on:
