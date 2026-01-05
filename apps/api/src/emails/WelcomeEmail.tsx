@@ -68,15 +68,7 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
 
           <Text style={footerLinks}>
             <Link href={loginUrl} style={link}>
-              Login
-            </Link>
-            {' | '}
-            <Link href="https://dental-saas.com/docs" style={link}>
-              Documentation
-            </Link>
-            {' | '}
-            <Link href="https://dental-saas.com/support" style={link}>
-              Support
+              Go to Dashboard
             </Link>
           </Text>
         </Container>
@@ -163,5 +155,3 @@ const link = {
   color: '#2563eb',
   textDecoration: 'underline',
 }
-
-export default WelcomeEmail

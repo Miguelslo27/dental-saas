@@ -14,19 +14,13 @@ const slugSchema = z.string()
  * Generate slug suggestions based on a taken slug
  */
 function generateSlugSuggestions(baseSlug: string): string[] {
-  const suggestions: string[] = []
-  const year = new Date().getFullYear()
-
-  // Add number suffixes
-  suggestions.push(`${baseSlug}-1`)
-  suggestions.push(`${baseSlug}-2`)
-  suggestions.push(`${baseSlug}-${year}`)
-
-  // Add common suffixes
-  suggestions.push(`${baseSlug}-clinic`)
-  suggestions.push(`${baseSlug}-dental`)
-
-  return suggestions.slice(0, 5)
+  return [
+    `${baseSlug}-1`,
+    `${baseSlug}-2`,
+    `${baseSlug}-3`,
+    `${baseSlug}-clinic`,
+    `${baseSlug}-dental`,
+  ]
 }
 
 /**
@@ -60,19 +54,17 @@ tenantsRouter.get('/check-slug/:slug', async (req, res, next) => {
       // Slug is taken, provide suggestions
       const suggestions = generateSlugSuggestions(slug)
 
-      // Filter out suggestions that are also taken
-      const availableSuggestions: string[] = []
-      for (const suggestion of suggestions) {
-        const exists = await prisma.tenant.findUnique({
-          where: { slug: suggestion },
-          select: { id: true },
-        })
-        if (!exists) {
-          availableSuggestions.push(suggestion)
-        }
-        // Stop once we have 3 available suggestions
-        if (availableSuggestions.length >= 3) break
-      }
+      // Check all suggestions in a single query to avoid N+1
+      const takenSlugs = await prisma.tenant.findMany({
+        where: { slug: { in: suggestions } },
+        select: { slug: true },
+      })
+      const takenSlugSet = new Set(takenSlugs.map((t) => t.slug))
+
+      // Filter to available suggestions (max 3)
+      const availableSuggestions = suggestions
+        .filter((s) => !takenSlugSet.has(s))
+        .slice(0, 3)
 
       return res.status(200).json({
         success: true,

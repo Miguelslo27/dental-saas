@@ -17,6 +17,14 @@ interface SendWelcomeEmailParams {
 }
 
 /**
+ * Sanitize string for use in email subject to prevent header injection
+ * Removes newlines and control characters
+ */
+function sanitizeForSubject(str: string): string {
+  return str.replace(/[\r\n\t]/g, ' ').trim().slice(0, 100)
+}
+
+/**
  * Send a welcome email to a new user who registered a clinic
  * This is fire-and-forget: errors are logged but don't block the caller
  */
@@ -28,11 +36,14 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams): Promise<
     return false
   }
 
+  // Sanitize clinic name to prevent email header injection
+  const safeClinicName = sanitizeForSubject(clinicName)
+
   try {
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: [to],
-      subject: `Welcome to Dental SaaS - ${clinicName} is ready!`,
+      subject: `Welcome to Dental SaaS - ${safeClinicName} is ready!`,
       react: WelcomeEmail({ firstName, clinicName, loginUrl }),
     })
 
