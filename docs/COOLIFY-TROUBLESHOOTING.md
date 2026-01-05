@@ -138,16 +138,30 @@ Traefik (reverse proxy) mantiene cache de los backends y puede apuntar a contene
 
 **Solución Inmediata:**
 ```bash
-docker restart coolify-proxy
+ssh $COOLIFY_SSH_USER@$COOLIFY_SSH_HOST "docker restart coolify-proxy"
 ```
 
-**Prevención (Ya implementado en docker-compose.yml):**
-El servicio API ahora incluye:
-1. **Docker healthcheck** - Verifica `/api/health` cada 10s con 30s de start_period
-2. **Traefik labels** - Configura healthcheck en el load balancer
+**Solución Permanente: Post-Deployment Hook (RECOMENDADO):**
+
+1. Ve a **Coolify UI → Applications → AlveoDent App**
+2. Navega a **Advanced → Deployment**
+3. En **Post Deployment Command**, ingresa:
+   ```
+   docker restart coolify-proxy
+   ```
+4. Guarda los cambios
+
+Esto reiniciará automáticamente el proxy después de cada deploy, asegurando que Traefik recargue sus rutas.
+
+**Prevención Adicional (Implementado en docker-compose.yml):**
+
+1. **`stop_grace_period: 30s`** - Da tiempo al contenedor para apagarse de forma ordenada y permitir que las peticiones en curso terminen antes de que Docker lo fuerce a detenerse
+2. **Docker healthcheck** - Verifica `/api/health` cada 10s con 30s de start_period
+3. **Traefik labels** - Configura healthcheck en el load balancer
 
 ```yaml
 # docker-compose.yml - api service
+stop_grace_period: 30s
 healthcheck:
   test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
   interval: 10s

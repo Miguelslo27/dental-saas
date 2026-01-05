@@ -379,6 +379,28 @@ curl -I https://your-domain.com
 
 ---
 
+## Post-Deployment Configuration
+
+### ⚠️ REQUIRED: Configure Post-Deployment Hook
+
+**Important:** After initial deployment, you MUST configure a post-deployment hook to prevent gateway timeout issues. Traefik (Coolify's reverse proxy) may not reload routes automatically after container replacements.
+
+**Steps to configure:**
+
+1. Go to **Coolify UI → Applications → [Your App]**
+2. Navigate to **Advanced → Deployment**
+3. In **Post Deployment Command**, enter:
+   ```
+   docker restart coolify-proxy
+   ```
+4. Click **Save**
+
+This ensures the proxy reloads its routing configuration after every deployment, preventing gateway timeout issues.
+
+> **Why is this needed?** When Docker Compose recreates containers during deployment, they get new internal IPs. Traefik may cache the old IPs, causing 504 Gateway Timeout errors until manually restarted. The post-deployment hook automates this restart.
+
+---
+
 ## Post-Deployment Checklist
 
 ### Services Health
