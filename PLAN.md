@@ -176,6 +176,13 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Fix import no usado en AdminUsersPage.tsx
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/19
 
+### PR #20: Fix VITE_API_URL inconsistency ⏳
+- ✅ Bug: En producción, `/admin/setup` hacía request a URL incorrecta (404)
+- ✅ Causa: Inconsistencia en cómo se definía `VITE_API_URL` (con/sin `/api` suffix)
+- ✅ Fix: Estandarizar que `VITE_API_URL` sea la URL base SIN `/api`
+- ✅ Modificados: `api.ts` y `admin-api.ts` para añadir `/api` explícitamente al baseURL
+- ⏳ Pendiente: Deploy a producción
+
 ---
 
 ## Notas Técnicas: Super Admin

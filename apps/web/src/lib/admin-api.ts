@@ -2,10 +2,10 @@ import axios from 'axios'
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { useAdminStore, type SuperAdmin } from '@/stores/admin.store'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export const adminApiClient = axios.create({
-  baseURL: `${API_URL}/admin`,
+  baseURL: `${API_BASE_URL}/api/admin`,
   headers: {
     'Content-Type': 'application/json',
   },
