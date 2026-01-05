@@ -176,12 +176,25 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Fix import no usado en AdminUsersPage.tsx
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/19
 
-### PR #20: Fix VITE_API_URL inconsistency ⏳
+### PR #38: Fix VITE_API_URL inconsistency ✅
 - ✅ Bug: En producción, `/admin/setup` hacía request a URL incorrecta (404)
 - ✅ Causa: Inconsistencia en cómo se definía `VITE_API_URL` (con/sin `/api` suffix)
 - ✅ Fix: Estandarizar que `VITE_API_URL` sea la URL base SIN `/api`
 - ✅ Modificados: `api.ts` y `admin-api.ts` para añadir `/api` explícitamente al baseURL
-- ⏳ Pendiente: Deploy a producción
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/38
+
+### PR #39: Fix API_URL typo in refresh token ✅
+- ✅ Bug: Build fallaba con `TS2304: Cannot find name 'API_URL'`
+- ✅ Causa: Variable renombrada a `API_BASE_URL` pero una referencia quedó sin actualizar
+- ✅ Fix: Corregir nombre de variable y añadir `/api` prefix al endpoint de refresh
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/39
+
+### PR #40: API Healthcheck and Traefik labels ✅
+- ✅ Bug: Gateway Timeout después de cada deploy
+- ✅ Causa: Traefik ruteaba tráfico antes de que el API estuviera listo
+- ✅ Fix: Añadir Docker healthcheck con `start_period: 30s` para migrations
+- ✅ Fix: Añadir Traefik labels para healthcheck-aware routing
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/40
 
 ---
 
