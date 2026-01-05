@@ -80,7 +80,7 @@ apiClient.interceptors.response.use(
       try {
         // NOTE: Using axios directly instead of apiClient to avoid infinite loops
         // if the refresh endpoint also returns 401. This bypasses our interceptors.
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
+        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
           refreshToken,
         })
 
