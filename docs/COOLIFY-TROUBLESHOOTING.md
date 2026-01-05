@@ -155,7 +155,7 @@ Esto reiniciará automáticamente el proxy después de cada deploy, asegurando q
 
 **Prevención Adicional (Implementado en docker-compose.yml):**
 
-1. **`stop_grace_period: 30s`** - Da tiempo a Traefik para detectar que el contenedor se está apagando
+1. **`stop_grace_period: 30s`** - Da tiempo al contenedor para apagarse de forma ordenada y permitir que las peticiones en curso terminen antes de que Docker lo fuerce a detenerse
 2. **Docker healthcheck** - Verifica `/api/health` cada 10s con 30s de start_period
 3. **Traefik labels** - Configura healthcheck en el load balancer
 
