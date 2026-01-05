@@ -141,11 +141,23 @@ Traefik (reverse proxy) mantiene cache de los backends y puede apuntar a contene
 docker restart coolify-proxy
 ```
 
-**Prevención (Agregar healthcheck a Traefik):**
+**Prevención (Ya implementado en docker-compose.yml):**
+El servicio API ahora incluye:
+1. **Docker healthcheck** - Verifica `/api/health` cada 10s con 30s de start_period
+2. **Traefik labels** - Configura healthcheck en el load balancer
+
 ```yaml
+# docker-compose.yml - api service
+healthcheck:
+  test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 30s
 labels:
   - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/health"
   - "traefik.http.services.api.loadbalancer.healthcheck.interval=10s"
+  - "traefik.http.services.api.loadbalancer.healthcheck.timeout=5s"
 ```
 
 ---

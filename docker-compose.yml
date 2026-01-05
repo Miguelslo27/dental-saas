@@ -84,6 +84,18 @@ services:
     networks:
       - dental-network
       - coolify
+    # Healthcheck ensures container is ready before receiving traffic
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Traefik labels for proper healthcheck-aware routing
+    labels:
+      - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/health"
+      - "traefik.http.services.api.loadbalancer.healthcheck.interval=10s"
+      - "traefik.http.services.api.loadbalancer.healthcheck.timeout=5s"
 
   web:
     build:
