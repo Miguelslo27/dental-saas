@@ -16,16 +16,16 @@ const slugSchema = z.string()
 function generateSlugSuggestions(baseSlug: string): string[] {
   const suggestions: string[] = []
   const year = new Date().getFullYear()
-  
+
   // Add number suffixes
   suggestions.push(`${baseSlug}-1`)
   suggestions.push(`${baseSlug}-2`)
   suggestions.push(`${baseSlug}-${year}`)
-  
+
   // Add common suffixes
   suggestions.push(`${baseSlug}-clinic`)
   suggestions.push(`${baseSlug}-dental`)
-  
+
   return suggestions.slice(0, 5)
 }
 
@@ -59,7 +59,7 @@ tenantsRouter.get('/check-slug/:slug', async (req, res, next) => {
     if (existingTenant) {
       // Slug is taken, provide suggestions
       const suggestions = generateSlugSuggestions(slug)
-      
+
       // Filter out suggestions that are also taken
       const availableSuggestions: string[] = []
       for (const suggestion of suggestions) {

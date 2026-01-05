@@ -28,11 +28,11 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
       <Body style={main}>
         <Container style={container}>
           <Heading style={heading}>🦷 Welcome to Dental SaaS!</Heading>
-          
+
           <Text style={paragraph}>Hi {firstName},</Text>
-          
+
           <Text style={paragraph}>
-            Thank you for registering <strong>{clinicName}</strong> with Dental SaaS. 
+            Thank you for registering <strong>{clinicName}</strong> with Dental SaaS.
             Your clinic management system is now ready to use!
           </Text>
 
@@ -59,7 +59,7 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
           <Text style={footer}>
             If you have any questions, reply to this email or contact our support team.
           </Text>
-          
+
           <Text style={footer}>
             — The Dental SaaS Team
           </Text>
