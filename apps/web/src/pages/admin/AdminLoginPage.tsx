@@ -147,6 +147,15 @@ export function AdminLoginPage() {
               {errors.password && (
                 <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
               )}
+
+              <div className="mt-2 text-right">
+                <a
+                  href="/admin/forgot-password"
+                  className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </a>
+              </div>
             </div>
           </div>
 

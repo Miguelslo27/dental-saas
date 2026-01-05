@@ -8,6 +8,8 @@ import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
 import AdminLayout from '@/components/admin/AdminLayout'
 import AdminSetupPage from '@pages/admin/AdminSetupPage'
 import AdminLoginPage from '@pages/admin/AdminLoginPage'
+import { AdminForgotPasswordPage } from '@pages/admin/AdminForgotPasswordPage'
+import { AdminResetPasswordPage } from '@pages/admin/AdminResetPasswordPage'
 import AdminDashboardPage from '@pages/admin/AdminDashboardPage'
 import AdminTenantsPage from '@pages/admin/AdminTenantsPage'
 import AdminUsersPage from '@pages/admin/AdminUsersPage'
@@ -24,6 +26,8 @@ function App() {
       {/* Admin routes (separate auth flow) */}
       <Route path="/admin/setup" element={<AdminSetupPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+      <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
       
       {/* Protected admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
