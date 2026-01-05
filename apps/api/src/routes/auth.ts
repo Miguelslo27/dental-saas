@@ -10,6 +10,7 @@ import {
   hashToken,
   getExpiryDate,
 } from '../services/auth.service.js'
+import { sendWelcomeEmail } from '../services/email.service.js'
 import { env } from '../config/env.js'
 
 const authRouter: IRouter = Router()
@@ -158,6 +159,20 @@ authRouter.post('/register', async (req, res, next) => {
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     })
+
+    // Send welcome email for new tenant owners (async, fire-and-forget)
+    if (isNewTenant) {
+      const loginUrl = `${env.CORS_ORIGIN}/${clinicSlug}/login`
+      // Don't await - send email in background without blocking response
+      sendWelcomeEmail({
+        to: email,
+        firstName,
+        clinicName: tenant.name,
+        loginUrl,
+      }).catch(() => {
+        // Error is already logged in the email service
+      })
+    }
 
     res.status(201).json({
       user,
