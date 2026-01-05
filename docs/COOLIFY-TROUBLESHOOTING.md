@@ -16,6 +16,7 @@
 | #34 | Use unique hostname `dental-postgres` | DNS conflict con `coolify-db` que también usa alias `postgres` |
 | #35 | Use VITE_API_URL for health check     | HomePage llamaba a `/api/health` relativo al frontend          |
 | #36 | Allow http in CSP for staging         | CSP bloqueaba conexiones HTTP al API en staging                |
+| #20 | Fix VITE_API_URL inconsistency        | Admin setup 404 - API clients usaban URL inconsistente         |
 
 ---
 
@@ -95,7 +96,37 @@ add_header Content-Security-Policy "... connect-src 'self' https: http:; ..." al
 
 ---
 
-### 4. Gateway Timeout después de Deploy
+### 4. Admin Setup retorna 404
+
+**Síntomas:**
+- Página `/admin/setup` carga correctamente
+- Al verificar status o enviar formulario: Error 404
+- Request va a `http://<web-domain>/admin/setup` en lugar de `http://<api-domain>/api/admin/setup`
+
+**Causa Raíz:**
+La variable `VITE_API_URL` no estaba configurada o llegaba vacía durante el build. El código tenía inconsistencia: algunos archivos asumían que `VITE_API_URL` incluía `/api` y otros no.
+
+**Solución:**
+1. Configurar `VITE_API_URL` en Coolify como **URL base SIN `/api`**:
+   ```
+   VITE_API_URL=http://api-xxxx.your-server.sslip.io
+   ```
+   (No incluir `/api` al final)
+
+2. El código ahora añade `/api` explícitamente:
+   - `api.ts`: `baseURL: ${API_BASE_URL}/api`
+   - `admin-api.ts`: `baseURL: ${API_BASE_URL}/api/admin`
+
+**Verificación:**
+```bash
+# El request debe ir a la API, no al frontend
+curl http://<api-domain>/api/admin/setup
+# Debe retornar: {"setupAvailable": true/false, ...}
+```
+
+---
+
+### 5. Gateway Timeout después de Deploy
 
 **Síntomas:**
 - API responde internamente (`docker exec ... wget`)
@@ -239,4 +270,36 @@ docker system prune -f
 
 ---
 
-*Última actualización: 4 de Enero, 2026*
+## 🖥️ Desarrollo Local - Troubleshooting
+
+### Docker/Colima no está corriendo
+
+**Síntomas:**
+- Error 500 en endpoints que usan base de datos
+- Logs: `Can't reach database server at 127.0.0.1:5432`
+- Error: `failed to connect to the docker API at unix:///Users/.../.colima/default/docker.sock`
+
+**Causa:**
+Docker (Colima en macOS) no está iniciado, por lo que PostgreSQL y Redis no están disponibles.
+
+**Solución:**
+```bash
+# 1. Iniciar Colima (macOS)
+colima start
+
+# 2. Levantar contenedores de desarrollo
+cd dental-saas
+docker-compose -f docker-compose.dev.yml up -d
+
+# 3. Verificar que PostgreSQL está corriendo
+docker exec dental-postgres pg_isready -U dental -d dental_saas
+
+# 4. Reiniciar el servidor API
+cd apps/api && pnpm dev
+```
+
+**Nota:** Usar `docker-compose.dev.yml` para desarrollo local, NO `docker-compose.yml` (que es para producción/Coolify).
+
+---
+
+*Última actualización: 5 de Enero, 2026*
