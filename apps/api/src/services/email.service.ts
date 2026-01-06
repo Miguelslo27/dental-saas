@@ -8,7 +8,7 @@ const resendApiKey = process.env.RESEND_API_KEY
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 // Default from address for development (Resend sandbox)
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Dental SaaS <onboarding@resend.dev>'
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Alveo System <onboarding@resend.dev>'
 
 interface SendWelcomeEmailParams {
   to: string
@@ -44,7 +44,7 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams): Promise<
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: [to],
-      subject: `Welcome to Dental SaaS - ${safeClinicName} is ready!`,
+      subject: `Welcome to Alveo System - ${safeClinicName} is ready!`,
       react: WelcomeEmail({ firstName, clinicName, loginUrl }),
     })
 
@@ -91,7 +91,7 @@ export async function sendPasswordResetEmail(params: SendPasswordResetEmailParam
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: [to],
-      subject: 'Reset your Dental SaaS password',
+      subject: 'Reset your Alveo System password',
       react: PasswordResetEmail({ firstName, resetUrl, expiresInMinutes }),
     })
 

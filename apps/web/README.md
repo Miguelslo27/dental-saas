@@ -1,6 +1,6 @@
 # @dental/web
 
-Frontend web para Dental SaaS - Sistema de gestión para clínicas dentales.
+Frontend web para Alveo System - Sistema de gestión para clínicas dentales.
 
 ## Stack
 

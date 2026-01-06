@@ -23,7 +23,7 @@ export function PasswordResetEmail({
   resetUrl,
   expiresInMinutes,
 }: PasswordResetEmailProps) {
-  const previewText = 'Reset your Dental SaaS password'
+  const previewText = 'Reset your Alveo System password'
 
   return (
     <Html>
@@ -36,7 +36,7 @@ export function PasswordResetEmail({
           <Text style={paragraph}>Hi {firstName},</Text>
 
           <Text style={paragraph}>
-            We received a request to reset your password for your Dental SaaS
+            We received a request to reset your password for your Alveo System
             administrator account. Click the button below to set a new password:
           </Text>
 
@@ -59,7 +59,7 @@ export function PasswordResetEmail({
           </Text>
 
           <Text style={footer}>
-            — The Dental SaaS Team
+            — The Alveo System Team
           </Text>
 
           <Hr style={hr} />

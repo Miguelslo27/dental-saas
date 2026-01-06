@@ -153,7 +153,7 @@ export function AdminForgotPasswordPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          © {new Date().getFullYear()} Dental SaaS. Todos los derechos reservados.
+          © {new Date().getFullYear()} Alveo System. Todos los derechos reservados.
         </p>
       </div>
     </div>

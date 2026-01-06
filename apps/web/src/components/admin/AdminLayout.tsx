@@ -34,7 +34,7 @@ export function AdminLayout() {
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-800">
           <Shield className="h-8 w-8 text-blue-400" />
           <div>
-            <h1 className="text-lg font-bold">Dental SaaS</h1>
+            <h1 className="text-lg font-bold">Alveo System</h1>
             <p className="text-xs text-gray-400">Super Admin Panel</p>
           </div>
         </div>

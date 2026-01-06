@@ -19,7 +19,7 @@ interface WelcomeEmailProps {
 }
 
 export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailProps) {
-  const previewText = `Welcome to Dental SaaS! Your clinic "${clinicName}" is ready.`
+  const previewText = `Welcome to Alveo System! Your clinic "${clinicName}" is ready.`
 
   return (
     <Html>
@@ -27,12 +27,12 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>🦷 Welcome to Dental SaaS!</Heading>
+          <Heading style={heading}>🦷 Welcome to Alveo System!</Heading>
 
           <Text style={paragraph}>Hi {firstName},</Text>
 
           <Text style={paragraph}>
-            Thank you for registering <strong>{clinicName}</strong> with Dental SaaS.
+            Thank you for registering <strong>{clinicName}</strong> with Alveo System.
             Your clinic management system is now ready to use!
           </Text>
 
@@ -61,7 +61,7 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
           </Text>
 
           <Text style={footer}>
-            — The Dental SaaS Team
+            — The Alveo System Team
           </Text>
 
           <Hr style={hr} />

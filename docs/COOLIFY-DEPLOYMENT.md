@@ -1,6 +1,6 @@
-# 🚀 Coolify Deployment Guide - Dental SaaS
+# 🚀 Coolify Deployment Guide - Alveo System
 
-This guide covers deploying the Dental SaaS monorepo to Coolify using Docker Compose.
+This guide covers deploying the Alveo System monorepo to Coolify using Docker Compose.
 
 ## Table of Contents
 
@@ -243,7 +243,7 @@ CORS_ORIGIN=https://your-domain.com
 # Get your API key from https://resend.com
 # If not configured, emails will be skipped silently
 RESEND_API_KEY=<your-resend-api-key>
-EMAIL_FROM=Dental SaaS <noreply@your-verified-domain.com>
+EMAIL_FROM=Alveo System <noreply@your-verified-domain.com>
 
 # =============================================
 # FRONTEND (Build-time)
@@ -281,7 +281,7 @@ SETUP_KEY=<REPLACE_WITH_SETUP_KEY>
 CORS_ORIGIN=https://dental.example.com
 VITE_API_URL=https://api.dental.example.com
 RESEND_API_KEY=<OPTIONAL_RESEND_API_KEY>
-EMAIL_FROM=Dental SaaS <noreply@dental.example.com>
+EMAIL_FROM=Alveo System <noreply@dental.example.com>
 ```
 
 ---

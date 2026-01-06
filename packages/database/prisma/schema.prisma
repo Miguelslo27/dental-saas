@@ -1,4 +1,4 @@
-// Prisma Schema for Dental SaaS
+// Prisma Schema for Alveo System
 // Multi-tenant architecture with row-level isolation
 
 generator client {

@@ -358,7 +358,7 @@ pnpm add resend @react-email/components
   - Log de error si falla el envío (no afecta registro)
 - [ ] 2.1.6: Añadir variables de entorno
   - `RESEND_API_KEY` - API key de Resend
-  - `EMAIL_FROM` - Dirección de envío (ej: "Dental SaaS <noreply@tudominio.com>")
+  - `EMAIL_FROM` - Dirección de envío (ej: "Alveo System <noreply@tudominio.com>")
 
 #### Notas técnicas - Resend:
 - SDK: `npm install resend`
@@ -428,7 +428,7 @@ model PasswordResetToken {
   - Mensaje de seguridad ("Si no solicitaste esto, ignora el email")
 - [ ] 2.2.A.4: Añadir sendPasswordResetEmail() a email.service.ts
   - Params: to, firstName, resetUrl
-  - Subject: "Reset your Dental SaaS password"
+  - Subject: "Reset your Alveo System password"
 - [ ] 2.2.A.5: Crear router /api/admin/auth con:
   - POST /api/admin/auth/forgot-password
     - Body: { email: string }
