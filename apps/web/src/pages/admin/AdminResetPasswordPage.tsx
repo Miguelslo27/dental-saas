@@ -58,7 +58,7 @@ export function AdminResetPasswordPage() {
     setError(null)
 
     try {
-      await adminApiClient.post('/admin/auth/reset-password', {
+      await adminApiClient.post('/auth/reset-password', {
         token,
         password: data.password,
       })

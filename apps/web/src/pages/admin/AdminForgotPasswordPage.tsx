@@ -31,7 +31,7 @@ export function AdminForgotPasswordPage() {
     setError(null)
 
     try {
-      await adminApiClient.post('/admin/auth/forgot-password', {
+      await adminApiClient.post('/auth/forgot-password', {
         email: data.email,
       })
 
