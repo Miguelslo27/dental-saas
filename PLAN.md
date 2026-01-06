@@ -461,14 +461,16 @@ model PasswordResetToken {
 - Hash del token en DB (no guardar token plano)
 - cleanupOldRefreshTokens extraído a auth.service.ts (DRY)
 
-### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ⏳
-- [ ] 2.3.1: Crear endpoint GET /api/users (admin only)
-- [ ] 2.3.2: Crear endpoint GET /api/users/:id
-- [ ] 2.3.3: Crear endpoint POST /api/users
-- [ ] 2.3.4: Crear endpoint PUT /api/users/:id
-- [ ] 2.3.5: Crear endpoint DELETE /api/users/:id
-- [ ] 2.3.6: Crear endpoint PUT /api/users/:id/permissions
-- [ ] 2.3.7: Crear middleware de verificación de límites
+### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ✅ (PR #46)
+- [x] 2.3.1: Crear endpoint GET /api/users (admin only)
+- [x] 2.3.2: Crear endpoint GET /api/users/:id
+- [x] 2.3.3: Crear endpoint POST /api/users
+- [x] 2.3.4: Crear endpoint PUT /api/users/:id
+- [x] 2.3.5: Crear endpoint DELETE /api/users/:id
+- [x] 2.3.6: Crear endpoint PUT /api/users/:id/role (cambio de rol)
+- [x] 2.3.7: Crear user.service.ts con verificación de límites de plan
+- [x] 2.3.8: Crear endpoint GET /api/users/stats (conteo por rol y límites)
+- [x] 2.3.9: Tests unitarios (16 tests)
 
 ### Tarea 2.4: Frontend - Landing Page y Registro ⏳
 - [ ] 2.4.1: Crear layout de landing page

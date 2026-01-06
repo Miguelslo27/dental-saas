@@ -7,6 +7,7 @@ import { adminRouter } from './routes/admin/index.js'
 import { patientsRouter } from './routes/patients.js'
 import { doctorsRouter } from './routes/doctors.js'
 import { appointmentsRouter } from './routes/appointments.js'
+import { usersRouter } from './routes/users.js'
 import { errorHandler } from './middleware/error-handler.js'
 import { requireAuthWithTenant } from './middleware/auth.js'
 import { logger } from './utils/logger.js'
@@ -36,6 +37,7 @@ app.use('/api/admin', adminRouter)
 app.use('/api/patients', requireAuthWithTenant, patientsRouter)
 app.use('/api/doctors', requireAuthWithTenant, doctorsRouter)
 app.use('/api/appointments', requireAuthWithTenant, appointmentsRouter)
+app.use('/api/users', requireAuthWithTenant, usersRouter)
 
 // 404 handler for unmapped routes
 app.use((_req, res) => {
