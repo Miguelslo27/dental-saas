@@ -9,6 +9,7 @@ import {
   verifyRefreshToken,
   hashToken,
   getExpiryDate,
+  cleanupOldRefreshTokens,
 } from '../services/auth.service.js'
 import { sendWelcomeEmail } from '../services/email.service.js'
 import { env } from '../config/env.js'
@@ -46,27 +47,6 @@ const loginSchema = z.object({
 const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })
-
-// Maximum refresh tokens per user (cleanup old ones)
-const MAX_REFRESH_TOKENS_PER_USER = 5
-
-/**
- * Clean up old refresh tokens for a user, keeping only the most recent ones
- */
-async function cleanupOldRefreshTokens(userId: string): Promise<void> {
-  const tokens = await prisma.refreshToken.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true },
-  })
-
-  if (tokens.length > MAX_REFRESH_TOKENS_PER_USER) {
-    const tokensToDelete = tokens.slice(MAX_REFRESH_TOKENS_PER_USER)
-    await prisma.refreshToken.deleteMany({
-      where: { id: { in: tokensToDelete.map((t) => t.id) } },
-    })
-  }
-}
 
 // POST /api/auth/register
 authRouter.post('/register', async (req, res, next) => {

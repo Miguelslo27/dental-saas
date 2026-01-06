@@ -8,6 +8,7 @@ import {
   verifyPassword,
   generateTokens,
   getExpiryDate,
+  cleanupOldRefreshTokens,
 } from '../../services/auth.service.js'
 import { sendPasswordResetEmail } from '../../services/email.service.js'
 import { logger } from '../../utils/logger.js'
@@ -66,27 +67,6 @@ function buildResetUrl(token: string): string {
   return `${baseUrl}/admin/reset-password?token=${token}`
 }
 
-// Maximum refresh tokens per user (cleanup old ones)
-const MAX_REFRESH_TOKENS_PER_USER = 5
-
-/**
- * Clean up old refresh tokens for a user, keeping only the most recent ones
- */
-async function cleanupOldRefreshTokens(userId: string): Promise<void> {
-  const tokens = await prisma.refreshToken.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true },
-  })
-
-  if (tokens.length > MAX_REFRESH_TOKENS_PER_USER) {
-    const tokensToDelete = tokens.slice(MAX_REFRESH_TOKENS_PER_USER)
-    await prisma.refreshToken.deleteMany({
-      where: { id: { in: tokensToDelete.map((t) => t.id) } },
-    })
-  }
-}
-
 // POST /api/admin/auth/login
 authRouter.post('/login', async (req, res, next) => {
   try {
@@ -126,6 +106,9 @@ authRouter.post('/login', async (req, res, next) => {
       })
     }
 
+    // Clean up old tokens for this user before creating new one
+    await cleanupOldRefreshTokens(user.id)
+
     // Generate tokens
     const tokens = generateTokens({
       userId: user.id,
@@ -143,9 +126,6 @@ authRouter.post('/login', async (req, res, next) => {
       },
     })
 
-    // Clean up old tokens for this user
-    await cleanupOldRefreshTokens(user.id)
-
     // Update last login
     await prisma.user.update({
       where: { id: user.id },
@@ -161,6 +141,7 @@ authRouter.post('/login', async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        createdAt: user.createdAt,
       },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
