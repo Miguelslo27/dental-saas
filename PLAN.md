@@ -349,38 +349,26 @@ SETUP_KEY="tu-clave-secreta-de-16-caracteres-minimo"
 **Rama:** `feature/authentication`  
 **Estado:** Backend Auth completado (PRs #9-12), Super Admin completado (PRs #13-14)
 
-### Tarea 2.1: Backend - Registro de Tenants (Onboarding) ⏳
-**Nota:** El endpoint `/api/auth/register` ya existe y crea tenants automáticamente. Esta tarea se enfoca en mejorarlo y añadir emails.
-
-#### Dependencias a instalar:
-```bash
-pnpm add resend @react-email/components
-```
-
-#### Archivos a crear/modificar:
-- `src/services/email.service.ts` - Cliente Resend + funciones de envío
-- `src/emails/WelcomeEmail.tsx` - Template React Email de bienvenida
-- `src/emails/index.ts` - Barrel export de templates
-- `src/routes/tenants.ts` - Nuevo router para gestión de tenants
-- `.env` - Añadir `RESEND_API_KEY` y `EMAIL_FROM`
+### Tarea 2.1: Backend - Registro de Tenants (Onboarding) ✅
+**Nota:** Completado como parte del PR #44 (Password Recovery). El endpoint `/api/auth/register` crea tenants y envía emails de bienvenida.
 
 #### Subtareas:
-- [ ] 2.1.1: Instalar dependencias (resend, @react-email/components)
-- [ ] 2.1.2: Crear servicio de email (`src/services/email.service.ts`)
+- [x] 2.1.1: Instalar dependencias (resend, @react-email/components)
+- [x] 2.1.2: Crear servicio de email (`src/services/email.service.ts`)
   - Inicializar cliente Resend con API key desde env
   - Función `sendWelcomeEmail(to, firstName, clinicName, loginUrl)`
   - Manejo de errores y logging
-- [ ] 2.1.3: Crear template de bienvenida (`src/emails/WelcomeEmail.tsx`)
+- [x] 2.1.3: Crear template de bienvenida (`src/emails/WelcomeEmail.tsx`)
   - Usar componentes de @react-email/components (Html, Container, Text, Button, etc.)
   - Props: firstName, clinicName, loginUrl
   - Diseño profesional con logo y branding
-- [ ] 2.1.4: Crear endpoint GET /api/tenants/check-slug/:slug
+- [x] 2.1.4: Crear endpoint GET /api/tenants/check-slug/:slug
   - Verificar disponibilidad de slug
   - Retornar { available: boolean, suggestions?: string[] }
-- [ ] 2.1.5: Modificar POST /api/auth/register para enviar email de bienvenida
+- [x] 2.1.5: Modificar POST /api/auth/register para enviar email de bienvenida
   - Llamar a `sendWelcomeEmail()` después de crear usuario (async, no bloquea respuesta)
   - Log de error si falla el envío (no afecta registro)
-- [ ] 2.1.6: Añadir variables de entorno
+- [x] 2.1.6: Añadir variables de entorno
   - `RESEND_API_KEY` - API key de Resend
   - `EMAIL_FROM` - Dirección de envío (ej: "Alveo System <noreply@tudominio.com>")
 
@@ -397,9 +385,6 @@ pnpm add resend @react-email/components
     react: WelcomeEmail({ firstName: 'John' }), // o html: '<p>...</p>'
   });
   ```
-- Para desarrollo: usar `onboarding@resend.dev` como from (no requiere dominio verificado)
-- React Email se renderiza a HTML automáticamente por Resend
-
 ### Tarea 2.2: Backend - Autenticación ✅ (PR #9)
 - [x] 2.2.1: Instalar bcrypt y jsonwebtoken
 - [x] 2.2.2: Crear servicio de hash de contraseñas (bcrypt 12 rounds)
@@ -407,8 +392,8 @@ pnpm add resend @react-email/components
 - [x] 2.2.4: Crear endpoint POST /api/auth/login
 - [x] 2.2.5: Crear endpoint POST /api/auth/refresh-token
 - [x] 2.2.6: Crear endpoint GET /api/auth/me
-- [ ] 2.2.7: Crear endpoint POST /api/auth/forgot-password
-- [ ] 2.2.8: Crear endpoint POST /api/auth/reset-password
+- [ ] 2.2.7: Crear endpoint POST /api/auth/forgot-password (para usuarios de tenant)
+- [ ] 2.2.8: Crear endpoint POST /api/auth/reset-password (para usuarios de tenant)
 - [x] 2.2.9: Crear middleware de autenticación
 - [x] 2.2.10: Crear middleware de autorización por rol (OWNER/ADMIN/DOCTOR/STAFF)
 - [ ] 2.2.11: Implementar rate limiting con Redis
