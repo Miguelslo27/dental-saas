@@ -3,7 +3,7 @@ import { useNavigate, Navigate, Link } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { apiClient } from '@/lib/api'
+import { adminApiClient } from '@/lib/admin-api'
 import { useAdminStore } from '@/stores/admin.store'
 import { Shield, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { AxiosError } from 'axios'
@@ -40,20 +40,13 @@ export function AdminLoginPage() {
     setError(null)
 
     try {
-      // Use the regular login endpoint but verify the user is SUPER_ADMIN
-      const response = await apiClient.post('/auth/login', {
+      // Use the admin auth login endpoint
+      const response = await adminApiClient.post('/auth/login', {
         email: data.email,
         password: data.password,
-        // No clinicSlug for super admin
       })
 
       const { user, accessToken, refreshToken } = response.data
-
-      // Verify user is SUPER_ADMIN
-      if (user.role !== 'SUPER_ADMIN') {
-        setError('Esta cuenta no tiene permisos de super administrador')
-        return
-      }
 
       // Store auth data
       setAuth(

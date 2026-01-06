@@ -3,8 +3,12 @@ import jwt from 'jsonwebtoken'
 import type { StringValue } from 'ms'
 import crypto from 'crypto'
 import { env } from '../config/env.js'
+import { prisma } from '@dental/database'
 
 const SALT_ROUNDS = 12
+
+// Maximum refresh tokens per user (cleanup old ones)
+export const MAX_REFRESH_TOKENS_PER_USER = 5
 
 // Types
 export interface TokenPayload {
@@ -112,4 +116,22 @@ export function getExpiryDate(expiresIn: string): Date {
   }
 
   return new Date(Date.now() + value * multipliers[unit])
+}
+
+/**
+ * Clean up old refresh tokens for a user, keeping only the most recent ones
+ */
+export async function cleanupOldRefreshTokens(userId: string): Promise<void> {
+  const tokens = await prisma.refreshToken.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true },
+  })
+
+  if (tokens.length > MAX_REFRESH_TOKENS_PER_USER) {
+    const tokensToDelete = tokens.slice(MAX_REFRESH_TOKENS_PER_USER)
+    await prisma.refreshToken.deleteMany({
+      where: { id: { in: tokensToDelete.map((t) => t.id) } },
+    })
+  }
 }

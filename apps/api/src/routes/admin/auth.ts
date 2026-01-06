@@ -2,9 +2,17 @@ import { Router, type IRouter } from 'express'
 import { z } from 'zod'
 import crypto from 'crypto'
 import { prisma } from '@dental/database'
-import { hashPassword, hashToken } from '../../services/auth.service.js'
+import {
+  hashPassword,
+  hashToken,
+  verifyPassword,
+  generateTokens,
+  getExpiryDate,
+  cleanupOldRefreshTokens,
+} from '../../services/auth.service.js'
 import { sendPasswordResetEmail } from '../../services/email.service.js'
 import { logger } from '../../utils/logger.js'
+import { env } from '../../config/env.js'
 
 const authRouter: IRouter = Router()
 
@@ -22,6 +30,11 @@ const passwordSchema = z
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),
+})
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
 })
 
 const resetPasswordSchema = z.object({
@@ -53,6 +66,90 @@ function buildResetUrl(token: string): string {
   const baseUrl = frontendUrl.replace(/\/$/, '')
   return `${baseUrl}/admin/reset-password?token=${token}`
 }
+
+// POST /api/admin/auth/login
+authRouter.post('/login', async (req, res, next) => {
+  try {
+    const parse = loginSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+      })
+    }
+
+    const { email, password } = parse.data
+    const normalizedEmail = email.toLowerCase().trim()
+
+    // Find user by email - must be SUPER_ADMIN without tenantId
+    const user = await prisma.user.findFirst({
+      where: {
+        email: normalizedEmail,
+        role: 'SUPER_ADMIN',
+        tenantId: null,
+      },
+    })
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    // Verify password
+    const isValid = await verifyPassword(password, user.passwordHash)
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    // Clean up old tokens for this user before creating new one
+    await cleanupOldRefreshTokens(user.id)
+
+    // Generate tokens
+    const tokens = generateTokens({
+      userId: user.id,
+      tenantId: '',
+      email: user.email,
+      role: user.role,
+    })
+
+    // Store refresh token hash
+    await prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(tokens.refreshToken),
+        expiresAt: getExpiryDate(env.JWT_REFRESH_EXPIRES_IN),
+      },
+    })
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    })
+
+    logger.info({ userId: user.id }, 'Super admin logged in successfully')
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    })
+  } catch (e) {
+    next(e)
+  }
+})
 
 // POST /api/admin/auth/forgot-password
 authRouter.post('/forgot-password', async (req, res, next) => {
