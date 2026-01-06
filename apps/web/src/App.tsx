@@ -28,7 +28,7 @@ function App() {
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
       <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
-      
+
       {/* Protected admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />

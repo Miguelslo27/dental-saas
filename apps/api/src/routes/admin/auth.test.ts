@@ -146,6 +146,36 @@ describe('Admin Auth - Password Recovery', () => {
       await prisma.user.delete({ where: { id: regularUser.id } })
       await prisma.tenant.delete({ where: { id: tenant.id } })
     })
+
+    it('should not create token for inactive super admin', async () => {
+      // Create an inactive super admin
+      const inactiveAdmin = await prisma.user.create({
+        data: {
+          email: 'inactive-admin@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Inactive',
+          lastName: 'Admin',
+          role: 'SUPER_ADMIN',
+          tenantId: null,
+          isActive: false,
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/admin/auth/forgot-password')
+        .send({ email: 'inactive-admin@test.com' })
+
+      expect(response.status).toBe(200) // Still 200 for security
+
+      // But no token should be created for inactive user
+      const token = await prisma.passwordResetToken.findFirst({
+        where: { userId: inactiveAdmin.id },
+      })
+      expect(token).toBeNull()
+
+      // Cleanup
+      await prisma.user.delete({ where: { id: inactiveAdmin.id } })
+    })
   })
 
   describe('POST /api/admin/auth/reset-password', () => {
