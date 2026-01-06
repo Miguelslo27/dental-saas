@@ -100,7 +100,7 @@ export function AdminDashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Resumen de la plataforma Dental SaaS</p>
+        <p className="text-gray-500">Resumen de la plataforma Alveo System</p>
       </div>
 
       {/* Stats Grid */}

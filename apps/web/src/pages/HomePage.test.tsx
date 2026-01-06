@@ -20,7 +20,7 @@ describe('HomePage', () => {
       </BrowserRouter>
     )
 
-    expect(screen.getByText('🦷 Dental SaaS')).toBeInTheDocument()
+    expect(screen.getByText('🦷 Alveo System')).toBeInTheDocument()
     expect(screen.getByText('Sistema de gestión para clínicas dentales')).toBeInTheDocument()
   })
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router'
+import { useNavigate, Navigate, Link } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -147,6 +147,15 @@ export function AdminLoginPage() {
               {errors.password && (
                 <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
               )}
+
+              <div className="mt-2 text-right">
+                <Link
+                  to="/admin/forgot-password"
+                  className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-# 🦷 Dental SaaS
+# 🦷 Alveo System
 
 Sistema de gestión para clínicas dentales - Multi-tenant SaaS.
 

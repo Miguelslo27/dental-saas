@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { WelcomeEmail } from '../emails/WelcomeEmail.js'
+import { PasswordResetEmail } from '../emails/PasswordResetEmail.js'
 import { logger } from '../utils/logger.js'
 
 // Initialize Resend client - will be undefined if no API key
@@ -7,7 +8,7 @@ const resendApiKey = process.env.RESEND_API_KEY
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 // Default from address for development (Resend sandbox)
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Dental SaaS <onboarding@resend.dev>'
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Alveo System <onboarding@resend.dev>'
 
 interface SendWelcomeEmailParams {
   to: string
@@ -43,7 +44,7 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams): Promise<
     const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: [to],
-      subject: `Welcome to Dental SaaS - ${safeClinicName} is ready!`,
+      subject: `Welcome to Alveo System - ${safeClinicName} is ready!`,
       react: WelcomeEmail({ firstName, clinicName, loginUrl }),
     })
 
@@ -65,4 +66,44 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams): Promise<
  */
 export function isEmailServiceConfigured(): boolean {
   return resend !== null
+}
+
+interface SendPasswordResetEmailParams {
+  to: string
+  firstName: string
+  resetUrl: string
+  expiresInMinutes?: number
+}
+
+/**
+ * Send a password reset email
+ * Returns true if sent successfully, false otherwise
+ */
+export async function sendPasswordResetEmail(params: SendPasswordResetEmailParams): Promise<boolean> {
+  const { to, firstName, resetUrl, expiresInMinutes = 15 } = params
+
+  if (!resend) {
+    logger.warn('Email service not configured: RESEND_API_KEY is missing. Skipping password reset email.')
+    return false
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: [to],
+      subject: 'Reset your Alveo System password',
+      react: PasswordResetEmail({ firstName, resetUrl, expiresInMinutes }),
+    })
+
+    if (error) {
+      logger.error({ error, to }, 'Failed to send password reset email')
+      return false
+    }
+
+    logger.info({ emailId: data?.id, to }, 'Password reset email sent successfully')
+    return true
+  } catch (err) {
+    logger.error({ err, to }, 'Exception while sending password reset email')
+    return false
+  }
 }

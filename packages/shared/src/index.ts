@@ -1,4 +1,4 @@
-// Shared types for Dental SaaS
+// Shared types for Alveo System
 
 export interface ApiResponse<T = unknown> {
   success: boolean

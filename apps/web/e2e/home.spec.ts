@@ -4,7 +4,7 @@ test.describe('Home Page', () => {
   test('should display the main title', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByText('🦷 Dental SaaS')).toBeVisible()
+    await expect(page.getByText('🦷 Alveo System')).toBeVisible()
     await expect(page.getByText('Sistema de gestión para clínicas dentales')).toBeVisible()
   })
 

@@ -1,6 +1,6 @@
 # @dental/api
 
-Backend API para Dental SaaS.
+Backend API para Alveo System.
 
 ## Stack
 

@@ -358,7 +358,7 @@ pnpm add resend @react-email/components
   - Log de error si falla el envío (no afecta registro)
 - [ ] 2.1.6: Añadir variables de entorno
   - `RESEND_API_KEY` - API key de Resend
-  - `EMAIL_FROM` - Dirección de envío (ej: "Dental SaaS <noreply@tudominio.com>")
+  - `EMAIL_FROM` - Dirección de envío (ej: "Alveo System <noreply@tudominio.com>")
 
 #### Notas técnicas - Resend:
 - SDK: `npm install resend`
@@ -388,6 +388,93 @@ pnpm add resend @react-email/components
 - [x] 2.2.9: Crear middleware de autenticación
 - [x] 2.2.10: Crear middleware de autorización por rol (OWNER/ADMIN/DOCTOR/STAFF)
 - [ ] 2.2.11: Implementar rate limiting con Redis
+
+### Tarea 2.2.A: Password Recovery para Super Admin ⏳ (NUEVA)
+**Descripción:** Implementar flujo de recuperación de contraseña para SUPER_ADMIN usando Resend.
+
+#### Modelo de Datos (Prisma)
+Añadir modelo `PasswordResetToken` al schema:
+```prisma
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique // SHA-256 hash del token
+  expiresAt DateTime
+  usedAt    DateTime? // null si no se ha usado
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+```
+
+#### Archivos a crear/modificar:
+1. `packages/database/prisma/schema.prisma` - Añadir PasswordResetToken
+2. `apps/api/src/emails/PasswordResetEmail.tsx` - Template del email
+3. `apps/api/src/services/email.service.ts` - Añadir sendPasswordResetEmail()
+4. `apps/api/src/routes/admin/auth.ts` - NUEVO: Rutas de auth para admin
+5. `apps/web/src/pages/admin/AdminForgotPasswordPage.tsx` - Formulario de solicitud
+6. `apps/web/src/pages/admin/AdminResetPasswordPage.tsx` - Formulario de reset
+
+#### Subtareas Backend:
+- [ ] 2.2.A.1: Añadir modelo PasswordResetToken a schema.prisma
+- [ ] 2.2.A.2: Ejecutar migración `pnpm prisma migrate dev --name add_password_reset_tokens`
+- [ ] 2.2.A.3: Crear template PasswordResetEmail.tsx
+  - Props: firstName, resetUrl, expiresInMinutes
+  - Diseño minimalista, instrucciones claras
+  - Mensaje de seguridad ("Si no solicitaste esto, ignora el email")
+- [ ] 2.2.A.4: Añadir sendPasswordResetEmail() a email.service.ts
+  - Params: to, firstName, resetUrl
+  - Subject: "Reset your Alveo System password"
+- [ ] 2.2.A.5: Crear router /api/admin/auth con:
+  - POST /api/admin/auth/forgot-password
+    - Body: { email: string }
+    - Buscar usuario SUPER_ADMIN con ese email (tenantId IS NULL)
+    - Si no existe, responder 200 igual (seguridad: no revelar existencia)
+    - Generar token aleatorio (32 bytes hex)
+    - Hashear token con SHA-256 y guardar en PasswordResetToken
+    - Expiry: 15 minutos
+    - Enviar email con link: `{FRONTEND_URL}/admin/reset-password?token={token}`
+    - Invalidar tokens anteriores del mismo usuario
+  - POST /api/admin/auth/reset-password
+    - Body: { token: string, password: string }
+    - Hashear token recibido con SHA-256
+    - Buscar PasswordResetToken por tokenHash
+    - Validar: no expirado, no usado, usuario activo
+    - Hashear nueva contraseña con bcrypt
+    - Actualizar user.passwordHash
+    - Marcar token como usado (usedAt = now)
+    - Invalidar todos los refresh tokens del usuario
+    - Responder { success: true }
+- [ ] 2.2.A.6: Añadir rate limiting (3 intentos por IP en 15 min)
+- [ ] 2.2.A.7: Tests unitarios para ambos endpoints
+
+#### Subtareas Frontend:
+- [ ] 2.2.A.8: Crear AdminForgotPasswordPage.tsx
+  - Formulario con campo email
+  - Enviar POST a /api/admin/auth/forgot-password
+  - Mostrar mensaje de confirmación (siempre, independiente del resultado)
+  - Link para volver a login
+- [ ] 2.2.A.9: Crear AdminResetPasswordPage.tsx
+  - Leer token de query string
+  - Formulario con password + confirm password
+  - Validación: 8+ chars, mayúscula, minúscula, número, especial
+  - Enviar POST a /api/admin/auth/reset-password
+  - Mostrar mensaje de éxito y redirigir a login
+  - Manejar errores (token inválido/expirado)
+- [ ] 2.2.A.10: Añadir link "¿Olvidaste tu contraseña?" en AdminLoginPage
+- [ ] 2.2.A.11: Añadir rutas en App.tsx
+
+#### Seguridad:
+- Token de un solo uso (marcado con usedAt después de usar)
+- Expiración corta (15 minutos)
+- Rate limiting para prevenir enumeración de usuarios
+- Respuesta genérica en forgot-password (no revelar si email existe)
+- Invalidación de todos los refresh tokens al cambiar contraseña
+- Hash del token en DB (no guardar token plano)
 
 ### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ⏳
 - [ ] 2.3.1: Crear endpoint GET /api/users (admin only)
