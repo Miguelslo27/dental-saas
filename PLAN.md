@@ -196,6 +196,30 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Fix: Añadir Traefik labels para healthcheck-aware routing
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/40
 
+### PR #43: Document post-deploy proxy restart solution ✅
+- ✅ Bug: Gateway timeout persistente después de deploys en Coolify
+- ✅ Causa: coolify-proxy container necesita reiniciarse para reconocer nuevos healthchecks
+- ✅ Fix: Documentado workaround en COOLIFY-TROUBLESHOOTING.md
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/43
+
+### PR #44: Password Recovery for Super Admin + Rename to Alveo System ✅
+- ✅ Modelo `PasswordResetToken` en Prisma con hash SHA-256
+- ✅ Template `PasswordResetEmail.tsx` con React Email
+- ✅ Endpoint `POST /api/admin/auth/forgot-password` (seguro contra enumeración)
+- ✅ Endpoint `POST /api/admin/auth/reset-password` (validación, hash, invalidación de refresh tokens)
+- ✅ `AdminForgotPasswordPage.tsx` y `AdminResetPasswordPage.tsx` en frontend
+- ✅ 12 tests unitarios para password recovery
+- ✅ Rename proyecto: "Dental SaaS" → "Alveo System" (38 archivos)
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/44
+
+### PR #45: Dedicated Login Endpoint for Super Admin ✅
+- ✅ Bug: AdminLoginPage usaba endpoint de tenant (`/api/auth/login`) que requiere clinicSlug
+- ✅ Fix: Crear `POST /api/admin/auth/login` dedicado para SUPER_ADMIN
+- ✅ Fix: AdminLoginPage usa `adminApiClient` en vez de `apiClient`
+- ✅ Refactor: Extraer `cleanupOldRefreshTokens` a `auth.service.ts` (DRY)
+- ✅ Fix: Añadir `createdAt` a respuesta de login
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/45
+
 ---
 
 ## Notas Técnicas: Super Admin
@@ -389,7 +413,7 @@ pnpm add resend @react-email/components
 - [x] 2.2.10: Crear middleware de autorización por rol (OWNER/ADMIN/DOCTOR/STAFF)
 - [ ] 2.2.11: Implementar rate limiting con Redis
 
-### Tarea 2.2.A: Password Recovery para Super Admin ⏳ (NUEVA)
+### Tarea 2.2.A: Password Recovery para Super Admin ✅ (PRs #44, #45)
 **Descripción:** Implementar flujo de recuperación de contraseña para SUPER_ADMIN usando Resend.
 
 #### Modelo de Datos (Prisma)
@@ -420,61 +444,37 @@ model PasswordResetToken {
 6. `apps/web/src/pages/admin/AdminResetPasswordPage.tsx` - Formulario de reset
 
 #### Subtareas Backend:
-- [ ] 2.2.A.1: Añadir modelo PasswordResetToken a schema.prisma
-- [ ] 2.2.A.2: Ejecutar migración `pnpm prisma migrate dev --name add_password_reset_tokens`
-- [ ] 2.2.A.3: Crear template PasswordResetEmail.tsx
+- [x] 2.2.A.1: Añadir modelo PasswordResetToken a schema.prisma
+- [x] 2.2.A.2: Ejecutar migración `pnpm prisma migrate dev --name add_password_reset_tokens`
+- [x] 2.2.A.3: Crear template PasswordResetEmail.tsx
   - Props: firstName, resetUrl, expiresInMinutes
   - Diseño minimalista, instrucciones claras
   - Mensaje de seguridad ("Si no solicitaste esto, ignora el email")
-- [ ] 2.2.A.4: Añadir sendPasswordResetEmail() a email.service.ts
+- [x] 2.2.A.4: Añadir sendPasswordResetEmail() a email.service.ts
   - Params: to, firstName, resetUrl
   - Subject: "Reset your Alveo System password"
-- [ ] 2.2.A.5: Crear router /api/admin/auth con:
+- [x] 2.2.A.5: Crear router /api/admin/auth con:
+  - POST /api/admin/auth/login (autenticación dedicada para SUPER_ADMIN)
   - POST /api/admin/auth/forgot-password
-    - Body: { email: string }
-    - Buscar usuario SUPER_ADMIN con ese email (tenantId IS NULL)
-    - Si no existe, responder 200 igual (seguridad: no revelar existencia)
-    - Generar token aleatorio (32 bytes hex)
-    - Hashear token con SHA-256 y guardar en PasswordResetToken
-    - Expiry: 15 minutos
-    - Enviar email con link: `{FRONTEND_URL}/admin/reset-password?token={token}`
-    - Invalidar tokens anteriores del mismo usuario
   - POST /api/admin/auth/reset-password
-    - Body: { token: string, password: string }
-    - Hashear token recibido con SHA-256
-    - Buscar PasswordResetToken por tokenHash
-    - Validar: no expirado, no usado, usuario activo
-    - Hashear nueva contraseña con bcrypt
-    - Actualizar user.passwordHash
-    - Marcar token como usado (usedAt = now)
-    - Invalidar todos los refresh tokens del usuario
-    - Responder { success: true }
 - [ ] 2.2.A.6: Añadir rate limiting (3 intentos por IP en 15 min)
-- [ ] 2.2.A.7: Tests unitarios para ambos endpoints
+- [x] 2.2.A.7: Tests unitarios para endpoints (12 tests)
 
 #### Subtareas Frontend:
-- [ ] 2.2.A.8: Crear AdminForgotPasswordPage.tsx
-  - Formulario con campo email
-  - Enviar POST a /api/admin/auth/forgot-password
-  - Mostrar mensaje de confirmación (siempre, independiente del resultado)
-  - Link para volver a login
-- [ ] 2.2.A.9: Crear AdminResetPasswordPage.tsx
-  - Leer token de query string
-  - Formulario con password + confirm password
-  - Validación: 8+ chars, mayúscula, minúscula, número, especial
-  - Enviar POST a /api/admin/auth/reset-password
-  - Mostrar mensaje de éxito y redirigir a login
-  - Manejar errores (token inválido/expirado)
-- [ ] 2.2.A.10: Añadir link "¿Olvidaste tu contraseña?" en AdminLoginPage
-- [ ] 2.2.A.11: Añadir rutas en App.tsx
+- [x] 2.2.A.8: Crear AdminForgotPasswordPage.tsx
+- [x] 2.2.A.9: Crear AdminResetPasswordPage.tsx
+- [x] 2.2.A.10: Añadir link "¿Olvidaste tu contraseña?" en AdminLoginPage
+- [x] 2.2.A.11: Añadir rutas en App.tsx
+- [x] 2.2.A.12: Usar adminApiClient en AdminLoginPage (fix endpoint correcto)
 
 #### Seguridad:
 - Token de un solo uso (marcado con usedAt después de usar)
 - Expiración corta (15 minutos)
-- Rate limiting para prevenir enumeración de usuarios
+- Rate limiting para prevenir enumeración de usuarios (PENDIENTE)
 - Respuesta genérica en forgot-password (no revelar si email existe)
 - Invalidación de todos los refresh tokens al cambiar contraseña
 - Hash del token en DB (no guardar token plano)
+- cleanupOldRefreshTokens extraído a auth.service.ts (DRY)
 
 ### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ⏳
 - [ ] 2.3.1: Crear endpoint GET /api/users (admin only)
