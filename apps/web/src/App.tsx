@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router'
-import HomePage from '@pages/HomePage'
+import LandingPage from '@pages/LandingPage'
+import PricingPage from '@pages/PricingPage'
 import LoginPage from '@pages/auth/LoginPage'
 import RegisterPage from '@pages/auth/RegisterPage'
+import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
 import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
 
 // Admin pages
@@ -18,9 +20,11 @@ function App() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register/success" element={<RegisterSuccessPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* Admin routes (separate auth flow) */}

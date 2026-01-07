@@ -69,7 +69,11 @@ export function useAuth() {
           tenantId: response.user.tenantId,
         }
         setAuth(authUser, response.accessToken, response.refreshToken)
-        navigate('/')
+        
+        // Redirect to success page with clinic info
+        const clinicName = payload.clinicName || 'tu clínica'
+        const clinicSlug = payload.clinicSlug || ''
+        navigate(`/register/success?clinic=${encodeURIComponent(clinicName)}&slug=${encodeURIComponent(clinicSlug)}`)
         return response
       } catch (err) {
         let message = 'Error al registrarse'
