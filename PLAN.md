@@ -472,23 +472,23 @@ model PasswordResetToken {
 - [x] 2.3.8: Crear endpoint GET /api/users/stats (conteo por rol y límites)
 - [x] 2.3.9: Tests unitarios (16 tests)
 
-### Tarea 2.4: Frontend - Landing Page y Registro ⏳
-- [ ] 2.4.1: Crear layout de landing page
-- [ ] 2.4.2: Crear página de pricing con los 3 planes
-- [ ] 2.4.3: Crear formulario de registro de tenant
-- [ ] 2.4.4: Crear página de confirmación de registro
-- [ ] 2.4.5: Implementar flujo de onboarding inicial
+### Tarea 2.4: Frontend - Landing Page y Registro 🔄 (PR #47)
+- [x] 2.4.1: Crear layout de landing page
+- [x] 2.4.2: Crear página de pricing con los 3 planes
+- [x] 2.4.3: Crear formulario de registro de tenant (ya existía RegisterPage.tsx)
+- [x] 2.4.4: Crear página de confirmación de registro
+- [ ] 2.4.5: Implementar flujo de onboarding inicial (diferido a fase posterior)
 
-### Tarea 2.5: Frontend - Autenticación ⏳
-- [ ] 2.5.1: Crear página de Login
-- [ ] 2.5.2: Crear página de Forgot Password
-- [ ] 2.5.3: Crear página de Reset Password
-- [ ] 2.5.4: Crear store de autenticación (Zustand)
-- [ ] 2.5.5: Crear hook useAuth
-- [ ] 2.5.6: Crear componente ProtectedRoute
-- [ ] 2.5.7: Crear interceptor de Axios para tokens
-- [ ] 2.5.8: Implementar refresh token automático
-- [ ] 2.5.9: Crear página de perfil de usuario
+### Tarea 2.5: Frontend - Autenticación ✅ (Ya implementado)
+- [x] 2.5.1: Crear página de Login (LoginPage.tsx)
+- [x] 2.5.2: Crear página de Forgot Password (admin flow)
+- [x] 2.5.3: Crear página de Reset Password (admin flow)
+- [x] 2.5.4: Crear store de autenticación (Zustand) (auth.store.ts)
+- [x] 2.5.5: Crear hook useAuth (useAuth.ts)
+- [x] 2.5.6: Crear componente ProtectedRoute (ProtectedRoute.tsx)
+- [x] 2.5.7: Crear interceptor de Axios para tokens (api.ts)
+- [x] 2.5.8: Implementar refresh token automático (api.ts interceptor)
+- [ ] 2.5.9: Crear página de perfil de usuario (diferido a fase 4)
 
 ### Tarea 2.6: Super Admin ✅ (PRs #13, #14)
 - [x] 2.6.1: Backend - Role SUPER_ADMIN y middleware
