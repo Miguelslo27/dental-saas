@@ -6,12 +6,12 @@ export default function RegisterSuccessPage() {
   const clinicSlug = searchParams.get('slug') || ''
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-green-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full text-center">
         {/* Success Icon */}
         <div className="mb-8">
           <div className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
-            <span className="text-5xl">✓</span>
+            <span className="text-5xl" role="img" aria-label="Registro exitoso">✓</span>
           </div>
         </div>
 
@@ -42,7 +42,7 @@ export default function RegisterSuccessPage() {
         {/* Next Steps */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8 text-left">
           <h2 className="text-lg font-semibold text-blue-900 mb-4">
-            🚀 Próximos pasos:
+            <span aria-hidden="true">🚀</span> Próximos pasos:
           </h2>
           <ol className="space-y-3 text-blue-800">
             <li className="flex gap-3">

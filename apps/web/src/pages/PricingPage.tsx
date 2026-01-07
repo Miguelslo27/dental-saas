@@ -122,7 +122,7 @@ export default function PricingPage() {
       </header>
 
       {/* Hero */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-blue-50 to-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
             Planes y Precios
@@ -140,11 +140,10 @@ export default function PricingPage() {
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`p-8 rounded-2xl ${
-                  plan.highlighted
+                className={`p-8 rounded-2xl ${plan.highlighted
                     ? 'bg-blue-600 text-white ring-4 ring-blue-600 ring-offset-4 scale-105'
                     : 'bg-white border border-gray-200'
-                }`}
+                  }`}
               >
                 {plan.highlighted && (
                   <div className="text-center mb-4">
@@ -154,16 +153,14 @@ export default function PricingPage() {
                   </div>
                 )}
                 <h3
-                  className={`text-2xl font-bold mb-2 ${
-                    plan.highlighted ? 'text-white' : 'text-gray-900'
-                  }`}
+                  className={`text-2xl font-bold mb-2 ${plan.highlighted ? 'text-white' : 'text-gray-900'
+                    }`}
                 >
                   {plan.name}
                 </h3>
                 <p
-                  className={`text-sm mb-4 ${
-                    plan.highlighted ? 'text-blue-100' : 'text-gray-500'
-                  }`}
+                  className={`text-sm mb-4 ${plan.highlighted ? 'text-blue-100' : 'text-gray-500'
+                    }`}
                 >
                   {plan.description}
                 </p>
@@ -177,11 +174,10 @@ export default function PricingPage() {
                 </div>
                 <Link
                   to="/register"
-                  className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-colors mb-8 ${
-                    plan.highlighted
+                  className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-colors mb-8 ${plan.highlighted
                       ? 'bg-white text-blue-600 hover:bg-blue-50'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
+                    }`}
                 >
                   {plan.cta}
                 </Link>
@@ -206,8 +202,8 @@ export default function PricingPage() {
                               ? 'text-white'
                               : 'text-gray-700'
                             : plan.highlighted
-                            ? 'text-blue-200 line-through'
-                            : 'text-gray-400 line-through'
+                              ? 'text-blue-200 line-through'
+                              : 'text-gray-400 line-through'
                         }
                       >
                         {feature.text}

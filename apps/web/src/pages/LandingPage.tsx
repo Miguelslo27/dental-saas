@@ -92,7 +92,7 @@ const features = [
   },
 ]
 
-export default function HomePage() {
+export default function LandingPage() {
   const { user, isAuthenticated } = useAuthStore()
   const { logout } = useAuth()
 
@@ -145,7 +145,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-blue-50 to-white">
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6">
             Gestiona tu clínica dental
@@ -219,23 +219,20 @@ export default function HomePage() {
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`p-8 rounded-2xl ${
-                  plan.highlighted
+                className={`p-8 rounded-2xl ${plan.highlighted
                     ? 'bg-blue-600 text-white ring-4 ring-blue-600 ring-offset-4'
                     : 'bg-white border border-gray-200'
-                }`}
+                  }`}
               >
                 <h3
-                  className={`text-xl font-semibold mb-2 ${
-                    plan.highlighted ? 'text-white' : 'text-gray-900'
-                  }`}
+                  className={`text-xl font-semibold mb-2 ${plan.highlighted ? 'text-white' : 'text-gray-900'
+                    }`}
                 >
                   {plan.name}
                 </h3>
                 <p
-                  className={`text-sm mb-4 ${
-                    plan.highlighted ? 'text-blue-100' : 'text-gray-500'
-                  }`}
+                  className={`text-sm mb-4 ${plan.highlighted ? 'text-blue-100' : 'text-gray-500'
+                    }`}
                 >
                   {plan.description}
                 </p>
@@ -269,11 +266,10 @@ export default function HomePage() {
                 </ul>
                 <Link
                   to="/register"
-                  className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-colors ${
-                    plan.highlighted
+                  className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-colors ${plan.highlighted
                       ? 'bg-white text-blue-600 hover:bg-blue-50'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
+                    }`}
                 >
                   {plan.cta}
                 </Link>
