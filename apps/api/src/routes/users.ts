@@ -25,6 +25,16 @@ const passwordSchema = z
       'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
   })
 
+// Phone validation: if provided, must be non-empty (rejects empty strings)
+const phoneSchema = z.string().min(1, 'Phone number cannot be empty').optional()
+
+// Query params validation for list endpoint
+const listUsersQuerySchema = z.object({
+  limit: z.coerce.number().int().positive().max(100).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
+  includeInactive: z.enum(['true', 'false']).optional(),
+})
+
 // Validation schemas
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -32,7 +42,7 @@ const createUserSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   role: z.enum(['ADMIN', 'DOCTOR', 'STAFF']), // OWNER cannot be assigned via API, SUPER_ADMIN is forbidden
-  phone: z.string().optional(),
+  phone: phoneSchema,
   avatar: z.string().url().optional(),
 })
 
@@ -40,7 +50,7 @@ const updateUserSchema = z.object({
   email: z.string().email().optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
-  phone: z.string().optional(),
+  phone: phoneSchema,
   avatar: z.string().url().optional(),
   isActive: z.boolean().optional(),
 })
@@ -57,11 +67,19 @@ usersRouter.get('/', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
-    const { limit, offset, includeInactive } = req.query
+    const parsedQuery = listUsersQuerySchema.safeParse(req.query)
+    if (!parsedQuery.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid query parameters', code: 'INVALID_QUERY', details: parsedQuery.error.errors },
+      })
+    }
+
+    const { limit, offset, includeInactive } = parsedQuery.data
 
     const users = await listUsers(tenantId, {
-      limit: limit ? parseInt(String(limit), 10) : undefined,
-      offset: offset ? parseInt(String(offset), 10) : undefined,
+      limit,
+      offset,
       includeInactive: includeInactive === 'true',
     })
 

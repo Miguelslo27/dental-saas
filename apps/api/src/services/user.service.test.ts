@@ -185,6 +185,86 @@ describe('user.service', () => {
     })
   })
 
+  describe('getUserById', () => {
+    it('should return user when found in tenant', async () => {
+      const mockUser = { id: 'user-1', email: 'user1@test.com', tenantId: 'tenant-1' }
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as any)
+
+      const user = await userService.getUserById('tenant-1', 'user-1')
+
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { id: 'user-1', tenantId: 'tenant-1' },
+        select: expect.any(Object),
+      })
+      expect(user).toEqual(mockUser)
+    })
+
+    it('should return null when user not found', async () => {
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+
+      const user = await userService.getUserById('tenant-1', 'non-existent')
+
+      expect(user).toBeNull()
+    })
+
+    it('should enforce tenant isolation (not return user from different tenant)', async () => {
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+
+      const user = await userService.getUserById('tenant-2', 'user-from-tenant-1')
+
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { id: 'user-from-tenant-1', tenantId: 'tenant-2' },
+        select: expect.any(Object),
+      })
+      expect(user).toBeNull()
+    })
+  })
+
+  describe('updateUser', () => {
+    it('should update user when found in tenant', async () => {
+      const mockUser = { id: 'user-1', email: 'updated@test.com', firstName: 'Updated' }
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1' } as any)
+      vi.mocked(prisma.user.update).mockResolvedValue(mockUser as any)
+
+      const user = await userService.updateUser('tenant-1', 'user-1', {
+        email: 'updated@test.com',
+        firstName: 'Updated',
+      })
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { email: 'updated@test.com', firstName: 'Updated' },
+        select: expect.any(Object),
+      })
+      expect(user).toEqual(mockUser)
+    })
+
+    it('should return null when user not found in tenant', async () => {
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+
+      const user = await userService.updateUser('tenant-1', 'non-existent', {
+        firstName: 'Updated',
+      })
+
+      expect(user).toBeNull()
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('should enforce tenant isolation on update', async () => {
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(null)
+
+      await userService.updateUser('tenant-2', 'user-from-tenant-1', {
+        firstName: 'Hacked',
+      })
+
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { id: 'user-from-tenant-1', tenantId: 'tenant-2' },
+        select: { id: true },
+      })
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+  })
+
   describe('createUser', () => {
     it('should create a user with hashed password', async () => {
       const mockUser = {
@@ -245,6 +325,18 @@ describe('user.service', () => {
 
       const result = await userService.updateUserRole('tenant-1', 'user-1', 'OWNER', 'OWNER')
 
+      expect(result.success).toBe(true)
+    })
+
+    it('should skip limit check when role is not changing', async () => {
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as any)
+      vi.mocked(prisma.user.update).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as any)
+
+      const result = await userService.updateUserRole('tenant-1', 'user-1', 'DOCTOR', 'ADMIN')
+
+      // Should not check limits since role is the same
+      expect(prisma.subscription.findUnique).not.toHaveBeenCalled()
+      expect(prisma.user.groupBy).not.toHaveBeenCalled()
       expect(result.success).toBe(true)
     })
   })

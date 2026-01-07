@@ -267,10 +267,12 @@ export async function updateUserRole(
     return { success: false, error: 'Cannot set role to SUPER_ADMIN' }
   }
 
-  // Check limits for the new role
-  const limitCheck = await checkRoleLimitForNewUser(tenantId, newRole)
-  if (!limitCheck.allowed) {
-    return { success: false, error: limitCheck.message }
+  // Check limits for the new role only if the role is actually changing
+  if (existing.role !== newRole) {
+    const limitCheck = await checkRoleLimitForNewUser(tenantId, newRole)
+    if (!limitCheck.allowed) {
+      return { success: false, error: limitCheck.message }
+    }
   }
 
   const user = await prisma.user.update({
