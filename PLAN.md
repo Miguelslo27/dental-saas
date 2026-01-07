@@ -472,7 +472,7 @@ model PasswordResetToken {
 - [x] 2.3.8: Crear endpoint GET /api/users/stats (conteo por rol y límites)
 - [x] 2.3.9: Tests unitarios (16 tests)
 
-### Tarea 2.4: Frontend - Landing Page y Registro 🔄 (PR #47)
+### Tarea 2.4: Frontend - Landing Page y Registro ✅ (PR #47)
 - [x] 2.4.1: Crear layout de landing page
 - [x] 2.4.2: Crear página de pricing con los 3 planes
 - [x] 2.4.3: Crear formulario de registro de tenant (ya existía RegisterPage.tsx)
