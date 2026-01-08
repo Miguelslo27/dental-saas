@@ -1,6 +1,5 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
-import crypto from 'crypto'
 import { prisma } from '@dental/database'
 import {
   hashPassword,
@@ -15,6 +14,12 @@ import {
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../services/email.service.js'
 import { logger } from '../utils/logger.js'
 import { env } from '../config/env.js'
+import {
+  TOKEN_EXPIRY_MINUTES,
+  generateResetToken,
+  getTokenExpiryDate,
+  buildTenantResetUrl,
+} from '../utils/password-reset.js'
 
 const authRouter: IRouter = Router()
 
@@ -60,32 +65,6 @@ const resetPasswordSchema = z.object({
   token: z.string().min(1),
   password: passwordSchema,
 })
-
-// Token expiry for password reset (15 minutes)
-const TOKEN_EXPIRY_MINUTES = 15
-
-/**
- * Generate a secure random token for password reset
- */
-function generateResetToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-/**
- * Get expiry date for password reset token
- */
-function getTokenExpiryDate(): Date {
-  return new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000)
-}
-
-/**
- * Build the password reset URL for tenant users
- */
-function buildResetUrl(token: string, clinicSlug: string): string {
-  const frontendUrl = env.CORS_ORIGIN || 'http://localhost:5173'
-  const baseUrl = frontendUrl.replace(/\/$/, '')
-  return `${baseUrl}/${clinicSlug}/reset-password?token=${token}`
-}
 
 // POST /api/auth/register
 authRouter.post('/register', async (req, res, next) => {
@@ -543,7 +522,7 @@ authRouter.post('/forgot-password', async (req, res, next) => {
     })
 
     // Send email (fire-and-forget, don't block response)
-    const resetUrl = buildResetUrl(plainToken, clinicSlug)
+    const resetUrl = buildTenantResetUrl(plainToken, clinicSlug)
     sendPasswordResetEmail({
       to: user.email,
       firstName: user.firstName,

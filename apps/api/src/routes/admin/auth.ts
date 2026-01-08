@@ -1,6 +1,5 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
-import crypto from 'crypto'
 import { prisma } from '@dental/database'
 import {
   hashPassword,
@@ -13,11 +12,14 @@ import {
 import { sendPasswordResetEmail } from '../../services/email.service.js'
 import { logger } from '../../utils/logger.js'
 import { env } from '../../config/env.js'
+import {
+  TOKEN_EXPIRY_MINUTES,
+  generateResetToken,
+  getTokenExpiryDate,
+  buildAdminResetUrl,
+} from '../../utils/password-reset.js'
 
 const authRouter: IRouter = Router()
-
-// Token expiry in minutes
-const TOKEN_EXPIRY_MINUTES = 15
 
 // Password validation schema (same as registration)
 const passwordSchema = z
@@ -41,31 +43,6 @@ const resetPasswordSchema = z.object({
   token: z.string().min(1),
   password: passwordSchema,
 })
-
-/**
- * Generate a secure random token
- */
-function generateResetToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-/**
- * Get expiry date for password reset token
- */
-function getTokenExpiryDate(): Date {
-  return new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000)
-}
-
-/**
- * Build the password reset URL
- */
-function buildResetUrl(token: string): string {
-  // Use CORS_ORIGIN as the frontend URL, or default for development
-  const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:5173'
-  // Clean up the URL (remove trailing slash if present)
-  const baseUrl = frontendUrl.replace(/\/$/, '')
-  return `${baseUrl}/admin/reset-password?token=${token}`
-}
 
 // POST /api/admin/auth/login
 authRouter.post('/login', async (req, res, next) => {
@@ -218,7 +195,7 @@ authRouter.post('/forgot-password', async (req, res, next) => {
     })
 
     // Send email (fire-and-forget, don't block response)
-    const resetUrl = buildResetUrl(plainToken)
+    const resetUrl = buildAdminResetUrl(plainToken)
     sendPasswordResetEmail({
       to: user.email,
       firstName: user.firstName,

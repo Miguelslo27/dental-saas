@@ -393,5 +393,44 @@ describe('Auth - Tenant User Password Recovery', () => {
       await prisma.passwordResetToken.deleteMany({ where: { userId: inactiveUser.id } })
       await prisma.user.delete({ where: { id: inactiveUser.id } })
     })
+
+    it('should return 400 for SUPER_ADMIN attempting to use tenant reset endpoint', async () => {
+      // Create a SUPER_ADMIN user (no tenantId)
+      const superAdmin = await prisma.user.create({
+        data: {
+          email: 'superadmin-reset-test@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Super',
+          lastName: 'Admin',
+          role: 'SUPER_ADMIN',
+          tenantId: null,
+        },
+      })
+
+      // Create a valid token for the SUPER_ADMIN
+      const plainToken = 'superadmin-tenant-reset-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: superAdmin.id,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      })
+
+      // Attempt to use tenant reset-password endpoint
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      // Should fail because SUPER_ADMIN has no tenantId
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('INVALID_TOKEN')
+
+      // Cleanup
+      await prisma.passwordResetToken.deleteMany({ where: { userId: superAdmin.id } })
+      await prisma.user.delete({ where: { id: superAdmin.id } })
+    })
   })
 })
