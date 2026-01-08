@@ -220,6 +220,28 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Fix: Añadir `createdAt` a respuesta de login
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/45
 
+### PR #46: Backend - Tenant User Management ✅
+- ✅ CRUD completo para usuarios del tenant (`/api/users`)
+- ✅ Verificación de límites de plan (owners, admins, doctors, staff)
+- ✅ Endpoint GET /api/users/stats para conteo por rol
+- ✅ 16 tests unitarios
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/46
+
+### PR #47: Frontend - Landing Page and Registration ✅
+- ✅ Landing page con pricing de los 3 planes
+- ✅ Formulario de registro de tenant
+- ✅ Página de confirmación de registro
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/47
+
+### PR #48: Password Recovery for Tenant Users ✅
+- ✅ Endpoint `POST /api/auth/forgot-password` (requiere email + clinicSlug)
+- ✅ Endpoint `POST /api/auth/reset-password` (validación de token, hash, expiración)
+- ✅ Módulo compartido `apps/api/src/utils/password-reset.ts` (DRY refactor)
+- ✅ `ForgotPasswordPage.tsx` y `ResetPasswordPage.tsx` en frontend
+- ✅ Link "¿Olvidaste tu contraseña?" en LoginPage
+- ✅ 16 tests unitarios (70 tests totales en API)
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/48
+
 ---
 
 ## Notas Técnicas: Super Admin
@@ -392,8 +414,8 @@ SETUP_KEY="tu-clave-secreta-de-16-caracteres-minimo"
 - [x] 2.2.4: Crear endpoint POST /api/auth/login
 - [x] 2.2.5: Crear endpoint POST /api/auth/refresh-token
 - [x] 2.2.6: Crear endpoint GET /api/auth/me
-- [ ] 2.2.7: Crear endpoint POST /api/auth/forgot-password (para usuarios de tenant)
-- [ ] 2.2.8: Crear endpoint POST /api/auth/reset-password (para usuarios de tenant)
+- [x] 2.2.7: Crear endpoint POST /api/auth/forgot-password (para usuarios de tenant) ✅ PR #48
+- [x] 2.2.8: Crear endpoint POST /api/auth/reset-password (para usuarios de tenant) ✅ PR #48
 - [x] 2.2.9: Crear middleware de autenticación
 - [x] 2.2.10: Crear middleware de autorización por rol (OWNER/ADMIN/DOCTOR/STAFF)
 - [ ] 2.2.11: Implementar rate limiting con Redis
