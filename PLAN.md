@@ -461,6 +461,42 @@ model PasswordResetToken {
 - Hash del token en DB (no guardar token plano)
 - cleanupOldRefreshTokens extraído a auth.service.ts (DRY)
 
+### Tarea 2.2.B: Password Recovery para Tenant Users ✅
+**Descripción:** Implementar flujo de recuperación de contraseña para usuarios de clínicas (tenant users).
+
+#### Diferencias con Super Admin Flow:
+- Los endpoints van en `/api/auth/*` (no `/api/admin/auth/*`)
+- El forgot-password require `clinicSlug` para identificar el tenant
+- El reset-password NO necesita validar role (acepta cualquier usuario de tenant)
+- La URL de reset incluye el clinicSlug: `/{clinicSlug}/reset-password?token=xxx`
+
+#### Archivos a crear/modificar:
+1. `apps/api/src/routes/auth.ts` - Añadir endpoints forgot-password y reset-password
+2. `apps/api/src/routes/auth.test.ts` - NUEVO: Tests para password recovery de tenant users
+3. `apps/web/src/pages/auth/ForgotPasswordPage.tsx` - Formulario de solicitud
+4. `apps/web/src/pages/auth/ResetPasswordPage.tsx` - Formulario de reset
+5. `apps/web/src/App.tsx` - Añadir rutas
+
+#### Subtareas Backend:
+- [x] 2.2.B.1: Crear POST /api/auth/forgot-password
+  - Params: `{ email, clinicSlug }`
+  - Buscar user por email + tenantId (resuelto via slug)
+  - Generar token, hashear, guardar en PasswordResetToken
+  - Enviar email con link: `/{clinicSlug}/reset-password?token=xxx`
+  - Respuesta genérica para evitar email enumeration
+- [x] 2.2.B.2: Crear POST /api/auth/reset-password
+  - Params: `{ token, password }`
+  - Validar token hash, expiración, usedAt, user isActive
+  - NO validar rol (cualquier tenant user puede resetear)
+  - Actualizar password, marcar token usado, invalidar refresh tokens
+- [x] 2.2.B.3: Tests unitarios (15 tests)
+
+#### Subtareas Frontend:
+- [x] 2.2.B.4: Crear ForgotPasswordPage.tsx (requiere email + clinicSlug)
+- [x] 2.2.B.5: Crear ResetPasswordPage.tsx
+- [x] 2.2.B.6: Añadir link "¿Olvidaste tu contraseña?" en LoginPage
+- [x] 2.2.B.7: Añadir rutas en App.tsx
+
 ### Tarea 2.3: Backend - Gestión de Usuarios del Tenant ✅ (PR #46)
 - [x] 2.3.1: Crear endpoint GET /api/users (admin only)
 - [x] 2.3.2: Crear endpoint GET /api/users/:id
