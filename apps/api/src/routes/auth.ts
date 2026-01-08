@@ -11,8 +11,15 @@ import {
   getExpiryDate,
   cleanupOldRefreshTokens,
 } from '../services/auth.service.js'
-import { sendWelcomeEmail } from '../services/email.service.js'
+import { sendWelcomeEmail, sendPasswordResetEmail } from '../services/email.service.js'
+import { logger } from '../utils/logger.js'
 import { env } from '../config/env.js'
+import {
+  TOKEN_EXPIRY_MINUTES,
+  generateResetToken,
+  getTokenExpiryDate,
+  buildTenantResetUrl,
+} from '../utils/password-reset.js'
 
 const authRouter: IRouter = Router()
 
@@ -46,6 +53,17 @@ const loginSchema = z.object({
 
 const refreshSchema = z.object({
   refreshToken: z.string().min(1),
+})
+
+// Password recovery schemas
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+  clinicSlug: z.string().min(1),
+})
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
+  password: passwordSchema,
 })
 
 // POST /api/auth/register
@@ -424,6 +442,204 @@ authRouter.get('/me', async (req, res, next) => {
     res.json(user)
   } catch (e) {
     next(e)
+  }
+})
+
+// POST /api/auth/forgot-password - Request password reset for tenant user
+authRouter.post('/forgot-password', async (req, res, next) => {
+  try {
+    const parse = forgotPasswordSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+      })
+    }
+
+    const { email, clinicSlug } = parse.data
+    const normalizedEmail = email.toLowerCase().trim()
+
+    // Always respond with success to prevent email enumeration
+    const successResponse = {
+      success: true,
+      message: 'If an account exists with this email, you will receive a password reset link.',
+    }
+
+    // Find tenant by slug
+    const tenant = await prisma.tenant.findUnique({
+      where: { slug: clinicSlug },
+    })
+
+    if (!tenant || !tenant.isActive) {
+      // Don't reveal that the clinic doesn't exist
+      logger.info({ email: normalizedEmail, clinicSlug }, 'Password reset requested for non-existent or inactive clinic')
+      return res.status(200).json(successResponse)
+    }
+
+    // Find user by email and tenant (must not be SUPER_ADMIN)
+    const user = await prisma.user.findUnique({
+      where: {
+        tenantId_email: { tenantId: tenant.id, email: normalizedEmail },
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        isActive: true,
+        role: true,
+      },
+    })
+
+    if (!user || !user.isActive || user.role === 'SUPER_ADMIN') {
+      // Don't reveal that the user doesn't exist or is inactive
+      logger.info({ email: normalizedEmail, clinicSlug }, 'Password reset requested for non-existent or ineligible user')
+      return res.status(200).json(successResponse)
+    }
+
+    // Invalidate any existing tokens for this user
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+      },
+      data: {
+        usedAt: new Date(), // Mark as used to invalidate
+      },
+    })
+
+    // Generate new token
+    const plainToken = generateResetToken()
+    const tokenHash = hashToken(plainToken)
+    const expiresAt = getTokenExpiryDate()
+
+    // Store hashed token
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      },
+    })
+
+    // Send email (fire-and-forget, don't block response)
+    const resetUrl = buildTenantResetUrl(plainToken, clinicSlug)
+    sendPasswordResetEmail({
+      to: user.email,
+      firstName: user.firstName,
+      resetUrl,
+      expiresInMinutes: TOKEN_EXPIRY_MINUTES,
+    }).catch((err) => {
+      logger.error({ err, userId: user.id }, 'Failed to send password reset email')
+    })
+
+    logger.info({ userId: user.id, clinicSlug }, 'Password reset token generated for tenant user')
+    return res.status(200).json(successResponse)
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/auth/reset-password - Reset password with token
+authRouter.post('/reset-password', async (req, res, next) => {
+  try {
+    const parse = resetPasswordSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Invalid request',
+          code: 'INVALID_PAYLOAD',
+          details: parse.error.errors,
+        },
+      })
+    }
+
+    const { token, password } = parse.data
+
+    // Hash the provided token to compare with stored hash
+    const tokenHash = hashToken(token)
+
+    // Find valid token
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          select: {
+            id: true,
+            isActive: true,
+            role: true,
+            tenantId: true,
+          },
+        },
+      },
+    })
+
+    // Validate token
+    if (!resetToken) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid or expired reset link', code: 'INVALID_TOKEN' },
+      })
+    }
+
+    if (resetToken.usedAt) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'This reset link has already been used', code: 'TOKEN_USED' },
+      })
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'This reset link has expired', code: 'TOKEN_EXPIRED' },
+      })
+    }
+
+    if (!resetToken.user.isActive) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Account is deactivated', code: 'ACCOUNT_INACTIVE' },
+      })
+    }
+
+    // This endpoint is for tenant users only (must have tenantId)
+    if (!resetToken.user.tenantId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid reset link', code: 'INVALID_TOKEN' },
+      })
+    }
+
+    // Hash new password
+    const passwordHash = await hashPassword(password)
+
+    // Update password and mark token as used in a transaction
+    await prisma.$transaction([
+      // Update user password
+      prisma.user.update({
+        where: { id: resetToken.userId },
+        data: { passwordHash },
+      }),
+      // Mark token as used
+      prisma.passwordResetToken.update({
+        where: { id: resetToken.id },
+        data: { usedAt: new Date() },
+      }),
+      // Invalidate all refresh tokens for security
+      prisma.refreshToken.deleteMany({
+        where: { userId: resetToken.userId },
+      }),
+    ])
+
+    logger.info({ userId: resetToken.userId }, 'Password reset successful for tenant user')
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. You can now log in with your new password.',
+    })
+  } catch (err) {
+    next(err)
   }
 })
 

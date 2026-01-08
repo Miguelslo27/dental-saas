@@ -5,6 +5,8 @@ import LoginPage from '@pages/auth/LoginPage'
 import RegisterPage from '@pages/auth/RegisterPage'
 import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
 import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
+import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
 
 // Admin pages
 import AdminLayout from '@/components/admin/AdminLayout'
@@ -26,6 +28,10 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/register/success" element={<RegisterSuccessPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {/* Clinic-specific reset password route */}
+      <Route path="/:clinicSlug/reset-password" element={<ResetPasswordPage />} />
 
       {/* Admin routes (separate auth flow) */}
       <Route path="/admin/setup" element={<AdminSetupPage />} />

@@ -7,7 +7,8 @@ import { hashPassword, hashToken } from '../../services/auth.service.js'
 
 describe('Admin Auth - Password Recovery', () => {
   let superAdminId: string
-  const testEmail = 'superadmin-test-recovery@test.com'
+  // Use unique email with timestamp to avoid conflicts
+  const testEmail = `superadmin-recovery-${Date.now()}@test.com`
   const testPassword = 'OldPassword123!'
 
   beforeAll(async () => {
@@ -27,16 +28,18 @@ describe('Admin Auth - Password Recovery', () => {
   })
 
   afterAll(async () => {
-    // Clean up test data
-    await prisma.passwordResetToken.deleteMany({
-      where: { userId: superAdminId },
-    })
-    await prisma.refreshToken.deleteMany({
-      where: { userId: superAdminId },
-    })
-    await prisma.user.delete({
-      where: { id: superAdminId },
-    })
+    // Clean up test data - handle cases where user may not exist
+    if (superAdminId) {
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: superAdminId },
+      })
+      await prisma.refreshToken.deleteMany({
+        where: { userId: superAdminId },
+      })
+      await prisma.user.delete({
+        where: { id: superAdminId },
+      }).catch(() => { /* User may not exist */ })
+    }
   })
 
   beforeEach(async () => {

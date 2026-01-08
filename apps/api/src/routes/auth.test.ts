@@ -1,0 +1,436 @@
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+import request from 'supertest'
+import { app } from '../app.js'
+import { prisma } from '@dental/database'
+import { hashPassword, hashToken } from '../services/auth.service.js'
+
+describe('Auth - Tenant User Password Recovery', () => {
+  let tenantId: string
+  let userId: string
+  const testEmail = 'tenant-user-recovery@test.com'
+  const testPassword = 'OldPassword123!'
+  // Use unique slug with random suffix to avoid conflicts with parallel tests
+  const testClinicSlug = `test-clinic-recovery-${Date.now()}`
+
+  beforeAll(async () => {
+    // Create a test tenant
+    const tenant = await prisma.tenant.create({
+      data: {
+        name: 'Test Clinic for Recovery',
+        slug: testClinicSlug,
+      },
+    })
+    tenantId = tenant.id
+
+    // Create a test user in this tenant
+    const passwordHash = await hashPassword(testPassword)
+    const user = await prisma.user.create({
+      data: {
+        email: testEmail,
+        passwordHash,
+        firstName: 'Test',
+        lastName: 'TenantUser',
+        role: 'OWNER',
+        tenantId: tenant.id,
+      },
+    })
+    userId = user.id
+  })
+
+  afterAll(async () => {
+    // Clean up test data - handle cases where creation may have failed
+    if (userId) {
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId },
+      })
+      await prisma.refreshToken.deleteMany({
+        where: { userId },
+      })
+      await prisma.user.delete({
+        where: { id: userId },
+      }).catch(() => { /* User may not exist */ })
+    }
+    if (tenantId) {
+      await prisma.tenant.delete({
+        where: { id: tenantId },
+      }).catch(() => { /* Tenant may not exist */ })
+    }
+  })
+
+  beforeEach(async () => {
+    // Clean up tokens before each test
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId },
+    })
+  })
+
+  describe('POST /api/auth/forgot-password', () => {
+    it('should return 200 for valid tenant user email and clinicSlug', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testEmail, clinicSlug: testClinicSlug })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toContain('If an account exists')
+
+      // Verify token was created
+      const token = await prisma.passwordResetToken.findFirst({
+        where: { userId },
+      })
+      expect(token).not.toBeNull()
+      expect(token?.usedAt).toBeNull()
+    })
+
+    it('should return 200 for non-existent email (security)', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'nonexistent@test.com', clinicSlug: testClinicSlug })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toContain('If an account exists')
+    })
+
+    it('should return 200 for non-existent clinic (security)', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testEmail, clinicSlug: 'non-existent-clinic' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toContain('If an account exists')
+    })
+
+    it('should return 400 for invalid email format', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'not-an-email', clinicSlug: testClinicSlug })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return 400 for missing clinicSlug', async () => {
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testEmail })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should invalidate previous tokens when requesting a new one', async () => {
+      // Request first token
+      await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testEmail, clinicSlug: testClinicSlug })
+
+      const firstToken = await prisma.passwordResetToken.findFirst({
+        where: { userId, usedAt: null },
+      })
+      expect(firstToken).not.toBeNull()
+
+      // Request second token
+      await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: testEmail, clinicSlug: testClinicSlug })
+
+      // First token should be invalidated (usedAt set)
+      const invalidatedToken = await prisma.passwordResetToken.findUnique({
+        where: { id: firstToken!.id },
+      })
+      expect(invalidatedToken?.usedAt).not.toBeNull()
+
+      // There should be a new valid token
+      const newToken = await prisma.passwordResetToken.findFirst({
+        where: { userId, usedAt: null },
+      })
+      expect(newToken).not.toBeNull()
+      expect(newToken?.id).not.toBe(firstToken?.id)
+    })
+
+    it('should not create token for inactive user', async () => {
+      // Create inactive user
+      const inactiveUser = await prisma.user.create({
+        data: {
+          email: 'inactive@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Inactive',
+          lastName: 'User',
+          role: 'STAFF',
+          tenantId,
+          isActive: false,
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'inactive@test.com', clinicSlug: testClinicSlug })
+
+      expect(response.status).toBe(200) // Still 200 for security
+
+      // But no token should be created
+      const token = await prisma.passwordResetToken.findFirst({
+        where: { userId: inactiveUser.id },
+      })
+      expect(token).toBeNull()
+
+      // Cleanup
+      await prisma.user.delete({ where: { id: inactiveUser.id } })
+    })
+
+    it('should not create token for SUPER_ADMIN (wrong endpoint)', async () => {
+      // Create a super admin
+      const superAdmin = await prisma.user.create({
+        data: {
+          email: 'superadmin-wrong@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Super',
+          lastName: 'Admin',
+          role: 'SUPER_ADMIN',
+          tenantId: null,
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/forgot-password')
+        .send({ email: 'superadmin-wrong@test.com', clinicSlug: testClinicSlug })
+
+      expect(response.status).toBe(200) // Still 200 for security
+
+      // But no token should be created
+      const token = await prisma.passwordResetToken.findFirst({
+        where: { userId: superAdmin.id },
+      })
+      expect(token).toBeNull()
+
+      // Cleanup
+      await prisma.user.delete({ where: { id: superAdmin.id } })
+    })
+  })
+
+  describe('POST /api/auth/reset-password', () => {
+    it('should reset password with valid token', async () => {
+      // Create a valid token
+      const plainToken = 'valid-test-token-for-reset'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 min
+        },
+      })
+
+      const newPassword = 'NewPassword123!'
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: newPassword })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.message).toContain('Password has been reset')
+
+      // Verify token was marked as used
+      const usedToken = await prisma.passwordResetToken.findUnique({
+        where: { tokenHash },
+      })
+      expect(usedToken?.usedAt).not.toBeNull()
+
+      // Verify we can login with new password
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
+        .send({ email: testEmail, password: newPassword, clinicSlug: testClinicSlug })
+
+      expect(loginResponse.status).toBe(200)
+    })
+
+    it('should return 400 for invalid token', async () => {
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: 'invalid-token', password: 'NewPassword123!' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('INVALID_TOKEN')
+    })
+
+    it('should return 400 for expired token', async () => {
+      const plainToken = 'expired-test-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: new Date(Date.now() - 1000), // Already expired
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('TOKEN_EXPIRED')
+    })
+
+    it('should return 400 for already used token', async () => {
+      const plainToken = 'used-test-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+          usedAt: new Date(), // Already used
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('TOKEN_USED')
+    })
+
+    it('should return 400 for weak password', async () => {
+      const plainToken = 'weak-password-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'weak' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should invalidate all refresh tokens on password reset', async () => {
+      // Create some refresh tokens
+      await prisma.refreshToken.create({
+        data: {
+          userId,
+          tokenHash: 'old-refresh-token-hash-1',
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      })
+      await prisma.refreshToken.create({
+        data: {
+          userId,
+          tokenHash: 'old-refresh-token-hash-2',
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      })
+
+      // Create a valid reset token
+      const plainToken = 'token-for-invalidation-test'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      expect(response.status).toBe(200)
+
+      // Verify all refresh tokens were deleted
+      const remainingTokens = await prisma.refreshToken.findMany({
+        where: { userId },
+      })
+      expect(remainingTokens).toHaveLength(0)
+    })
+
+    it('should return 400 for inactive user', async () => {
+      // Create inactive user
+      const inactiveUser = await prisma.user.create({
+        data: {
+          email: 'inactive-reset@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Inactive',
+          lastName: 'User',
+          role: 'STAFF',
+          tenantId,
+          isActive: false,
+        },
+      })
+
+      const plainToken = 'inactive-user-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: inactiveUser.id,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      })
+
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('ACCOUNT_INACTIVE')
+
+      // Cleanup
+      await prisma.passwordResetToken.deleteMany({ where: { userId: inactiveUser.id } })
+      await prisma.user.delete({ where: { id: inactiveUser.id } })
+    })
+
+    it('should return 400 for SUPER_ADMIN attempting to use tenant reset endpoint', async () => {
+      // Create a SUPER_ADMIN user (no tenantId)
+      const superAdmin = await prisma.user.create({
+        data: {
+          email: 'superadmin-reset-test@test.com',
+          passwordHash: await hashPassword('Test123!'),
+          firstName: 'Super',
+          lastName: 'Admin',
+          role: 'SUPER_ADMIN',
+          tenantId: null,
+        },
+      })
+
+      // Create a valid token for the SUPER_ADMIN
+      const plainToken = 'superadmin-tenant-reset-token'
+      const tokenHash = hashToken(plainToken)
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: superAdmin.id,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      })
+
+      // Attempt to use tenant reset-password endpoint
+      const response = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: plainToken, password: 'NewPassword123!' })
+
+      // Should fail because SUPER_ADMIN has no tenantId
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('INVALID_TOKEN')
+
+      // Cleanup
+      await prisma.passwordResetToken.deleteMany({ where: { userId: superAdmin.id } })
+      await prisma.user.delete({ where: { id: superAdmin.id } })
+    })
+  })
+})
