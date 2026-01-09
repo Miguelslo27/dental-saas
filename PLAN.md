@@ -10,24 +10,23 @@
 
 ---
 
-##  BUGS PRIORITARIOS
+## ✅ BUGS RESUELTOS
 
-### BUG-001: Link de email de bienvenida no funciona
+### BUG-001: Link de email de bienvenida no funciona ✅ RESUELTO
 - **Prioridad:** ALTA
-- **Descripción:** El email de bienvenida dirige a `http://[url]/[slug]/login` pero esa ruta no muestra nada
-- **Causa probable:** La ruta `/:clinicSlug/login` no existe o no está bien configurada
-- **Archivo afectado:** `apps/app/src/App.tsx`, `apps/api/src/services/email.service.ts`
+- **Descripción:** El email de bienvenida dirige a `http://[url]/[slug]/login` pero esa ruta no mostraba nada
+- **Solución:** Añadida ruta `/:clinicSlug/login` en App.tsx (PR #51)
+- **PR:** #51
 
-### BUG-002: Login redirige a landing page en lugar de dashboard
+### BUG-002: Login redirige a landing page en lugar de dashboard ✅ RESUELTO
 - **Prioridad:** ALTA
-- **Descripción:** Después del login exitoso, el usuario es redirigido a la landing page en lugar del panel de gestión
-- **Impacto:** El usuario no puede acceder al panel de la clínica
-- **Decisión arquitectónica:** La landing page ahora es un proyecto separado (`apps/web`). El panel (`apps/app`) debe tener `/login` como página principal.
-- **Acciones requeridas:**
-  1. ✅ Crear `apps/web` para landing page separada
-  2. ⏳ Eliminar landing page de `apps/app`
-  3. ⏳ Configurar login como página principal (`/login`) en apps/app
-  4. ⏳ Redirigir post-login al dashboard (`/dashboard`)
+- **Descripción:** Después del login exitoso, el usuario era redirigido a la landing page en lugar del panel de gestión
+- **Solución:** 
+  1. Separación de apps: `apps/app` (panel) y `apps/web` (landing) - PR #51
+  2. Ruta `/` ahora muestra `HomePage` envuelto en `ProtectedRoute` - PR #52
+  3. Si no autenticado → redirige a `/login`
+  4. Si autenticado → muestra dashboard (HomePage)
+- **PRs:** #51, #52
 
 ---
 
@@ -35,8 +34,8 @@
 
 ### Progreso de Implementación
 - ✅ `apps/api` - Backend completo
-- ✅ `apps/web` - Landing page creada (puerto 5174)
-- ⏳ `apps/app` - Limpiar landing page, configurar login como root
+- ✅ `apps/web` - Landing page (puerto 5174)
+- ✅ `apps/app` - Panel de gestión (puerto 5173)
 
 ### Estructura del Monorepo
 
