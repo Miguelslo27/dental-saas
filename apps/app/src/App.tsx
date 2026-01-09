@@ -1,10 +1,12 @@
-import { Routes, Route, Navigate } from 'react-router'
+import { Routes, Route } from 'react-router'
 import LoginPage from '@pages/auth/LoginPage'
 import RegisterPage from '@pages/auth/RegisterPage'
 import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
 import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
 import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
+import HomePage from '@pages/HomePage'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 // Admin pages
 import AdminLayout from '@/components/admin/AdminLayout'
@@ -19,8 +21,15 @@ import AdminUsersPage from '@pages/admin/AdminUsersPage'
 function App() {
   return (
     <Routes>
-      {/* Root redirects to login */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Dashboard - protected, redirects to /login if not authenticated */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Public auth routes */}
       <Route path="/login" element={<LoginPage />} />
