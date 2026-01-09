@@ -1,53 +1,14 @@
-import { Routes, Route, Navigate } from 'react-router'
-import LandingPage from '@pages/LandingPage'
-import PricingPage from '@pages/PricingPage'
-import LoginPage from '@pages/auth/LoginPage'
-import RegisterPage from '@pages/auth/RegisterPage'
-import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
-import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
-import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
-import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
+import { BrowserRouter, Routes, Route } from "react-router";
+import { HomePage } from "./pages/HomePage";
+import { PricingPage } from "./pages/PricingPage";
 
-// Admin pages
-import AdminLayout from '@/components/admin/AdminLayout'
-import AdminSetupPage from '@pages/admin/AdminSetupPage'
-import AdminLoginPage from '@pages/admin/AdminLoginPage'
-import { AdminForgotPasswordPage } from '@pages/admin/AdminForgotPasswordPage'
-import { AdminResetPasswordPage } from '@pages/admin/AdminResetPasswordPage'
-import AdminDashboardPage from '@pages/admin/AdminDashboardPage'
-import AdminTenantsPage from '@pages/admin/AdminTenantsPage'
-import AdminUsersPage from '@pages/admin/AdminUsersPage'
-
-function App() {
+export default function App() {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/register/success" element={<RegisterSuccessPage />} />
-      <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      {/* Clinic-specific reset password route */}
-      <Route path="/:clinicSlug/reset-password" element={<ResetPasswordPage />} />
-
-      {/* Admin routes (separate auth flow) */}
-      <Route path="/admin/setup" element={<AdminSetupPage />} />
-      <Route path="/admin/login" element={<AdminLoginPage />} />
-      <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
-      <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
-
-      {/* Protected admin routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<AdminDashboardPage />} />
-        <Route path="tenants" element={<AdminTenantsPage />} />
-        <Route path="users" element={<AdminUsersPage />} />
-      </Route>
-    </Routes>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/precios" element={<PricingPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App
