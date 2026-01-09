@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router'
+import { Routes, Route, Navigate } from 'react-router'
 import LoginPage from '@pages/auth/LoginPage'
 import RegisterPage from '@pages/auth/RegisterPage'
 import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
