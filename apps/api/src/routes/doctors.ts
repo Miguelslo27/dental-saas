@@ -15,11 +15,73 @@ import {
 const doctorsRouter: IRouter = Router()
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Prisma P2002 unique constraint error type
+ */
+type PrismaP2002Error = {
+  code?: string
+  meta?: {
+    driverAdapterError?: {
+      cause?: {
+        originalMessage?: string
+      }
+    }
+  }
+}
+
+/**
+ * Handle Prisma P2002 unique constraint violations
+ * Returns true if the error was handled, false otherwise
+ */
+function handlePrismaUniqueError(
+  e: unknown,
+  res: import('express').Response
+): boolean {
+  const error = e as PrismaP2002Error
+  if (error.code !== 'P2002') {
+    return false
+  }
+
+  const originalMessage = error.meta?.driverAdapterError?.cause?.originalMessage || ''
+
+  if (originalMessage.includes('email')) {
+    res.status(409).json({
+      success: false,
+      error: { message: 'A doctor with this email already exists', code: 'DUPLICATE_EMAIL' },
+    })
+    return true
+  }
+
+  if (originalMessage.includes('licenseNumber')) {
+    res.status(409).json({
+      success: false,
+      error: { message: 'A doctor with this license number already exists', code: 'DUPLICATE_LICENSE' },
+    })
+    return true
+  }
+
+  // Generic duplicate error
+  res.status(409).json({
+    success: false,
+    error: { message: 'A doctor with these values already exists', code: 'DUPLICATE_ENTRY' },
+  })
+  return true
+}
+
+// ============================================================================
 // Validation Schemas
 // ============================================================================
 
-// Phone validation: if provided, must be non-empty
-const phoneSchema = z.string().min(1, 'Phone number cannot be empty').optional().nullable()
+// Phone validation: if provided, must be non-empty string
+// Using transform to normalize empty strings to undefined for cleaner handling
+const phoneSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .transform((val) => (val === '' ? undefined : val))
 
 // Working hours schema
 const workingHoursSchema = z
@@ -50,7 +112,7 @@ const createDoctorSchema = z.object({
   workingHours: workingHoursSchema,
   consultingRoom: z.string().min(1).optional(),
   avatar: z.string().url().optional(),
-  bio: z.string().optional(),
+  bio: z.string().max(5000, 'Bio cannot exceed 5000 characters').optional(),
   hourlyRate: z.number().positive().optional(),
 })
 
@@ -66,7 +128,7 @@ const updateDoctorSchema = z.object({
   workingHours: workingHoursSchema,
   consultingRoom: z.string().min(1).optional().nullable(),
   avatar: z.string().url().optional().nullable(),
-  bio: z.string().optional().nullable(),
+  bio: z.string().max(5000, 'Bio cannot exceed 5000 characters').optional().nullable(),
   hourlyRate: z.number().positive().optional().nullable(),
 })
 
@@ -185,44 +247,22 @@ doctorsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
       })
     }
 
-    const doctor = await createDoctor(tenantId, parsed.data)
+    // Transform null phone to undefined for create (create doesn't accept null)
+    const createData = {
+      ...parsed.data,
+      phone: parsed.data.phone ?? undefined,
+      workingHours: parsed.data.workingHours ?? undefined,
+    }
+
+    const doctor = await createDoctor(tenantId, createData)
 
     res.status(201).json({
       success: true,
       data: doctor,
     })
   } catch (e) {
-    // Handle unique constraint violations from Prisma
-    const error = e as { 
-      code?: string
-      meta?: { 
-        driverAdapterError?: { 
-          cause?: { 
-            originalMessage?: string 
-          } 
-        } 
-      }
-    }
-    if (error.code === 'P2002') {
-      // Extract constraint info from driver adapter error
-      const originalMessage = error.meta?.driverAdapterError?.cause?.originalMessage || ''
-      if (originalMessage.includes('email')) {
-        return res.status(409).json({
-          success: false,
-          error: { message: 'A doctor with this email already exists', code: 'DUPLICATE_EMAIL' },
-        })
-      }
-      if (originalMessage.includes('licenseNumber')) {
-        return res.status(409).json({
-          success: false,
-          error: { message: 'A doctor with this license number already exists', code: 'DUPLICATE_LICENSE' },
-        })
-      }
-      // Generic duplicate error
-      return res.status(409).json({
-        success: false,
-        error: { message: 'A doctor with these values already exists', code: 'DUPLICATE_ENTRY' },
-      })
+    if (handlePrismaUniqueError(e, res)) {
+      return
     }
     next(e)
   }
@@ -260,35 +300,8 @@ doctorsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
       data: doctor,
     })
   } catch (e) {
-    // Handle unique constraint violations from Prisma
-    const error = e as { 
-      code?: string
-      meta?: { 
-        driverAdapterError?: { 
-          cause?: { 
-            originalMessage?: string 
-          } 
-        } 
-      }
-    }
-    if (error.code === 'P2002') {
-      const originalMessage = error.meta?.driverAdapterError?.cause?.originalMessage || ''
-      if (originalMessage.includes('email')) {
-        return res.status(409).json({
-          success: false,
-          error: { message: 'A doctor with this email already exists', code: 'DUPLICATE_EMAIL' },
-        })
-      }
-      if (originalMessage.includes('licenseNumber')) {
-        return res.status(409).json({
-          success: false,
-          error: { message: 'A doctor with this license number already exists', code: 'DUPLICATE_LICENSE' },
-        })
-      }
-      return res.status(409).json({
-        success: false,
-        error: { message: 'A doctor with these values already exists', code: 'DUPLICATE_ENTRY' },
-      })
+    if (handlePrismaUniqueError(e, res)) {
+      return
     }
     next(e)
   }
@@ -306,10 +319,18 @@ doctorsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => 
     const result = await deleteDoctor(tenantId, id)
 
     if (!result.success) {
-      const statusCode = result.error === 'Doctor not found' ? 404 : 400
-      return res.status(statusCode).json({
+      // Use errorCode for reliable error type detection
+      if (result.errorCode === 'NOT_FOUND') {
+        return res.status(404).json({
+          success: false,
+          error: { message: result.error, code: 'NOT_FOUND' },
+        })
+      }
+
+      // ALREADY_INACTIVE or other cases
+      return res.status(400).json({
         success: false,
-        error: { message: result.error, code: result.error === 'Doctor not found' ? 'NOT_FOUND' : 'INVALID_OPERATION' },
+        error: { message: result.error, code: result.errorCode || 'INVALID_OPERATION' },
       })
     }
 
@@ -334,18 +355,25 @@ doctorsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next
     const result = await restoreDoctor(tenantId, id)
 
     if (!result.success) {
-      // Check if it's a plan limit error
-      if (result.error?.includes('limit reached')) {
+      // Use errorCode for reliable error type detection
+      if (result.errorCode === 'PLAN_LIMIT_EXCEEDED') {
         return res.status(403).json({
           success: false,
           error: { message: result.error, code: 'PLAN_LIMIT_EXCEEDED' },
         })
       }
 
-      const statusCode = result.error === 'Doctor not found' ? 404 : 400
-      return res.status(statusCode).json({
+      if (result.errorCode === 'NOT_FOUND') {
+        return res.status(404).json({
+          success: false,
+          error: { message: result.error, code: 'NOT_FOUND' },
+        })
+      }
+
+      // ALREADY_ACTIVE or other cases
+      return res.status(400).json({
         success: false,
-        error: { message: result.error, code: result.error === 'Doctor not found' ? 'NOT_FOUND' : 'INVALID_OPERATION' },
+        error: { message: result.error, code: result.errorCode || 'INVALID_OPERATION' },
       })
     }
 

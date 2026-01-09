@@ -11,6 +11,9 @@ vi.mock('@dental/database', () => ({
       findMany: vi.fn(),
     },
   },
+  Prisma: {
+    JsonNull: { __brand: 'JsonNull' }, // Mock JsonNull for doctor.service.ts
+  },
 }))
 
 // Helper to create mock tenant

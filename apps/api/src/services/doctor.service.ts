@@ -2,6 +2,9 @@ import { prisma, Prisma } from '@dental/database'
 import { getTenantPlanLimits } from './user.service.js'
 import { logger } from '../utils/logger.js'
 
+// Prisma JsonNull helper for nullable JSON fields
+const JsonNull = Prisma.JsonNull
+
 // Fields to include in doctor responses
 const DOCTOR_SELECT = {
   id: true,
@@ -165,7 +168,7 @@ export async function createDoctor(
       specialty,
       licenseNumber,
       workingDays: workingDays || [],
-      workingHours: workingHours || null,
+      workingHours: workingHours ?? JsonNull,
       consultingRoom,
       avatar,
       bio,
@@ -211,9 +214,16 @@ export async function updateDoctor(
     return null
   }
 
+  // Transform workingHours null to Prisma.JsonNull for proper null handling
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const prismaData: Record<string, any> = { ...data }
+  if (data.workingHours !== undefined) {
+    prismaData.workingHours = data.workingHours === null ? JsonNull : data.workingHours
+  }
+
   const doctor = await prisma.doctor.update({
     where: { id: doctorId },
-    data,
+    data: prismaData,
     select: DOCTOR_SELECT,
   })
 
@@ -228,7 +238,7 @@ export async function updateDoctor(
 export async function deleteDoctor(
   tenantId: string,
   doctorId: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; errorCode?: DoctorErrorCode }> {
   // Verify doctor belongs to tenant
   const existing = await prisma.doctor.findFirst({
     where: { id: doctorId, tenantId },
@@ -236,11 +246,11 @@ export async function deleteDoctor(
   })
 
   if (!existing) {
-    return { success: false, error: 'Doctor not found' }
+    return { success: false, error: 'Doctor not found', errorCode: 'NOT_FOUND' }
   }
 
   if (!existing.isActive) {
-    return { success: false, error: 'Doctor is already inactive' }
+    return { success: false, error: 'Doctor is already inactive', errorCode: 'ALREADY_INACTIVE' }
   }
 
   await prisma.doctor.update({
@@ -254,12 +264,17 @@ export async function deleteDoctor(
 }
 
 /**
+ * Error codes for doctor operations
+ */
+export type DoctorErrorCode = 'NOT_FOUND' | 'ALREADY_INACTIVE' | 'ALREADY_ACTIVE' | 'PLAN_LIMIT_EXCEEDED'
+
+/**
  * Restore a soft-deleted doctor
  */
 export async function restoreDoctor(
   tenantId: string,
   doctorId: string
-): Promise<{ success: boolean; doctor?: SafeDoctor; error?: string }> {
+): Promise<{ success: boolean; doctor?: SafeDoctor; error?: string; errorCode?: DoctorErrorCode }> {
   // Verify doctor belongs to tenant
   const existing = await prisma.doctor.findFirst({
     where: { id: doctorId, tenantId },
@@ -267,17 +282,17 @@ export async function restoreDoctor(
   })
 
   if (!existing) {
-    return { success: false, error: 'Doctor not found' }
+    return { success: false, error: 'Doctor not found', errorCode: 'NOT_FOUND' }
   }
 
   if (existing.isActive) {
-    return { success: false, error: 'Doctor is already active' }
+    return { success: false, error: 'Doctor is already active', errorCode: 'ALREADY_ACTIVE' }
   }
 
   // Check if restoring would exceed limits
   const limitCheck = await checkDoctorLimit(tenantId)
   if (!limitCheck.allowed) {
-    return { success: false, error: limitCheck.message }
+    return { success: false, error: limitCheck.message, errorCode: 'PLAN_LIMIT_EXCEEDED' }
   }
 
   const doctor = await prisma.doctor.update({

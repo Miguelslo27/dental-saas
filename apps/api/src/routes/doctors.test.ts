@@ -13,7 +13,6 @@ describe('Doctors API', () => {
   let staffUserId: string
   let adminToken: string
   let staffToken: string
-  let doctorId: string
   const testSlug = `test-clinic-doctors-${Date.now()}`
 
   // Helper to generate JWT token
@@ -103,7 +102,6 @@ describe('Doctors API', () => {
   beforeEach(async () => {
     // Clean up doctors before each test (except specific ones we want to keep)
     await prisma.doctor.deleteMany({ where: { tenantId } })
-    doctorId = ''
   })
 
   describe('POST /api/doctors', () => {
@@ -131,7 +129,6 @@ describe('Doctors API', () => {
       expect(response.body.data.email).toBe('john.doe@clinic.com')
       expect(response.body.data.specialty).toBe('General Dentistry')
       expect(response.body.data.tenantId).toBe(tenantId)
-      doctorId = response.body.data.id
     })
 
     it('should create a doctor with minimal data', async () => {
@@ -511,7 +508,7 @@ describe('Doctors API', () => {
         .set('Authorization', `Bearer ${adminToken}`)
 
       expect(response.status).toBe(400)
-      expect(response.body.error.code).toBe('INVALID_OPERATION')
+      expect(response.body.error.code).toBe('ALREADY_INACTIVE')
     })
 
     it('should return 403 for STAFF trying to delete', async () => {
@@ -572,7 +569,7 @@ describe('Doctors API', () => {
         .set('Authorization', `Bearer ${adminToken}`)
 
       expect(response.status).toBe(400)
-      expect(response.body.error.code).toBe('INVALID_OPERATION')
+      expect(response.body.error.code).toBe('ALREADY_ACTIVE')
     })
 
     it('should return 403 when restoring would exceed plan limit', async () => {
