@@ -1,144 +1,386 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
-import { prisma } from '@dental/database'
+import { requireMinRole } from '../middleware/auth.js'
+import {
+  listDoctors,
+  getDoctorById,
+  createDoctor,
+  updateDoctor,
+  deleteDoctor,
+  restoreDoctor,
+  checkDoctorLimit,
+  getDoctorStats,
+} from '../services/doctor.service.js'
 
 const doctorsRouter: IRouter = Router()
 
-// Simple tenant extractor middleware (expects `x-tenant-id` header)
-function getTenantId(req: any) {
-  const tenantId = String(req.headers['x-tenant-id'] || '')
-  if (!tenantId) return null
-  return tenantId
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Prisma P2002 unique constraint error type
+ */
+type PrismaP2002Error = {
+  code?: string
+  meta?: {
+    driverAdapterError?: {
+      cause?: {
+        originalMessage?: string
+      }
+    }
+  }
 }
 
-// Zod schemas
-const doctorCreateSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
+/**
+ * Handle Prisma P2002 unique constraint violations
+ * Returns true if the error was handled, false otherwise
+ */
+function handlePrismaUniqueError(
+  e: unknown,
+  res: import('express').Response
+): boolean {
+  const error = e as PrismaP2002Error
+  if (error.code !== 'P2002') {
+    return false
+  }
+
+  const originalMessage = error.meta?.driverAdapterError?.cause?.originalMessage || ''
+
+  if (originalMessage.includes('email')) {
+    res.status(409).json({
+      success: false,
+      error: { message: 'A doctor with this email already exists', code: 'DUPLICATE_EMAIL' },
+    })
+    return true
+  }
+
+  if (originalMessage.includes('licenseNumber')) {
+    res.status(409).json({
+      success: false,
+      error: { message: 'A doctor with this license number already exists', code: 'DUPLICATE_LICENSE' },
+    })
+    return true
+  }
+
+  // Generic duplicate error
+  res.status(409).json({
+    success: false,
+    error: { message: 'A doctor with these values already exists', code: 'DUPLICATE_ENTRY' },
+  })
+  return true
+}
+
+// ============================================================================
+// Validation Schemas
+// ============================================================================
+
+// Phone validation: if provided, must be non-empty string
+// Using transform to normalize empty strings to undefined for cleaner handling
+const phoneSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .transform((val) => (val === '' ? undefined : val))
+
+// Working hours schema
+const workingHoursSchema = z
+  .object({
+    start: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Start time must be in HH:MM format'),
+    end: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'End time must be in HH:MM format'),
+  })
+  .optional()
+  .nullable()
+
+// Query params validation for list endpoint
+const listDoctorsQuerySchema = z.object({
+  limit: z.coerce.number().int().positive().max(100).optional(),
+  offset: z.coerce.number().int().nonnegative().optional(),
+  includeInactive: z.enum(['true', 'false']).optional(),
+  search: z.string().optional(),
+})
+
+// Create doctor schema
+const createDoctorSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email().optional(),
-  phone: z.string().optional(),
-  specialty: z.string().optional(),
-  licenseNumber: z.string().optional(),
-  workingDays: z.array(z.string()).optional(),
-  workingHours: z.object({
-    start: z.string(),
-    end: z.string(),
-  }).optional(),
-  consultingRoom: z.string().optional(),
+  phone: phoneSchema,
+  specialty: z.string().min(1).optional(),
+  licenseNumber: z.string().min(1).optional(),
+  workingDays: z.array(z.enum(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])).optional(),
+  workingHours: workingHoursSchema,
+  consultingRoom: z.string().min(1).optional(),
   avatar: z.string().url().optional(),
-  bio: z.string().optional(),
+  bio: z.string().max(5000, 'Bio cannot exceed 5000 characters').optional(),
   hourlyRate: z.number().positive().optional(),
 })
 
-const allowedUpdateFields = [
-  'firstName',
-  'lastName',
-  'email',
-  'phone',
-  'specialty',
-  'licenseNumber',
-  'workingDays',
-  'workingHours',
-  'consultingRoom',
-  'avatar',
-  'bio',
-  'hourlyRate',
-]
-
-// List doctors
-doctorsRouter.get('/', async (req, res, next) => {
-  try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
-
-    const { limit, offset } = req.query
-    const where: any = { tenantId }
-
-    const take = limit ? Math.min(parseInt(String(limit), 10) || 0, 100) : undefined
-    const skip = offset ? Math.max(parseInt(String(offset), 10) || 0, 0) : undefined
-
-    const doctors = await prisma.doctor.findMany({ where, take, skip })
-    res.json(doctors)
-  } catch (e) {
-    next(e)
-  }
+// Update doctor schema (all fields optional)
+const updateDoctorSchema = z.object({
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
+  email: z.string().email().optional().nullable(),
+  phone: phoneSchema,
+  specialty: z.string().min(1).optional().nullable(),
+  licenseNumber: z.string().min(1).optional().nullable(),
+  workingDays: z.array(z.enum(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])).optional(),
+  workingHours: workingHoursSchema,
+  consultingRoom: z.string().min(1).optional().nullable(),
+  avatar: z.string().url().optional().nullable(),
+  bio: z.string().max(5000, 'Bio cannot exceed 5000 characters').optional().nullable(),
+  hourlyRate: z.number().positive().optional().nullable(),
 })
 
-// Get doctor by ID
-doctorsRouter.get('/:id', async (req, res, next) => {
+// ============================================================================
+// Routes
+// ============================================================================
+
+/**
+ * GET /api/doctors
+ * List all doctors for the tenant (STAFF+ required)
+ */
+doctorsRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
+    const tenantId = req.user!.tenantId
 
-    const { id } = req.params
-    const doctor = await prisma.doctor.findUnique({ where: { id } })
-    if (!doctor || doctor.tenantId !== tenantId) {
-      return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
-    }
-    res.json(doctor)
-  } catch (e) {
-    next(e)
-  }
-})
-
-// Create doctor
-doctorsRouter.post('/', async (req, res, next) => {
-  try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
-
-    const parse = doctorCreateSchema.safeParse(req.body)
-    if (!parse.success) return res.status(400).json({ success: false, error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors } })
-
-    const data = { ...parse.data, tenantId }
-    const doctor = await prisma.doctor.create({ data })
-    res.status(201).json(doctor)
-  } catch (e) {
-    next(e)
-  }
-})
-
-// Update doctor
-doctorsRouter.put('/:id', async (req, res, next) => {
-  try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
-
-    const { id } = req.params
-
-    // Prevent changing tenantId or id
-    const forbidden = ['id', 'tenantId']
-    const attempted = forbidden.filter((f) => Object.prototype.hasOwnProperty.call(req.body, f))
-    if (attempted.length > 0) return res.status(400).json({ success: false, error: { message: 'Attempt to modify immutable fields', code: 'IMMUTABLE_FIELDS', fields: attempted } })
-
-    // Whitelist allowed fields
-    const data: any = {}
-    for (const key of allowedUpdateFields) {
-      if (Object.prototype.hasOwnProperty.call(req.body, key)) data[key] = (req.body as any)[key]
+    const parsedQuery = listDoctorsQuerySchema.safeParse(req.query)
+    if (!parsedQuery.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid query parameters', code: 'INVALID_QUERY', details: parsedQuery.error.errors },
+      })
     }
 
-    const existing = await prisma.doctor.findUnique({ where: { id } })
-    if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
+    const { limit, offset, includeInactive, search } = parsedQuery.data
 
-    const doctor = await prisma.doctor.update({ where: { id }, data })
-    res.json(doctor)
+    const doctors = await listDoctors(tenantId, {
+      limit,
+      offset,
+      includeInactive: includeInactive === 'true',
+      search,
+    })
+
+    res.json({
+      success: true,
+      data: doctors,
+    })
   } catch (e) {
     next(e)
   }
 })
 
-// Soft delete doctor
-doctorsRouter.delete('/:id', async (req, res, next) => {
+/**
+ * GET /api/doctors/stats
+ * Get doctor counts and plan limits (ADMIN+ required)
+ */
+doctorsRouter.get('/stats', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
+    const tenantId = req.user!.tenantId
 
+    const stats = await getDoctorStats(tenantId)
+
+    res.json({
+      success: true,
+      data: stats,
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/doctors/:id
+ * Get a single doctor by ID (STAFF+ required)
+ */
+doctorsRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
     const { id } = req.params
-    const existing = await prisma.doctor.findUnique({ where: { id } })
-    if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
 
-    const doctor = await prisma.doctor.update({ where: { id }, data: { isActive: false } })
-    res.json(doctor)
+    const doctor = await getDoctorById(tenantId, id)
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Doctor not found', code: 'NOT_FOUND' },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: doctor,
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * POST /api/doctors
+ * Create a new doctor (ADMIN+ required)
+ */
+doctorsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+
+    // Check plan limits first
+    const limitCheck = await checkDoctorLimit(tenantId)
+    if (!limitCheck.allowed) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          message: limitCheck.message,
+          code: 'PLAN_LIMIT_EXCEEDED',
+          currentCount: limitCheck.currentCount,
+          limit: limitCheck.limit,
+        },
+      })
+    }
+
+    // Validate request body
+    const parsed = createDoctorSchema.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid request body', code: 'VALIDATION_ERROR', details: parsed.error.errors },
+      })
+    }
+
+    // Transform null phone to undefined for create (create doesn't accept null)
+    const createData = {
+      ...parsed.data,
+      phone: parsed.data.phone ?? undefined,
+      workingHours: parsed.data.workingHours ?? undefined,
+    }
+
+    const doctor = await createDoctor(tenantId, createData)
+
+    res.status(201).json({
+      success: true,
+      data: doctor,
+    })
+  } catch (e) {
+    if (handlePrismaUniqueError(e, res)) {
+      return
+    }
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/doctors/:id
+ * Update a doctor (ADMIN+ required)
+ */
+doctorsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    // Validate request body
+    const parsed = updateDoctorSchema.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid request body', code: 'VALIDATION_ERROR', details: parsed.error.errors },
+      })
+    }
+
+    const doctor = await updateDoctor(tenantId, id, parsed.data)
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Doctor not found', code: 'NOT_FOUND' },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: doctor,
+    })
+  } catch (e) {
+    if (handlePrismaUniqueError(e, res)) {
+      return
+    }
+    next(e)
+  }
+})
+
+/**
+ * DELETE /api/doctors/:id
+ * Soft delete a doctor (ADMIN+ required)
+ */
+doctorsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await deleteDoctor(tenantId, id)
+
+    if (!result.success) {
+      // Use errorCode for reliable error type detection
+      if (result.errorCode === 'NOT_FOUND') {
+        return res.status(404).json({
+          success: false,
+          error: { message: result.error, code: 'NOT_FOUND' },
+        })
+      }
+
+      // ALREADY_INACTIVE or other cases
+      return res.status(400).json({
+        success: false,
+        error: { message: result.error, code: result.errorCode || 'INVALID_OPERATION' },
+      })
+    }
+
+    res.json({
+      success: true,
+      message: 'Doctor deleted successfully',
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/doctors/:id/restore
+ * Restore a soft-deleted doctor (ADMIN+ required)
+ */
+doctorsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await restoreDoctor(tenantId, id)
+
+    if (!result.success) {
+      // Use errorCode for reliable error type detection
+      if (result.errorCode === 'PLAN_LIMIT_EXCEEDED') {
+        return res.status(403).json({
+          success: false,
+          error: { message: result.error, code: 'PLAN_LIMIT_EXCEEDED' },
+        })
+      }
+
+      if (result.errorCode === 'NOT_FOUND') {
+        return res.status(404).json({
+          success: false,
+          error: { message: result.error, code: 'NOT_FOUND' },
+        })
+      }
+
+      // ALREADY_ACTIVE or other cases
+      return res.status(400).json({
+        success: false,
+        error: { message: result.error, code: result.errorCode || 'INVALID_OPERATION' },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: result.doctor,
+    })
   } catch (e) {
     next(e)
   }
