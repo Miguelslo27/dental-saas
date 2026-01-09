@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link, Navigate } from 'react-router'
+import { Link, Navigate, useParams } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { AxiosError } from 'axios'
@@ -16,6 +16,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginPage() {
+  const { clinicSlug: urlClinicSlug } = useParams<{ clinicSlug?: string }>()
   const { login, isLoading, error, clearError } = useAuth()
   const { isAuthenticated } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
@@ -29,7 +30,7 @@ export function LoginPage() {
     defaultValues: {
       email: '',
       password: '',
-      clinicSlug: '',
+      clinicSlug: urlClinicSlug || '',
     },
   })
 
