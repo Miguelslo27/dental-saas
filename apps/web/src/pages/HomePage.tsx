@@ -1,127 +1,241 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
-import { useAuthStore } from '@/stores/auth.store'
-import { useAuth } from '@/hooks/useAuth'
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-
-interface HealthResponse {
-  status: string
-  timestamp: string
-  uptime?: number
-}
-
-export default function HomePage() {
-  const [health, setHealth] = useState<HealthResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const { user, isAuthenticated } = useAuthStore()
-  const { logout } = useAuth()
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/health`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`)
-        }
-        return res.json()
-      })
-      .then((data: HealthResponse) => setHealth(data))
-      .catch((err) => setError(err.message))
-  }, [])
+export function HomePage() {
+  const appUrl = __APP_URL__;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">🦷 Alveo System</h1>
-          <nav className="flex items-center gap-4">
-            {isAuthenticated && user ? (
-              <>
-                <span className="text-gray-600">
-                  Hola, <strong>{user.firstName}</strong> ({user.role})
-                </span>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-                >
-                  Cerrar Sesión
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Registrarse
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col">
+      <Header />
 
-      {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">
-            Sistema de gestión para clínicas dentales
-          </h2>
-          <p className="text-gray-600">
-            Gestiona pacientes, citas, doctores y más desde una sola plataforma.
-          </p>
-        </div>
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-sky-50 to-white py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Gestiona tu clínica dental de forma{" "}
+                <span className="text-sky-500">inteligente</span>
+              </h1>
+              <p className="text-xl text-gray-600 mb-8">
+                Simplifica la administración de pacientes, citas, tratamientos y
+                facturación con nuestra plataforma todo-en-uno diseñada para
+                profesionales dentales.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href={`${appUrl}/register`}
+                  className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+                >
+                  Comenzar Prueba Gratis
+                </a>
+                <a
+                  href="#caracteristicas"
+                  className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+                >
+                  Ver Características
+                </a>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">
+                14 días gratis • Sin tarjeta de crédito
+              </p>
+            </div>
+          </div>
+        </section>
 
-        {/* User info card (if authenticated) */}
-        {isAuthenticated && user && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">
-              👤 Información del Usuario
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Nombre:</span>
-                <span className="ml-2 font-medium">
-                  {user.firstName} {user.lastName}
-                </span>
+        {/* Features Section */}
+        <section id="caracteristicas" className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Todo lo que necesitas para tu clínica
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Herramientas potentes diseñadas específicamente para la gestión
+                dental moderna.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Gestión de Pacientes
+                </h3>
+                <p className="text-gray-600">
+                  Historial clínico completo, odontogramas digitales y seguimiento
+                  de tratamientos en un solo lugar.
+                </p>
               </div>
-              <div>
-                <span className="text-gray-600">Email:</span>
-                <span className="ml-2 font-medium">{user.email}</span>
+
+              {/* Feature 2 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Agenda Inteligente
+                </h3>
+                <p className="text-gray-600">
+                  Calendario visual con recordatorios automáticos, gestión de
+                  múltiples profesionales y horarios flexibles.
+                </p>
               </div>
-              <div>
-                <span className="text-gray-600">Rol:</span>
-                <span className="ml-2 font-medium">{user.role}</span>
+
+              {/* Feature 3 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Reportes y Estadísticas
+                </h3>
+                <p className="text-gray-600">
+                  Métricas detalladas sobre ingresos, tratamientos realizados y
+                  rendimiento de tu clínica.
+                </p>
               </div>
-              <div>
-                <span className="text-gray-600">Tenant ID:</span>
-                <span className="ml-2 font-medium">{user.tenantId}</span>
+
+              {/* Feature 4 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Facturación Simple
+                </h3>
+                <p className="text-gray-600">
+                  Genera facturas, controla pagos y mantén tus finanzas
+                  organizadas sin complicaciones.
+                </p>
+              </div>
+
+              {/* Feature 5 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  100% en la Nube
+                </h3>
+                <p className="text-gray-600">
+                  Accede desde cualquier dispositivo, en cualquier momento. Tus
+                  datos siempre seguros y respaldados.
+                </p>
+              </div>
+
+              {/* Feature 6 */}
+              <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-sky-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Seguridad Avanzada
+                </h3>
+                <p className="text-gray-600">
+                  Encriptación de datos, cumplimiento normativo y control de
+                  acceso por roles.
+                </p>
               </div>
             </div>
           </div>
-        )}
+        </section>
 
-        {/* API Health Check */}
-        <div className="bg-gray-100 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">🔧 API Health Check</h3>
-          {error && (
-            <p className="text-red-600 bg-red-50 p-3 rounded">Error: {error}</p>
-          )}
-          {health && (
-            <pre className="bg-white p-4 rounded border text-sm overflow-auto">
-              {JSON.stringify(health, null, 2)}
-            </pre>
-          )}
-          {!health && !error && <p className="text-gray-500">Cargando...</p>}
-        </div>
+        {/* CTA Section */}
+        <section className="bg-sky-500 py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              ¿Listo para transformar tu clínica?
+            </h2>
+            <p className="text-xl text-sky-100 mb-8">
+              Únete a cientos de profesionales que ya confían en Alveodent.
+            </p>
+            <a
+              href={`${appUrl}/register`}
+              className="inline-block bg-white text-sky-500 hover:bg-sky-50 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+            >
+              Comenzar Ahora - Es Gratis
+            </a>
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
-  )
+  );
 }

@@ -10,6 +10,85 @@
 
 ---
 
+##  BUGS PRIORITARIOS
+
+### BUG-001: Link de email de bienvenida no funciona
+- **Prioridad:** ALTA
+- **Descripción:** El email de bienvenida dirige a `http://[url]/[slug]/login` pero esa ruta no muestra nada
+- **Causa probable:** La ruta `/:clinicSlug/login` no existe o no está bien configurada
+- **Archivo afectado:** `apps/app/src/App.tsx`, `apps/api/src/services/email.service.ts`
+
+### BUG-002: Login redirige a landing page en lugar de dashboard
+- **Prioridad:** ALTA
+- **Descripción:** Después del login exitoso, el usuario es redirigido a la landing page en lugar del panel de gestión
+- **Impacto:** El usuario no puede acceder al panel de la clínica
+- **Decisión arquitectónica:** La landing page ahora es un proyecto separado (`apps/web`). El panel (`apps/app`) debe tener `/login` como página principal.
+- **Acciones requeridas:**
+  1. ✅ Crear `apps/web` para landing page separada
+  2. ⏳ Eliminar landing page de `apps/app`
+  3. ⏳ Configurar login como página principal (`/login`) en apps/app
+  4. ⏳ Redirigir post-login al dashboard (`/dashboard`)
+
+---
+
+## 🏗️ Arquitectura de Aplicaciones
+
+### Progreso de Implementación
+- ✅ `apps/api` - Backend completo
+- ✅ `apps/web` - Landing page creada (puerto 5174)
+- ⏳ `apps/app` - Limpiar landing page, configurar login como root
+
+### Estructura del Monorepo
+
+```
+dental-saas/
+├── apps/
+│   ├── api/          # Backend Express + TypeScript (puerto 3000)
+│   ├── app/          # Panel de gestión de clínica (puerto 5173)
+│   └── web/          # Landing page / Marketing site (puerto 5174)
+├── packages/
+│   ├── database/     # Prisma schema y cliente
+│   └── shared/       # Tipos y utilidades compartidas
+```
+
+### apps/app - Panel de Gestión (SPA Autenticada)
+- **Propósito:** Panel de gestión para usuarios de clínicas dentales
+- **Acceso:** Requiere autenticación (login)
+- **Rutas principales:**
+  - `/login` - Página de inicio de sesión
+  - `/register` - Registro de nueva clínica
+  - `/dashboard` - Dashboard principal post-login
+  - `/doctors`, `/patients`, `/appointments`, etc.
+- **Puerto desarrollo:** 5173
+- **URL producción:** `app.alveodent.com` (subdominio)
+
+### apps/web - Landing Page (Sitio Público)
+- **Propósito:** Marketing, pricing, información del producto
+- **Acceso:** Público, sin autenticación
+- **Rutas principales:**
+  - `/` - Landing page principal
+  - `/pricing` - Planes y precios
+  - `/features` - Características del producto
+  - `/contact` - Formulario de contacto
+- **Redirecciones externas:**
+  - "Iniciar Sesión" → `app.alveodent.com/login`
+  - "Comenzar Prueba" → `app.alveodent.com/register`
+  - "Registrarse" → `app.alveodent.com/register`
+- **Puerto desarrollo:** 5174
+- **URL producción:** `alveodent.com` (dominio principal)
+
+### Variables de Entorno por App
+
+```env
+# apps/app (.env)
+VITE_API_URL="http://localhost:3000"
+
+# apps/web (.env)
+VITE_APP_URL="http://localhost:5173"  # URL del panel de gestión
+```
+
+---
+
 ## 🚀 Modelo de Negocio SaaS
 
 ### Planes de Suscripción

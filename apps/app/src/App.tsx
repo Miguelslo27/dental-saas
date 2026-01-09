@@ -1,0 +1,54 @@
+import { Routes, Route, Navigate } from 'react-router'
+import LoginPage from '@pages/auth/LoginPage'
+import RegisterPage from '@pages/auth/RegisterPage'
+import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
+import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
+import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
+
+// Admin pages
+import AdminLayout from '@/components/admin/AdminLayout'
+import AdminSetupPage from '@pages/admin/AdminSetupPage'
+import AdminLoginPage from '@pages/admin/AdminLoginPage'
+import { AdminForgotPasswordPage } from '@pages/admin/AdminForgotPasswordPage'
+import { AdminResetPasswordPage } from '@pages/admin/AdminResetPasswordPage'
+import AdminDashboardPage from '@pages/admin/AdminDashboardPage'
+import AdminTenantsPage from '@pages/admin/AdminTenantsPage'
+import AdminUsersPage from '@pages/admin/AdminUsersPage'
+
+function App() {
+  return (
+    <Routes>
+      {/* Root redirects to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
+      {/* Public auth routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register/success" element={<RegisterSuccessPage />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Clinic-specific routes (from welcome email) */}
+      <Route path="/:clinicSlug/login" element={<LoginPage />} />
+      <Route path="/:clinicSlug/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Admin routes (separate auth flow) */}
+      <Route path="/admin/setup" element={<AdminSetupPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+      <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
+
+      {/* Protected admin routes */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+        <Route path="tenants" element={<AdminTenantsPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+      </Route>
+    </Routes>
+  )
+}
+
+export default App
