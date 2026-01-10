@@ -293,7 +293,7 @@ patientsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
       gender: parsed.data.gender ?? undefined,
     }
 
-    const patient = await createPatient(tenantId, createData)
+    const patient = await createPatient(tenantId, createData as any)
 
     res.status(201).json({
       success: true,
@@ -325,7 +325,7 @@ patientsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
       })
     }
 
-    const patient = await updatePatient(tenantId, id, parsed.data)
+    const patient = await updatePatient(tenantId, id, parsed.data as any)
 
     if (!patient) {
       return res.status(404).json({
