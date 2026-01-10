@@ -109,8 +109,8 @@ export function DoctorsPage() {
     }
   }
 
-  const canAddDoctor = stats?.canAdd ?? true
-  const limitReached = stats && !stats.canAdd
+  const canAddDoctor = stats ? stats.remaining > 0 : true
+  const limitReached = stats && stats.remaining <= 0
 
   return (
     <div className="space-y-6">

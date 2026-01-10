@@ -29,7 +29,7 @@ export interface DoctorStats {
   active: number
   inactive: number
   limit: number
-  canAdd: boolean
+  remaining: number
 }
 
 export interface CreateDoctorData {
