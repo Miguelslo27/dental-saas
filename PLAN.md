@@ -320,6 +320,16 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ 16 tests unitarios (70 tests totales en API)
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/48
 
+### PR #55: Frontend - Doctors Management ✅
+- ✅ Cliente API para doctores (`doctor-api.ts`)
+- ✅ Zustand store para gestión de estado (`doctors.store.ts`)
+- ✅ AppLayout con sidebar responsive para tenant users
+- ✅ DoctorsPage con listado, búsqueda y filtros
+- ✅ DoctorCard, DoctorFormModal, ConfirmDialog components
+- ✅ Integración con límites de plan (banner de upgrade)
+- ✅ Accesibilidad: ARIA attributes, escape key handlers, stopPropagation
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/55
+
 ---
 
 ## Notas Técnicas: Super Admin
@@ -637,9 +647,9 @@ model PasswordResetToken {
 
 ---
 
-## 📦 FASE 3: Gestión de Doctores (con límites de plan)
+## 📦 FASE 3: Gestión de Doctores (con límites de plan) ✅ COMPLETADA
 **Rama Backend:** `feature/doctors-management` ✅ COMPLETADO  
-**Rama Frontend:** `feature/doctors-frontend` 🔄 EN PROGRESO  
+**Rama Frontend:** `feature/doctors-frontend` ✅ COMPLETADO (PR #55)
 **Duración estimada:** 2 días
 
 ### Tarea 3.1: Backend - CRUD Doctores ✅ COMPLETADO
@@ -655,8 +665,8 @@ model PasswordResetToken {
 - [x] 3.1.10: Crear endpoint GET /api/doctors/stats
 - [x] 3.1.11: Tests unitarios (641 líneas en `doctors.test.ts`)
 
-### Tarea 3.2: Frontend - Gestión de Doctores 🔄 EN PROGRESO
-**PR:** Pendiente
+### Tarea 3.2: Frontend - Gestión de Doctores ✅ COMPLETADA
+**PR:** #55 (Merged)
 
 #### Archivos a crear:
 1. `apps/app/src/lib/doctor-api.ts` - Cliente API para doctores
