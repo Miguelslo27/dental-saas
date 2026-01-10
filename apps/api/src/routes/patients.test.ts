@@ -187,6 +187,22 @@ describe('Patients API', () => {
       expect(response.body.success).toBe(false)
     })
 
+    it('should return 400 for date of birth in the future', async () => {
+      const futureDate = new Date()
+      futureDate.setFullYear(futureDate.getFullYear() + 1)
+      const response = await request(app)
+        .post('/api/patients')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          firstName: 'Test',
+          lastName: 'Patient',
+          dob: futureDate.toISOString().split('T')[0],
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
     it('should return 400 for invalid gender', async () => {
       const response = await request(app)
         .post('/api/patients')

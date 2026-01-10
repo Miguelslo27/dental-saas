@@ -150,7 +150,7 @@ export function PatientsPage() {
               Tu plan actual permite hasta {stats?.limit} pacientes. Para agregar más pacientes,
               actualiza tu plan a uno superior.
             </p>
-            <span className="mt-2 inline-block text-sm font-medium text-amber-800 hover:text-amber-900 underline cursor-pointer">
+            <span className="mt-2 inline-block text-sm font-medium text-amber-800">
               Ver planes disponibles
             </span>
           </div>

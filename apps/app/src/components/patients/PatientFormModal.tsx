@@ -14,7 +14,21 @@ const patientFormSchema = z.object({
   lastName: z.string().min(1, 'El apellido es requerido'),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   phone: z.string().optional(),
-  dob: z.string().optional(),
+  dob: z
+    .string()
+    .optional()
+    .refine(
+      (value) => {
+        if (!value) return true
+        const date = new Date(value)
+        if (Number.isNaN(date.getTime())) return false
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        date.setHours(0, 0, 0, 0)
+        return date <= today
+      },
+      { message: 'La fecha de nacimiento no puede ser en el futuro' }
+    ),
   gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).optional().or(z.literal('')),
   address: z.string().max(500, 'La dirección no puede exceder 500 caracteres').optional(),
 })

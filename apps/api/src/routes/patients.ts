@@ -75,7 +75,7 @@ const phoneSchema = z
   .nullable()
   .transform((val) => (val === '' ? undefined : val))
 
-// Date of birth validation: accept ISO date string
+// Date of birth validation: accept ISO date string, must not be in the future
 const dobSchema = z
   .string()
   .optional()
@@ -87,6 +87,15 @@ const dobSchema = z
       return !isNaN(date.getTime())
     },
     { message: 'Invalid date format' }
+  )
+  .refine(
+    (val) => {
+      if (!val) return true
+      const date = new Date(val)
+      if (isNaN(date.getTime())) return false
+      return date.getTime() <= Date.now()
+    },
+    { message: 'Date of birth cannot be in the future' }
   )
 
 // Gender validation

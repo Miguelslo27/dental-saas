@@ -166,11 +166,15 @@ export async function getPatientStats(): Promise<PatientStats> {
 
 /**
  * Calculate patient age from date of birth
+ * Returns null for invalid dates or dates in the future
  */
 export function calculateAge(dob: string | null): number | null {
   if (!dob) return null
   const birthDate = new Date(dob)
+  if (isNaN(birthDate.getTime())) return null
   const today = new Date()
+  // Return null for future dates
+  if (birthDate > today) return null
   let age = today.getFullYear() - birthDate.getFullYear()
   const monthDiff = today.getMonth() - birthDate.getMonth()
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
