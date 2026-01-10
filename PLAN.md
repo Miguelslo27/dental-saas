@@ -638,31 +638,120 @@ model PasswordResetToken {
 ---
 
 ## 📦 FASE 3: Gestión de Doctores (con límites de plan)
-**Rama:** `feature/doctors-management`  
+**Rama Backend:** `feature/doctors-management` ✅ COMPLETADO  
+**Rama Frontend:** `feature/doctors-frontend` 🔄 EN PROGRESO  
 **Duración estimada:** 2 días
 
-### Tarea 3.1: Backend - CRUD Doctores
-- [ ] 3.1.1: Crear esquemas Zod para Doctor
-- [ ] 3.1.2: Crear servicio DoctorService con tenant isolation
-- [ ] 3.1.3: Crear middleware de verificación de límite de doctores por plan
-- [ ] 3.1.4: Crear endpoint GET /api/doctors
-- [ ] 3.1.5: Crear endpoint GET /api/doctors/:id
-- [ ] 3.1.6: Crear endpoint POST /api/doctors
-- [ ] 3.1.7: Crear endpoint PUT /api/doctors/:id
-- [ ] 3.1.8: Crear endpoint DELETE /api/doctors/:id (soft delete)
-- [ ] 3.1.9: Crear endpoint PUT /api/doctors/:id/restore
-- [ ] 3.1.10: Crear endpoint GET /api/doctors/count
+### Tarea 3.1: Backend - CRUD Doctores ✅ COMPLETADO
+- [x] 3.1.1: Crear esquemas Zod para Doctor (`apps/api/src/routes/doctors.ts`)
+- [x] 3.1.2: Crear servicio DoctorService con tenant isolation (`apps/api/src/services/doctor.service.ts`)
+- [x] 3.1.3: Crear middleware de verificación de límite de doctores por plan (`checkDoctorLimit()`)
+- [x] 3.1.4: Crear endpoint GET /api/doctors
+- [x] 3.1.5: Crear endpoint GET /api/doctors/:id
+- [x] 3.1.6: Crear endpoint POST /api/doctors
+- [x] 3.1.7: Crear endpoint PUT /api/doctors/:id
+- [x] 3.1.8: Crear endpoint DELETE /api/doctors/:id (soft delete)
+- [x] 3.1.9: Crear endpoint PUT /api/doctors/:id/restore
+- [x] 3.1.10: Crear endpoint GET /api/doctors/stats
+- [x] 3.1.11: Tests unitarios (641 líneas en `doctors.test.ts`)
 
-### Tarea 3.2: Frontend - Gestión de Doctores
-- [ ] 3.2.1: Crear store de doctores
-- [ ] 3.2.2: Crear hooks para doctores
-- [ ] 3.2.3: Crear página de listado de doctores
-- [ ] 3.2.4: Crear componente DoctorCard
-- [ ] 3.2.5: Crear componente de formulario Doctor
-- [ ] 3.2.6: Crear modal de confirmación de eliminación
-- [ ] 3.2.7: Implementar búsqueda y filtros
-- [ ] 3.2.8: Crear componente DoctorPicker
-- [ ] 3.2.9: Mostrar mensaje de upgrade cuando se alcanza el límite
+### Tarea 3.2: Frontend - Gestión de Doctores 🔄 EN PROGRESO
+**PR:** Pendiente
+
+#### Archivos a crear:
+1. `apps/app/src/lib/doctor-api.ts` - Cliente API para doctores
+2. `apps/app/src/stores/doctors.store.ts` - Zustand store
+3. `apps/app/src/pages/doctors/DoctorsPage.tsx` - Página principal de listado
+4. `apps/app/src/components/doctors/DoctorCard.tsx` - Card para mostrar doctor
+5. `apps/app/src/components/doctors/DoctorFormModal.tsx` - Modal crear/editar
+6. `apps/app/src/components/doctors/DoctorPicker.tsx` - Selector de doctor (para citas)
+7. `apps/app/src/components/layout/AppLayout.tsx` - Layout con sidebar para tenant users
+8. `apps/app/src/App.tsx` - Añadir rutas `/doctors`
+
+#### Subtareas:
+- [x] 3.2.1: Crear `doctor-api.ts` con funciones:
+  - `getDoctors(params?)` - Lista paginada con búsqueda
+  - `getDoctorById(id)` - Obtener doctor por ID
+  - `createDoctor(data)` - Crear nuevo doctor
+  - `updateDoctor(id, data)` - Actualizar doctor
+  - `deleteDoctor(id)` - Soft delete
+  - `restoreDoctor(id)` - Restaurar doctor eliminado
+  - `getDoctorStats()` - Estadísticas y límites
+- [x] 3.2.2: Crear `doctors.store.ts` (Zustand):
+  - Estado: `doctors`, `loading`, `error`, `stats`
+  - Acciones: `fetchDoctors`, `addDoctor`, `updateDoctor`, `removeDoctor`
+- [x] 3.2.3: Crear `AppLayout.tsx` con sidebar:
+  - Navegación: Dashboard, Doctores, Pacientes, Citas, Configuración
+  - User menu con logout
+  - Responsive (mobile hamburger menu)
+- [x] 3.2.4: Crear `DoctorsPage.tsx`:
+  - Header con título y botón "Nuevo Doctor"
+  - Barra de búsqueda
+  - Grid de DoctorCards
+  - Estado vacío cuando no hay doctores
+  - Banner de límite alcanzado
+- [x] 3.2.5: Crear `DoctorCard.tsx`:
+  - Avatar (iniciales si no hay foto)
+  - Nombre, especialidad, teléfono
+  - Días de trabajo (badges)
+  - Botones: Editar, Eliminar
+- [x] 3.2.6: Crear `DoctorFormModal.tsx`:
+  - Campos: firstName, lastName, email, phone, specialty, licenseNumber
+  - Campos: workingDays (checkboxes), workingHours (start/end)
+  - Campos: consultingRoom, bio, hourlyRate
+  - Validación con React Hook Form + Zod
+  - Modo crear vs editar
+- [x] 3.2.7: Crear modal de confirmación de eliminación (reutilizable)
+- [ ] 3.2.8: Crear `DoctorPicker.tsx` (para uso en citas):
+  - Dropdown/Combobox con búsqueda
+  - Mostrar nombre y especialidad
+- [x] 3.2.9: Actualizar `App.tsx`:
+  - Añadir ruta `/doctors` con ProtectedRoute
+  - Añadir AppLayout como wrapper
+
+#### Tipos TypeScript (`doctor-api.ts`):
+```typescript
+interface Doctor {
+  id: string
+  tenantId: string
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string | null
+  specialty: string | null
+  licenseNumber: string | null
+  workingDays: string[]
+  workingHours: { start: string; end: string } | null
+  consultingRoom: string | null
+  avatar: string | null
+  bio: string | null
+  hourlyRate: number | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface DoctorStats {
+  total: number
+  active: number
+  limit: number
+  canAdd: boolean
+}
+
+interface CreateDoctorData {
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  specialty?: string
+  licenseNumber?: string
+  workingDays?: string[]
+  workingHours?: { start: string; end: string }
+  consultingRoom?: string
+  bio?: string
+  hourlyRate?: number
+}
+```
 
 ---
 

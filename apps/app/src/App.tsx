@@ -6,7 +6,9 @@ import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
 import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
 import HomePage from '@pages/HomePage'
+import DoctorsPage from '@pages/doctors/DoctorsPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import AppLayout from '@/components/layout/AppLayout'
 
 // Admin pages
 import AdminLayout from '@/components/admin/AdminLayout'
@@ -21,16 +23,6 @@ import AdminUsersPage from '@pages/admin/AdminUsersPage'
 function App() {
   return (
     <Routes>
-      {/* Dashboard - protected, redirects to /login if not authenticated */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-
       {/* Public auth routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -42,6 +34,19 @@ function App() {
       {/* Clinic-specific routes (from welcome email) */}
       <Route path="/:clinicSlug/login" element={<LoginPage />} />
       <Route path="/:clinicSlug/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Protected tenant routes with AppLayout */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<HomePage />} />
+        <Route path="/doctors" element={<DoctorsPage />} />
+        {/* Future routes: /patients, /appointments, /settings */}
+      </Route>
 
       {/* Admin routes (separate auth flow) */}
       <Route path="/admin/setup" element={<AdminSetupPage />} />
