@@ -121,7 +121,6 @@ const createPatientSchema = z.object({
   dob: dobSchema,
   gender: genderSchema,
   address: z.string().max(500, 'Address cannot exceed 500 characters').optional(),
-  notes: z.record(z.unknown()).optional(),
 })
 
 // Update patient schema (all fields optional)
@@ -133,7 +132,6 @@ const updatePatientSchema = z.object({
   dob: dobSchema,
   gender: genderSchema,
   address: z.string().max(500, 'Address cannot exceed 500 characters').optional().nullable(),
-  notes: z.record(z.unknown()).optional().nullable(),
 })
 
 // ============================================================================
@@ -293,7 +291,7 @@ patientsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
       gender: parsed.data.gender ?? undefined,
     }
 
-    const patient = await createPatient(tenantId, createData as any)
+    const patient = await createPatient(tenantId, createData)
 
     res.status(201).json({
       success: true,
@@ -325,7 +323,7 @@ patientsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
       })
     }
 
-    const patient = await updatePatient(tenantId, id, parsed.data as any)
+    const patient = await updatePatient(tenantId, id, parsed.data)
 
     if (!patient) {
       return res.status(404).json({
