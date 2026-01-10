@@ -7,6 +7,7 @@ import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
 import HomePage from '@pages/HomePage'
 import DoctorsPage from '@pages/doctors/DoctorsPage'
+import PatientsPage from '@pages/patients/PatientsPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AppLayout from '@/components/layout/AppLayout'
 
@@ -45,7 +46,8 @@ function App() {
       >
         <Route path="/" element={<HomePage />} />
         <Route path="/doctors" element={<DoctorsPage />} />
-        {/* Future routes: /patients, /appointments, /settings */}
+        <Route path="/patients" element={<PatientsPage />} />
+        {/* Future routes: /appointments, /settings */}
       </Route>
 
       {/* Admin routes (separate auth flow) */}
