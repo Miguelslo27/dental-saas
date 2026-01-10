@@ -121,7 +121,6 @@ const createPatientSchema = z.object({
   dob: dobSchema,
   gender: genderSchema,
   address: z.string().max(500, 'Address cannot exceed 500 characters').optional(),
-  notes: z.record(z.unknown()).optional(),
 })
 
 // Update patient schema (all fields optional)
@@ -133,7 +132,6 @@ const updatePatientSchema = z.object({
   dob: dobSchema,
   gender: genderSchema,
   address: z.string().max(500, 'Address cannot exceed 500 characters').optional().nullable(),
-  notes: z.record(z.unknown()).optional().nullable(),
 })
 
 // ============================================================================
