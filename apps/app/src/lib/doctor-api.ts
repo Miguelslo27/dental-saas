@@ -79,7 +79,7 @@ interface ApiErrorResponse {
  */
 export async function getDoctors(params?: ListDoctorsParams): Promise<Doctor[]> {
   const queryParams = new URLSearchParams()
-  
+
   if (params?.limit) queryParams.set('limit', String(params.limit))
   if (params?.offset) queryParams.set('offset', String(params.offset))
   if (params?.includeInactive) queryParams.set('includeInactive', 'true')
@@ -87,7 +87,7 @@ export async function getDoctors(params?: ListDoctorsParams): Promise<Doctor[]> 
 
   const queryString = queryParams.toString()
   const url = `/doctors${queryString ? `?${queryString}` : ''}`
-  
+
   const response = await apiClient.get<ApiResponse<Doctor[]>>(url)
   return response.data.data
 }

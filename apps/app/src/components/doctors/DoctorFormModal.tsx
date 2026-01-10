@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -158,7 +158,26 @@ export function DoctorFormModal({
     }
   }
 
+  // Handle Escape key
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isSubmitting && !isLoading) {
+        onClose()
+      }
+    },
+    [onClose, isSubmitting, isLoading]
+  )
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, handleKeyDown])
+
   if (!isOpen) return null
+
+  const modalTitleId = 'doctor-form-modal-title'
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -166,18 +185,26 @@ export function DoctorFormModal({
       <div
         className="fixed inset-0 bg-black/50 transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={modalTitleId}
+          className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 id={modalTitleId} className="text-xl font-semibold text-gray-900">
               {isEditing ? 'Editar Doctor' : 'Nuevo Doctor'}
             </h2>
             <button
               onClick={onClose}
+              aria-label="Cerrar formulario"
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="h-5 w-5" />

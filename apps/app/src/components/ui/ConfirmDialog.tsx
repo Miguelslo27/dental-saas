@@ -1,3 +1,4 @@
+import { useEffect, useCallback } from 'react'
 import { AlertTriangle, Loader2 } from 'lucide-react'
 
 interface ConfirmDialogProps {
@@ -23,6 +24,23 @@ export function ConfirmDialog({
   variant = 'danger',
   isLoading = false,
 }: ConfirmDialogProps) {
+  // Handle Escape key
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isLoading) {
+        onClose()
+      }
+    },
+    [onClose, isLoading]
+  )
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, handleKeyDown])
+
   if (!isOpen) return null
 
   const variantStyles = {
@@ -48,21 +66,33 @@ export function ConfirmDialog({
       <div
         className="fixed inset-0 bg-black/50 transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Dialog */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-md bg-white rounded-xl shadow-xl p-6">
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          aria-describedby="confirm-dialog-description"
+          className="relative w-full max-w-md bg-white rounded-xl shadow-xl p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-start gap-4">
             {/* Icon */}
-            <div className={`flex-shrink-0 w-10 h-10 rounded-full ${styles.icon} flex items-center justify-center`}>
+            <div className={`shrink-0 w-10 h-10 rounded-full ${styles.icon} flex items-center justify-center`}>
               <AlertTriangle className="h-5 w-5" />
             </div>
 
             {/* Content */}
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-              <p className="mt-2 text-sm text-gray-600">{message}</p>
+              <h3 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900">
+                {title}
+              </h3>
+              <p id="confirm-dialog-description" className="mt-2 text-sm text-gray-600">
+                {message}
+              </p>
             </div>
           </div>
 

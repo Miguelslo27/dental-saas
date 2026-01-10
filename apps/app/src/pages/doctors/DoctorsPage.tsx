@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Plus, Search, AlertCircle, Stethoscope, Loader2 } from 'lucide-react'
+import { Plus, Search, AlertCircle, Stethoscope, Loader2, X } from 'lucide-react'
 import { useDoctorsStore } from '@/stores/doctors.store'
 import { DoctorCard } from '@/components/doctors/DoctorCard'
 import { DoctorFormModal } from '@/components/doctors/DoctorFormModal'
@@ -32,18 +32,20 @@ export function DoctorsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Fetch doctors on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchDoctors()
     fetchStats()
-  }, [fetchDoctors, fetchStats])
+  }, [])
 
   // Debounced search
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchDoctors()
     }, 300)
     return () => clearTimeout(timer)
-  }, [searchQuery, showInactive, fetchDoctors])
+  }, [searchQuery, showInactive])
 
   // Clear success message after 3 seconds
   useEffect(() => {
@@ -141,16 +143,16 @@ export function DoctorsPage() {
       {/* Limit reached banner */}
       {limitReached && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
             <h3 className="font-medium text-amber-800">Límite de doctores alcanzado</h3>
             <p className="text-sm text-amber-700 mt-1">
               Tu plan actual permite hasta {stats?.limit} doctores. Para agregar más doctores,
               actualiza tu plan a uno superior.
             </p>
-            <button className="mt-2 text-sm font-medium text-amber-800 hover:text-amber-900 underline">
+            <span className="mt-2 inline-block text-sm font-medium text-amber-800 hover:text-amber-900 underline cursor-pointer">
               Ver planes disponibles
-            </button>
+            </span>
           </div>
         </div>
       )}
@@ -165,15 +167,16 @@ export function DoctorsPage() {
       {/* Error message */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-red-800">{error}</p>
           </div>
           <button
             onClick={clearError}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 p-1"
+            aria-label="Cerrar"
           >
-            ×
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}

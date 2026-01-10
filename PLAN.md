@@ -669,7 +669,7 @@ model PasswordResetToken {
 8. `apps/app/src/App.tsx` - Añadir rutas `/doctors`
 
 #### Subtareas:
-- [ ] 3.2.1: Crear `doctor-api.ts` con funciones:
+- [x] 3.2.1: Crear `doctor-api.ts` con funciones:
   - `getDoctors(params?)` - Lista paginada con búsqueda
   - `getDoctorById(id)` - Obtener doctor por ID
   - `createDoctor(data)` - Crear nuevo doctor
@@ -677,35 +677,35 @@ model PasswordResetToken {
   - `deleteDoctor(id)` - Soft delete
   - `restoreDoctor(id)` - Restaurar doctor eliminado
   - `getDoctorStats()` - Estadísticas y límites
-- [ ] 3.2.2: Crear `doctors.store.ts` (Zustand):
+- [x] 3.2.2: Crear `doctors.store.ts` (Zustand):
   - Estado: `doctors`, `loading`, `error`, `stats`
   - Acciones: `fetchDoctors`, `addDoctor`, `updateDoctor`, `removeDoctor`
-- [ ] 3.2.3: Crear `AppLayout.tsx` con sidebar:
+- [x] 3.2.3: Crear `AppLayout.tsx` con sidebar:
   - Navegación: Dashboard, Doctores, Pacientes, Citas, Configuración
   - User menu con logout
   - Responsive (mobile hamburger menu)
-- [ ] 3.2.4: Crear `DoctorsPage.tsx`:
+- [x] 3.2.4: Crear `DoctorsPage.tsx`:
   - Header con título y botón "Nuevo Doctor"
   - Barra de búsqueda
   - Grid de DoctorCards
   - Estado vacío cuando no hay doctores
   - Banner de límite alcanzado
-- [ ] 3.2.5: Crear `DoctorCard.tsx`:
+- [x] 3.2.5: Crear `DoctorCard.tsx`:
   - Avatar (iniciales si no hay foto)
   - Nombre, especialidad, teléfono
   - Días de trabajo (badges)
   - Botones: Editar, Eliminar
-- [ ] 3.2.6: Crear `DoctorFormModal.tsx`:
+- [x] 3.2.6: Crear `DoctorFormModal.tsx`:
   - Campos: firstName, lastName, email, phone, specialty, licenseNumber
   - Campos: workingDays (checkboxes), workingHours (start/end)
   - Campos: consultingRoom, bio, hourlyRate
   - Validación con React Hook Form + Zod
   - Modo crear vs editar
-- [ ] 3.2.7: Crear modal de confirmación de eliminación (reutilizable)
+- [x] 3.2.7: Crear modal de confirmación de eliminación (reutilizable)
 - [ ] 3.2.8: Crear `DoctorPicker.tsx` (para uso en citas):
   - Dropdown/Combobox con búsqueda
   - Mostrar nombre y especialidad
-- [ ] 3.2.9: Actualizar `App.tsx`:
+- [x] 3.2.9: Actualizar `App.tsx`:
   - Añadir ruta `/doctors` con ProtectedRoute
   - Añadir AppLayout como wrapper
 

@@ -59,6 +59,7 @@ export function AppLayout() {
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
@@ -76,6 +77,7 @@ export function AppLayout() {
           <button
             onClick={closeSidebar}
             className="lg:hidden p-1 text-gray-500 hover:text-gray-700"
+            aria-label="Cerrar menú"
           >
             <X className="h-5 w-5" />
           </button>
@@ -143,6 +145,7 @@ export function AppLayout() {
             <button
               onClick={() => setSidebarOpen(true)}
               className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+              aria-label="Abrir menú"
             >
               <Menu className="h-6 w-6" />
             </button>

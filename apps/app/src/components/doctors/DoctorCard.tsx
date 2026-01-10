@@ -29,9 +29,8 @@ export function DoctorCard({ doctor, onEdit, onDelete, onRestore }: DoctorCardPr
 
   return (
     <div
-      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
-        doctor.isActive ? 'border-gray-200' : 'border-orange-200 bg-orange-50/30'
-      }`}
+      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${doctor.isActive ? 'border-gray-200' : 'border-orange-200 bg-orange-50/30'
+        }`}
     >
       <div className="p-6">
         {/* Header */}
@@ -98,11 +97,10 @@ export function DoctorCard({ doctor, onEdit, onDelete, onRestore }: DoctorCardPr
                 return (
                   <span
                     key={day}
-                    className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-medium ${
-                      isWorking
+                    className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-medium ${isWorking
                         ? 'bg-blue-100 text-blue-700'
                         : 'bg-gray-100 text-gray-400'
-                    }`}
+                      }`}
                   >
                     {DAYS_MAP[day]}
                   </span>
