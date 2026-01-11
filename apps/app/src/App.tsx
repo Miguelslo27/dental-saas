@@ -8,6 +8,7 @@ import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
 import HomePage from '@pages/HomePage'
 import DoctorsPage from '@pages/doctors/DoctorsPage'
 import PatientsPage from '@pages/patients/PatientsPage'
+import AppointmentsPage from '@pages/appointments/AppointmentsPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AppLayout from '@/components/layout/AppLayout'
 
@@ -47,7 +48,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/doctors" element={<DoctorsPage />} />
         <Route path="/patients" element={<PatientsPage />} />
-        {/* Future routes: /appointments, /settings */}
+        <Route path="/appointments" element={<AppointmentsPage />} />
+        {/* Future routes: /settings */}
       </Route>
 
       {/* Admin routes (separate auth flow) */}
