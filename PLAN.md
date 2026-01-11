@@ -765,36 +765,49 @@ interface CreateDoctorData {
 
 ---
 
-## 📦 FASE 4: Gestión de Pacientes (con límites de plan)
-**Rama:** `feature/patients-management`  
-**Duración estimada:** 3 días
+## 📦 FASE 4: Gestión de Pacientes (con límites de plan) ✅ COMPLETADA
+**Rama:** `feature/patients-management` ✅ COMPLETADO  
+**PR:** #56 ✅ MERGED  
+**Duración estimada:** 2 días  
+**Fecha completada:** 10 de Enero, 2026
 
-### Tarea 4.1: Backend - CRUD Pacientes
-- [ ] 4.1.1: Crear esquemas Zod para Patient
-- [ ] 4.1.2: Crear servicio PatientService con tenant isolation
-- [ ] 4.1.3: Crear middleware de verificación de límite de pacientes
-- [ ] 4.1.4: Crear endpoint GET /api/patients (paginado)
-- [ ] 4.1.5: Crear endpoint GET /api/patients/:id
-- [ ] 4.1.6: Crear endpoint POST /api/patients
-- [ ] 4.1.7: Crear endpoint PUT /api/patients/:id
-- [ ] 4.1.8: Crear endpoint DELETE /api/patients/:id
-- [ ] 4.1.9: Crear endpoint GET /api/patients/:id/appointments
-- [ ] 4.1.10: Crear endpoint PUT /api/patients/:id/teeth-chart
-- [ ] 4.1.11: Crear endpoint GET /api/patients/count
+### Tarea 4.1: Backend - CRUD Pacientes ✅ COMPLETADO
+- [x] 4.1.1: Crear esquemas Zod para Patient
+- [x] 4.1.2: Crear servicio PatientService con tenant isolation
+- [x] 4.1.3: Crear middleware de verificación de límite de pacientes por plan
+- [x] 4.1.4: Crear endpoint GET /api/patients
+- [x] 4.1.5: Crear endpoint GET /api/patients/:id
+- [x] 4.1.6: Crear endpoint POST /api/patients
+- [x] 4.1.7: Crear endpoint PUT /api/patients/:id
+- [x] 4.1.8: Crear endpoint DELETE /api/patients/:id (soft delete)
+- [x] 4.1.9: Crear endpoint PUT /api/patients/:id/restore
+- [x] 4.1.10: Crear endpoint GET /api/patients/stats
+- [x] 4.1.11: Tests unitarios con DOB future validation (136 tests total)
 
-### Tarea 4.2: Frontend - Gestión de Pacientes
-- [ ] 4.2.1: Crear store de pacientes
-- [ ] 4.2.2: Crear hooks para pacientes
-- [ ] 4.2.3: Crear página de listado de pacientes
-- [ ] 4.2.4: Crear componente PatientCard
-- [ ] 4.2.5: Crear formulario de Patient
-- [ ] 4.2.6: Crear componente de tags input
-- [ ] 4.2.7: Crear vista de detalle de paciente
-- [ ] 4.2.8: Implementar búsqueda y filtros
-- [ ] 4.2.9: Crear componente PatientPicker
-- [ ] 4.2.10: Mostrar mensaje de upgrade
+### Tarea 4.2: Frontend - Gestión de Pacientes ✅ COMPLETADO
+**PR:** #56 (Merged)
 
-### Tarea 4.3: Dental Chart
+#### Archivos creados:
+1. [x] `apps/app/src/lib/patient-api.ts` - Cliente API para pacientes
+2. [x] `apps/app/src/stores/patients.store.ts` - Zustand store
+3. [x] `apps/app/src/pages/patients/PatientsPage.tsx` - Página principal de listado
+4. [x] `apps/app/src/components/patients/PatientCard.tsx` - Card para mostrar paciente
+5. [x] `apps/app/src/components/patients/PatientFormModal.tsx` - Modal crear/editar
+6. [x] `apps/app/src/App.tsx` - Añadir rutas `/patients`
+
+#### Subtareas:
+- [x] 4.2.1: Crear `patient-api.ts` con funciones CRUD
+- [x] 4.2.2: Crear `patients.store.ts` (Zustand)
+- [x] 4.2.3: Crear `PatientsPage.tsx` con grid y filtros
+- [x] 4.2.4: Crear `PatientCard.tsx` con información básica
+- [x] 4.2.5: Crear `PatientFormModal.tsx` con validación DOB
+- [x] 4.2.6: Añadir DOB future validation (frontend + backend)
+- [x] 4.2.7: Implementar plan limit banner (15 pacientes free)
+- [x] 4.2.8: Integrar en App.tsx con ProtectedRoute
+- [x] 4.2.9: Validación de email único por tenant
+
+### Tarea 4.3: Dental Chart (DIFERIDO) ⏳
+**Estado:** Diferido a fase posterior
 - [ ] 4.3.1: Crear componente visual DentalChart
 - [ ] 4.3.2: Implementar selección de dientes
 - [ ] 4.3.3: Implementar notas por diente

@@ -135,6 +135,9 @@ services:
     networks:
       - dental-network
       - coolify
+    # Traefik labels for proper port routing
+    labels:
+      - "traefik.http.services.app.loadbalancer.server.port=8080"
 
 networks:
   dental-network:
