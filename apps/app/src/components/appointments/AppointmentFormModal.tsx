@@ -50,7 +50,8 @@ interface PatientOption {
 
 interface DoctorOption {
   id: string
-  name: string
+  firstName: string
+  lastName: string
   specialty: string | null
 }
 
@@ -264,7 +265,7 @@ export function AppointmentFormModal({
                     <option value="">Seleccionar doctor...</option>
                     {doctors.map((doctor) => (
                       <option key={doctor.id} value={doctor.id}>
-                        {doctor.name} {doctor.specialty ? `(${doctor.specialty})` : ''}
+                        {doctor.firstName} {doctor.lastName} {doctor.specialty ? `(${doctor.specialty})` : ''}
                       </option>
                     ))}
                   </select>

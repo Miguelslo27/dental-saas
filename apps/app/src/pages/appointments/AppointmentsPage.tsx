@@ -222,7 +222,7 @@ export function AppointmentsPage() {
             Gestiona las citas de tu clínica
             {stats && (
               <span className="text-gray-500 ml-1">
-                ({stats.upcoming} próximas, {stats.completed} completadas)
+                ({stats.scheduled} programadas, {stats.completed} completadas)
               </span>
             )}
           </p>

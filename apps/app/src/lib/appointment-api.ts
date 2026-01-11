@@ -52,13 +52,14 @@ export interface Appointment {
 
 export interface AppointmentStats {
   total: number
-  byStatus: Record<AppointmentStatus, number>
-  upcoming: number
+  scheduled: number
   completed: number
   cancelled: number
   noShow: number
-  totalRevenue: number
-  unpaidAmount: number
+  todayCount: number
+  weekCount: number
+  revenue: number
+  pendingPayment: number
 }
 
 export interface CreateAppointmentData {
@@ -272,13 +273,13 @@ export async function markAppointmentDone(id: string, notes?: string): Promise<A
  */
 export function getStatusLabel(status: AppointmentStatus): string {
   const labels: Record<AppointmentStatus, string> = {
-    SCHEDULED: 'Scheduled',
-    CONFIRMED: 'Confirmed',
-    IN_PROGRESS: 'In Progress',
-    COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled',
-    NO_SHOW: 'No Show',
-    RESCHEDULED: 'Rescheduled',
+    SCHEDULED: 'Programada',
+    CONFIRMED: 'Confirmada',
+    IN_PROGRESS: 'En Progreso',
+    COMPLETED: 'Completada',
+    CANCELLED: 'Cancelada',
+    NO_SHOW: 'No Asistió',
+    RESCHEDULED: 'Reprogramada',
   }
   return labels[status] || status
 }

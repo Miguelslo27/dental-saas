@@ -38,10 +38,10 @@ const dateTimeSchema = z
   .datetime({ message: 'Invalid datetime format. Use ISO 8601 format.' })
   .transform((val) => new Date(val))
 
-// Cost validation: must be positive if provided
+// Cost validation: must be non-negative if provided (0 for free appointments)
 const costSchema = z
   .number()
-  .positive({ message: 'Cost must be a positive number' })
+  .min(0, { message: 'Cost cannot be negative' })
   .optional()
   .nullable()
 
@@ -112,6 +112,23 @@ appointmentsRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { limit, offset, doctorId, patientId, status, from, to, includeInactive } = req.query
+
+    // Validate status if provided
+    const validStatuses = ['SCHEDULED', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'RESCHEDULED']
+    if (status && !validStatuses.includes(String(status))) {
+      res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` })
+      return
+    }
+
+    // Validate date formats if provided
+    if (from && isNaN(new Date(String(from)).getTime())) {
+      res.status(400).json({ success: false, error: 'Invalid from date format' })
+      return
+    }
+    if (to && isNaN(new Date(String(to)).getTime())) {
+      res.status(400).json({ success: false, error: 'Invalid to date format' })
+      return
+    }
 
     const appointments = await listAppointments(tenantId, {
       limit: limit ? Math.min(parseInt(String(limit), 10), 100) : undefined,
