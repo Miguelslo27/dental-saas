@@ -1,221 +1,450 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
-import { prisma } from '@dental/database'
+import { AppointmentStatus } from '@dental/database'
+import { requireMinRole } from '../middleware/auth.js'
+import {
+  listAppointments,
+  getAppointmentById,
+  createAppointment,
+  updateAppointment,
+  deleteAppointment,
+  restoreAppointment,
+  markAppointmentDone,
+  getCalendarAppointments,
+  getAppointmentStats,
+  getAppointmentsByDoctor,
+  getAppointmentsByPatient,
+} from '../services/appointment.service.js'
 
 const appointmentsRouter: IRouter = Router()
 
-// Simple tenant extractor middleware (expects `x-tenant-id` header)
-function getTenantId(req: any) {
-  const tenantId = String(req.headers['x-tenant-id'] || '')
-  if (!tenantId) return null
-  return tenantId
-}
+// ============================================================================
+// Validation Schemas
+// ============================================================================
 
-// Zod schemas
-const appointmentCreateSchema = z.object({
-  patientId: z.string().min(1),
-  doctorId: z.string().min(1),
-  startTime: z.string().datetime(),
-  endTime: z.string().datetime(),
+const appointmentStatusSchema = z.enum([
+  'SCHEDULED',
+  'CONFIRMED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'CANCELLED',
+  'NO_SHOW',
+  'RESCHEDULED',
+])
+
+// Date validation: accept ISO date string
+const dateTimeSchema = z
+  .string()
+  .datetime({ message: 'Invalid datetime format. Use ISO 8601 format.' })
+  .transform((val) => new Date(val))
+
+// Cost validation: must be non-negative if provided (0 for free appointments)
+const costSchema = z
+  .number()
+  .min(0, { message: 'Cost cannot be negative' })
+  .optional()
+  .nullable()
+
+const createAppointmentSchema = z.object({
+  patientId: z.string().min(1, 'Patient ID is required'),
+  doctorId: z.string().min(1, 'Doctor ID is required'),
+  startTime: dateTimeSchema,
+  endTime: dateTimeSchema,
   duration: z.number().int().positive().optional(),
-  status: z.enum(['SCHEDULED', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'RESCHEDULED']).optional(),
-  type: z.string().optional(),
-  notes: z.string().optional(),
-  privateNotes: z.string().optional(),
-  cost: z.number().positive().optional(),
+  status: appointmentStatusSchema.optional(),
+  type: z.string().max(100).optional(),
+  notes: z.string().max(5000).optional(),
+  privateNotes: z.string().max(5000).optional(),
+  cost: costSchema,
   isPaid: z.boolean().optional(),
 })
 
-const allowedUpdateFields = [
-  'patientId',
-  'doctorId',
-  'startTime',
-  'endTime',
-  'duration',
-  'status',
-  'type',
-  'notes',
-  'privateNotes',
-  'cost',
-  'isPaid',
-]
+const updateAppointmentSchema = z.object({
+  patientId: z.string().min(1).optional(),
+  doctorId: z.string().min(1).optional(),
+  startTime: dateTimeSchema.optional(),
+  endTime: dateTimeSchema.optional(),
+  duration: z.number().int().positive().optional(),
+  status: appointmentStatusSchema.optional(),
+  type: z.string().max(100).optional().nullable(),
+  notes: z.string().max(5000).optional().nullable(),
+  privateNotes: z.string().max(5000).optional().nullable(),
+  cost: costSchema,
+  isPaid: z.boolean().optional(),
+})
 
-// List appointments with optional filters
-appointmentsRouter.get('/', async (req, res, next) => {
+const markDoneSchema = z.object({
+  notes: z.string().max(5000).optional(),
+})
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function mapErrorCodeToStatus(code: string): number {
+  switch (code) {
+    case 'NOT_FOUND':
+      return 404
+    case 'INVALID_PATIENT':
+    case 'INVALID_DOCTOR':
+    case 'INVALID_TIME_RANGE':
+      return 400
+    case 'TIME_CONFLICT':
+      return 409
+    case 'ALREADY_INACTIVE':
+    case 'ALREADY_ACTIVE':
+      return 400
+    default:
+      return 400
+  }
+}
+
+// ============================================================================
+// Routes
+// ============================================================================
+
+/**
+ * GET /api/appointments
+ * List all appointments with optional filters
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
+    const tenantId = req.user!.tenantId
+    const { limit, offset, doctorId, patientId, status, from, to, includeInactive } = req.query
 
-    const { limit, offset, doctorId, patientId, status, from, to } = req.query
-    const where: any = { tenantId }
-
-    // Optional filters
-    if (doctorId) where.doctorId = String(doctorId)
-    if (patientId) where.patientId = String(patientId)
-    if (status) where.status = String(status)
-    
-    // Date range filter
-    if (from || to) {
-      where.startTime = {}
-      if (from) where.startTime.gte = new Date(String(from))
-      if (to) where.startTime.lte = new Date(String(to))
+    // Validate status if provided
+    const validStatuses = ['SCHEDULED', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'RESCHEDULED']
+    if (status && !validStatuses.includes(String(status))) {
+      res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` })
+      return
     }
 
-    const take = limit ? Math.min(parseInt(String(limit), 10) || 0, 100) : undefined
-    const skip = offset ? Math.max(parseInt(String(offset), 10) || 0, 0) : undefined
+    // Validate date formats if provided
+    if (from && isNaN(new Date(String(from)).getTime())) {
+      res.status(400).json({ success: false, error: 'Invalid from date format' })
+      return
+    }
+    if (to && isNaN(new Date(String(to)).getTime())) {
+      res.status(400).json({ success: false, error: 'Invalid to date format' })
+      return
+    }
 
-    const appointments = await prisma.appointment.findMany({
-      where,
-      take,
-      skip,
-      include: {
-        patient: { select: { id: true, firstName: true, lastName: true } },
-        doctor: { select: { id: true, firstName: true, lastName: true, specialty: true } },
-      },
-      orderBy: { startTime: 'asc' },
+    const appointments = await listAppointments(tenantId, {
+      limit: limit ? Math.min(parseInt(String(limit), 10), 100) : undefined,
+      offset: offset ? parseInt(String(offset), 10) : undefined,
+      doctorId: doctorId ? String(doctorId) : undefined,
+      patientId: patientId ? String(patientId) : undefined,
+      status: status ? (String(status) as AppointmentStatus) : undefined,
+      from: from ? new Date(String(from)) : undefined,
+      to: to ? new Date(String(to)) : undefined,
+      includeInactive: includeInactive === 'true',
     })
-    res.json(appointments)
+
+    res.json({ success: true, data: appointments })
   } catch (e) {
     next(e)
   }
 })
 
-// Get appointment by ID
-appointmentsRouter.get('/:id', async (req, res, next) => {
+/**
+ * GET /api/appointments/calendar
+ * Get appointments for calendar view (optimized for date ranges)
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/calendar', requireMinRole('STAFF'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
+    const tenantId = req.user!.tenantId
+    const { from, to, doctorId, patientId } = req.query
 
+    if (!from || !to) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Both from and to dates are required', code: 'INVALID_DATE_RANGE' },
+      })
+    }
+
+    const appointments = await getCalendarAppointments(tenantId, {
+      from: new Date(String(from)),
+      to: new Date(String(to)),
+      doctorId: doctorId ? String(doctorId) : undefined,
+      patientId: patientId ? String(patientId) : undefined,
+    })
+
+    res.json({ success: true, data: appointments })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/appointments/stats
+ * Get appointment statistics
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/stats', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { from, to, doctorId } = req.query
+
+    const stats = await getAppointmentStats(tenantId, {
+      from: from ? new Date(String(from)) : undefined,
+      to: to ? new Date(String(to)) : undefined,
+      doctorId: doctorId ? String(doctorId) : undefined,
+    })
+
+    res.json({ success: true, data: stats })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/appointments/by-doctor/:doctorId
+ * Get appointments for a specific doctor
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/by-doctor/:doctorId', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { doctorId } = req.params
+    const { from, to, limit } = req.query
+
+    const appointments = await getAppointmentsByDoctor(tenantId, doctorId, {
+      from: from ? new Date(String(from)) : undefined,
+      to: to ? new Date(String(to)) : undefined,
+      limit: limit ? parseInt(String(limit), 10) : undefined,
+    })
+
+    res.json({ success: true, data: appointments })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/appointments/by-patient/:patientId
+ * Get appointments for a specific patient
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/by-patient/:patientId', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { patientId } = req.params
+    const { limit, includeInactive } = req.query
+
+    const appointments = await getAppointmentsByPatient(tenantId, patientId, {
+      limit: limit ? parseInt(String(limit), 10) : undefined,
+      includeInactive: includeInactive === 'true',
+    })
+
+    res.json({ success: true, data: appointments })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/appointments/:id
+ * Get a single appointment by ID
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
     const { id } = req.params
-    const appointment = await prisma.appointment.findUnique({
-      where: { id },
-      include: {
-        patient: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
-        doctor: { select: { id: true, firstName: true, lastName: true, specialty: true, email: true } },
-      },
-    })
-    if (!appointment || appointment.tenantId !== tenantId) {
-      return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
+
+    const appointment = await getAppointmentById(tenantId, id)
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Appointment not found', code: 'NOT_FOUND' },
+      })
     }
-    res.json(appointment)
+
+    res.json({ success: true, data: appointment })
   } catch (e) {
     next(e)
   }
 })
 
-// Create appointment
-appointmentsRouter.post('/', async (req, res, next) => {
+/**
+ * POST /api/appointments
+ * Create a new appointment
+ * Requires: ADMIN role or higher
+ */
+appointmentsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
+    const tenantId = req.user!.tenantId
+    const parse = createAppointmentSchema.safeParse(req.body)
 
-    const parse = appointmentCreateSchema.safeParse(req.body)
-    if (!parse.success) return res.status(400).json({ success: false, error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors } })
-
-    // Verify patient belongs to tenant
-    const patient = await prisma.patient.findUnique({ where: { id: parse.data.patientId } })
-    if (!patient || patient.tenantId !== tenantId) {
-      return res.status(400).json({ success: false, error: { message: 'Invalid patient', code: 'INVALID_PATIENT' } })
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Invalid payload',
+          code: 'INVALID_PAYLOAD',
+          details: parse.error.errors,
+        },
+      })
     }
 
-    // Verify doctor belongs to tenant
-    const doctor = await prisma.doctor.findUnique({ where: { id: parse.data.doctorId } })
-    if (!doctor || doctor.tenantId !== tenantId) {
-      return res.status(400).json({ success: false, error: { message: 'Invalid doctor', code: 'INVALID_DOCTOR' } })
+    const result = await createAppointment(tenantId, parse.data)
+
+    if (result.error) {
+      const status = mapErrorCodeToStatus(result.error.code)
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+      })
     }
 
-    const data = {
-      ...parse.data,
-      tenantId,
-      startTime: new Date(parse.data.startTime),
-      endTime: new Date(parse.data.endTime),
-    }
-
-    const appointment = await prisma.appointment.create({
-      data,
-      include: {
-        patient: { select: { id: true, firstName: true, lastName: true } },
-        doctor: { select: { id: true, firstName: true, lastName: true } },
-      },
-    })
-    res.status(201).json(appointment)
+    res.status(201).json({ success: true, data: result.appointment })
   } catch (e) {
     next(e)
   }
 })
 
-// Update appointment
-appointmentsRouter.put('/:id', async (req, res, next) => {
+/**
+ * PUT /api/appointments/:id
+ * Update an existing appointment
+ * Requires: ADMIN role or higher
+ */
+appointmentsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
-
+    const tenantId = req.user!.tenantId
     const { id } = req.params
 
-    // Prevent changing tenantId or id
-    const forbidden = ['id', 'tenantId']
+    // Prevent changing immutable fields
+    const forbidden = ['id', 'tenantId', 'createdAt']
     const attempted = forbidden.filter((f) => Object.prototype.hasOwnProperty.call(req.body, f))
-    if (attempted.length > 0) return res.status(400).json({ success: false, error: { message: 'Attempt to modify immutable fields', code: 'IMMUTABLE_FIELDS', fields: attempted } })
-
-    // Whitelist allowed fields
-    const data: any = {}
-    for (const key of allowedUpdateFields) {
-      if (Object.prototype.hasOwnProperty.call(req.body, key)) {
-        let value = (req.body as any)[key]
-        // Convert date strings to Date objects
-        if ((key === 'startTime' || key === 'endTime') && typeof value === 'string') {
-          value = new Date(value)
-        }
-        data[key] = value
-      }
+    if (attempted.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Attempt to modify immutable fields',
+          code: 'IMMUTABLE_FIELDS',
+          fields: attempted,
+        },
+      })
     }
 
-    // Verify appointment exists and belongs to tenant
-    const existing = await prisma.appointment.findUnique({ where: { id } })
-    if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
+    const parse = updateAppointmentSchema.safeParse(req.body)
 
-    // If changing patient, verify new patient belongs to tenant
-    if (data.patientId) {
-      const patient = await prisma.patient.findUnique({ where: { id: data.patientId } })
-      if (!patient || patient.tenantId !== tenantId) {
-        return res.status(400).json({ success: false, error: { message: 'Invalid patient', code: 'INVALID_PATIENT' } })
-      }
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Invalid payload',
+          code: 'INVALID_PAYLOAD',
+          details: parse.error.errors,
+        },
+      })
     }
 
-    // If changing doctor, verify new doctor belongs to tenant
-    if (data.doctorId) {
-      const doctor = await prisma.doctor.findUnique({ where: { id: data.doctorId } })
-      if (!doctor || doctor.tenantId !== tenantId) {
-        return res.status(400).json({ success: false, error: { message: 'Invalid doctor', code: 'INVALID_DOCTOR' } })
-      }
+    const result = await updateAppointment(tenantId, id, parse.data)
+
+    if (result.error) {
+      const status = mapErrorCodeToStatus(result.error.code)
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+      })
     }
 
-    const appointment = await prisma.appointment.update({
-      where: { id },
-      data,
-      include: {
-        patient: { select: { id: true, firstName: true, lastName: true } },
-        doctor: { select: { id: true, firstName: true, lastName: true } },
-      },
-    })
-    res.json(appointment)
+    res.json({ success: true, data: result.appointment })
   } catch (e) {
     next(e)
   }
 })
 
-// Soft delete appointment
-appointmentsRouter.delete('/:id', async (req, res, next) => {
+/**
+ * PUT /api/appointments/:id/mark-done
+ * Mark an appointment as completed
+ * Requires: ADMIN role or higher
+ */
+appointmentsRouter.put('/:id/mark-done', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req)
-    if (!tenantId) return res.status(401).json({ success: false, error: { message: 'Missing tenant header', code: 'UNAUTHENTICATED' } })
-
+    const tenantId = req.user!.tenantId
     const { id } = req.params
-    const existing = await prisma.appointment.findUnique({ where: { id } })
-    if (!existing || existing.tenantId !== tenantId) return res.status(404).json({ success: false, error: { message: 'Not Found', code: 'NOT_FOUND' } })
 
-    const appointment = await prisma.appointment.update({ where: { id }, data: { isActive: false, status: 'CANCELLED' } })
-    res.json(appointment)
+    const parse = markDoneSchema.safeParse(req.body)
+
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Invalid payload',
+          code: 'INVALID_PAYLOAD',
+          details: parse.error.errors,
+        },
+      })
+    }
+
+    const result = await markAppointmentDone(tenantId, id, parse.data.notes)
+
+    if (result.error) {
+      const status = mapErrorCodeToStatus(result.error.code)
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+      })
+    }
+
+    res.json({ success: true, data: result.appointment })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/appointments/:id/restore
+ * Restore a soft-deleted appointment
+ * Requires: ADMIN role or higher
+ */
+appointmentsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await restoreAppointment(tenantId, id)
+
+    if (result.error) {
+      const status = mapErrorCodeToStatus(result.error.code)
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+      })
+    }
+
+    res.json({ success: true, data: result.appointment })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * DELETE /api/appointments/:id
+ * Soft delete an appointment
+ * Requires: ADMIN role or higher
+ */
+appointmentsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await deleteAppointment(tenantId, id)
+
+    if (result.error) {
+      const status = mapErrorCodeToStatus(result.error.code)
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+      })
+    }
+
+    res.json({ success: true, data: result.appointment })
   } catch (e) {
     next(e)
   }
