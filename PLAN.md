@@ -765,28 +765,6 @@ interface CreateDoctorData {
 
 ---
 
-## 📦 FASE 4: Gestión de Pacientes (con límites de plan)
-**Rama:** `feature/patients-management`  
-**Duración estimada:** 3 días
-
-### Tarea 4.1: Backend - CRUD Pacientes
-- [ ] 4.1.1: Crear esquemas Zod para Patient
-- [ ] 4.1.2: Crear servicio PatientService con tenant isolation
-- [ ] 4.1.3: Crear middleware de verificación de límite de pacientes
-- [ ] 4.1.4: Crear endpoint GET /api/patients (paginado)
-- [ ] 4.1.5: Crear endpoint GET /api/patients/:id
-- [ ] 4.1.6: Crear endpoint POST /api/patients
-- [ ] 4.1.7: Crear endpoint PUT /api/patients/:id
-- [ ] 4.1.8: Crear endpoint DELETE /api/patients/:id
-- [ ] 4.1.9: Crear endpoint GET /api/patients/:id/appointments
-- [ ] 4.1.10: Crear endpoint PUT /api/patients/:id/teeth-chart
-- [ ] 4.1.11: Crear endpoint GET /api/patients/count
-
-### Tarea 4.2: Frontend - Gestión de Pacientes
-- [ ] 4.2.1: Crear store de pacientes
-- [ ] 4.2.2: Crear hooks para pacientes
-- [ ] 4.2.3: Crear página de listado de pacientes
-- [ ] 4.2.4: Crear componente PatientCard
 ## 📦 FASE 4: Gestión de Pacientes (con límites de plan) ✅ COMPLETADA
 **Rama:** `feature/patients-management` ✅ COMPLETADO  
 **PR:** #56 ✅ MERGED  
