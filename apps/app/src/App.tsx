@@ -5,7 +5,7 @@ import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
 import UnauthorizedPage from '@pages/auth/UnauthorizedPage'
 import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
-import HomePage from '@pages/HomePage'
+import DashboardPage from '@pages/dashboard/DashboardPage'
 import DoctorsPage from '@pages/doctors/DoctorsPage'
 import PatientsPage from '@pages/patients/PatientsPage'
 import AppointmentsPage from '@pages/appointments/AppointmentsPage'
@@ -47,7 +47,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<DashboardPage />} />
         <Route path="/doctors" element={<DoctorsPage />} />
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
