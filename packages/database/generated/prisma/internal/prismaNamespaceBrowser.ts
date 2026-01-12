@@ -58,6 +58,8 @@ export const ModelName = {
   Patient: 'Patient',
   Doctor: 'Doctor',
   Appointment: 'Appointment',
+  Labwork: 'Labwork',
+  Expense: 'Expense',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken'
 } as const
@@ -212,6 +214,46 @@ export const AppointmentScalarFieldEnum = {
 } as const
 
 export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+export const LabworkScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  patientId: 'patientId',
+  lab: 'lab',
+  phoneNumber: 'phoneNumber',
+  date: 'date',
+  note: 'note',
+  price: 'price',
+  isPaid: 'isPaid',
+  isDelivered: 'isDelivered',
+  doctorIds: 'doctorIds',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LabworkScalarFieldEnum = (typeof LabworkScalarFieldEnum)[keyof typeof LabworkScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  date: 'date',
+  amount: 'amount',
+  issuer: 'issuer',
+  phoneNumber: 'phoneNumber',
+  note: 'note',
+  items: 'items',
+  tags: 'tags',
+  isPaid: 'isPaid',
+  doctorIds: 'doctorIds',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {

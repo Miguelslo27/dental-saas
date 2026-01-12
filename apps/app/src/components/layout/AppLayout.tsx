@@ -6,6 +6,8 @@ import {
   Stethoscope,
   Users,
   Calendar,
+  FlaskConical,
+  Receipt,
   Settings,
   LogOut,
   Menu,
@@ -18,6 +20,8 @@ const navItems = [
   { path: '/doctors', label: 'Doctores', icon: Stethoscope },
   { path: '/patients', label: 'Pacientes', icon: Users },
   { path: '/appointments', label: 'Citas', icon: Calendar },
+  { path: '/labworks', label: 'Laboratorio', icon: FlaskConical },
+  { path: '/expenses', label: 'Gastos', icon: Receipt },
   { path: '/settings', label: 'Configuración', icon: Settings },
 ]
 

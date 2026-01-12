@@ -888,33 +888,42 @@ interface CreateDoctorData {
 
 ---
 
-## 📦 FASE 6: Trabajos de Laboratorio y Gastos
-**Rama:** `feature/labworks-expenses`  
+## 📦 FASE 6: Trabajos de Laboratorio y Gastos ✅ COMPLETADA
+**Rama:** `feature/phase6-labworks-expenses`  
 **Duración estimada:** 2 días
+**Fecha de Implementación:** 12 de Enero, 2026
+**PR:** #60 (Pendiente de creación)
 
-### Tarea 6.1: Backend - Labworks
-- [ ] 6.1.1: Crear esquemas Zod para Labwork
-- [ ] 6.1.2: Crear servicio LabworkService
-- [ ] 6.1.3: Crear endpoints CRUD /api/labworks
-- [ ] 6.1.4: Crear endpoint de estadísticas de labworks
+### Tarea 6.1: Backend - Labworks ✅
+- [x] 6.1.1: Crear esquemas Zod para Labwork
+- [x] 6.1.2: Crear servicio LabworkService (`labwork.service.ts`)
+- [x] 6.1.3: Crear endpoints CRUD /api/labworks (`labworks.ts`)
+- [x] 6.1.4: Crear endpoint de estadísticas de labworks
 
-### Tarea 6.2: Backend - Expenses
-- [ ] 6.2.1: Crear esquemas Zod para Expense
-- [ ] 6.2.2: Crear servicio ExpenseService
-- [ ] 6.2.3: Crear endpoints CRUD /api/expenses
-- [ ] 6.2.4: Crear endpoint de estadísticas de gastos
+### Tarea 6.2: Backend - Expenses ✅
+- [x] 6.2.1: Crear esquemas Zod para Expense
+- [x] 6.2.2: Crear servicio ExpenseService (`expense.service.ts`)
+- [x] 6.2.3: Crear endpoints CRUD /api/expenses (`expenses.ts`)
+- [x] 6.2.4: Crear endpoint de estadísticas de gastos
 
-### Tarea 6.3: Frontend - Labworks
-- [ ] 6.3.1: Crear store de labworks
-- [ ] 6.3.2: Crear página de listado de labworks
-- [ ] 6.3.3: Crear formulario de labwork
-- [ ] 6.3.4: Implementar filtros por estado de pago
+### Tarea 6.3: Frontend - Labworks ✅
+- [x] 6.3.1: Crear API client (`labwork-api.ts`) y store de labworks (`labworks.store.ts`)
+- [x] 6.3.2: Crear página de listado de labworks (`LabworksPage.tsx`)
+- [x] 6.3.3: Crear formulario de labwork (`LabworkFormModal.tsx`)
+- [x] 6.3.4: Implementar filtros por estado de pago y entrega
+- [x] 6.3.5: Crear componente de tarjeta (`LabworkCard.tsx`)
 
-### Tarea 6.4: Frontend - Expenses
-- [ ] 6.4.1: Crear store de expenses
-- [ ] 6.4.2: Crear página de listado de expenses
-- [ ] 6.4.3: Crear formulario de expense
-- [ ] 6.4.4: Implementar tags y filtros
+### Tarea 6.4: Frontend - Expenses ✅
+- [x] 6.4.1: Crear API client (`expense-api.ts`) y store de expenses (`expenses.store.ts`)
+- [x] 6.4.2: Crear página de listado de expenses (`ExpensesPage.tsx`)
+- [x] 6.4.3: Crear formulario de expense (`ExpenseFormModal.tsx`) con items y tags
+- [x] 6.4.4: Implementar tags y filtros
+- [x] 6.4.5: Crear componente de tarjeta (`ExpenseCard.tsx`)
+
+### Migración de Base de Datos
+- [x] Migración `20260112001606_add_labworks_expenses` aplicada
+- [x] Modelos Labwork y Expense añadidos al schema de Prisma
+- [x] Relaciones con Patient y Tenant establecidas
 
 ---
 

@@ -75,6 +75,16 @@ export type Doctor = Prisma.DoctorModel
  */
 export type Appointment = Prisma.AppointmentModel
 /**
+ * Model Labwork
+ * 
+ */
+export type Labwork = Prisma.LabworkModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
  * Model RefreshToken
  * 
  */
