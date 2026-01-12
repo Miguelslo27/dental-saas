@@ -85,6 +85,14 @@ statsRouter.get('/appointments', async (req, res, next) => {
       ? new Date(parseResult.data.endDate)
       : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 
+    // Validate date range
+    if (startDate > endDate) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'startDate must be before or equal to endDate' },
+      })
+    }
+
     const stats = await getAppointmentStatsForPeriod(tenantId, startDate, endDate)
 
     res.json({

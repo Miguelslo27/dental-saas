@@ -262,6 +262,19 @@ describe('Stats API', () => {
 
       expect(res.status).toBe(400)
     })
+
+    it('should return 400 when startDate is after endDate', async () => {
+      const res = await request(app)
+        .get('/api/stats/appointments')
+        .query({
+          startDate: '2026-01-31T00:00:00.000Z',
+          endDate: '2026-01-01T00:00:00.000Z',
+        })
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(400)
+      expect(res.body.error.message).toBe('startDate must be before or equal to endDate')
+    })
   })
 
   // ============================================================================
@@ -321,6 +334,16 @@ describe('Stats API', () => {
       expect(res.body.data).toHaveProperty('growthPercentage')
       expect(res.body.data).toHaveProperty('byMonth')
       expect(res.body.data.total).toBe(1)
+    })
+
+    it('should accept custom months parameter', async () => {
+      const res = await request(app)
+        .get('/api/stats/patients-growth')
+        .query({ months: '12' })
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
     })
   })
 

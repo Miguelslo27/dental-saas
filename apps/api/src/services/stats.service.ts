@@ -365,23 +365,40 @@ export async function getDoctorPerformanceStats(tenantId: string): Promise<Docto
     },
   })
 
-  // Get appointments for each doctor this month
+  if (doctors.length === 0) {
+    return []
+  }
+
+  const doctorIds = doctors.map((doctor) => doctor.id)
+
+  // Get all appointments for all doctors this month in a single query (avoids N+1)
+  const allAppointments = await prisma.appointment.findMany({
+    where: {
+      tenantId,
+      doctorId: { in: doctorIds },
+      isActive: true,
+      startTime: { gte: monthStart, lte: monthEnd },
+    },
+    select: {
+      doctorId: true,
+      status: true,
+      cost: true,
+      isPaid: true,
+    },
+  })
+
+  // Group appointments by doctorId
+  const appointmentsByDoctor = new Map<string, typeof allAppointments>()
+  for (const appointment of allAppointments) {
+    const existing = appointmentsByDoctor.get(appointment.doctorId) ?? []
+    existing.push(appointment)
+    appointmentsByDoctor.set(appointment.doctorId, existing)
+  }
+
   const performanceStats: DoctorPerformanceStats[] = []
 
   for (const doctor of doctors) {
-    const appointments = await prisma.appointment.findMany({
-      where: {
-        tenantId,
-        doctorId: doctor.id,
-        isActive: true,
-        startTime: { gte: monthStart, lte: monthEnd },
-      },
-      select: {
-        status: true,
-        cost: true,
-        isPaid: true,
-      },
-    })
+    const appointments = appointmentsByDoctor.get(doctor.id) ?? []
 
     const appointmentsCount = appointments.length
     const completedCount = appointments.filter((a) => a.status === 'COMPLETED').length
