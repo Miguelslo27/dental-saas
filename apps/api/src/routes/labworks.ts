@@ -1,0 +1,262 @@
+import { Router, type IRouter } from 'express'
+import { z } from 'zod'
+import { requireMinRole } from '../middleware/auth.js'
+import {
+  createLabwork,
+  getLabworkById,
+  listLabworks,
+  updateLabwork,
+  deleteLabwork,
+  restoreLabwork,
+  getLabworkStats,
+} from '../services/labwork.service.js'
+
+const labworksRouter: IRouter = Router()
+
+// Zod schemas for validation
+const createLabworkSchema = z.object({
+  patientId: z.string().optional(),
+  lab: z.string().min(1, 'Laboratory name is required'),
+  phoneNumber: z.string().optional(),
+  date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+  note: z.string().optional(),
+  price: z.number().min(0).optional(),
+  isPaid: z.boolean().optional(),
+  isDelivered: z.boolean().optional(),
+  doctorIds: z.array(z.string()).optional(),
+})
+
+const updateLabworkSchema = z.object({
+  patientId: z.string().nullable().optional(),
+  lab: z.string().min(1).optional(),
+  phoneNumber: z.string().nullable().optional(),
+  date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).optional(),
+  note: z.string().nullable().optional(),
+  price: z.number().min(0).optional(),
+  isPaid: z.boolean().optional(),
+  isDelivered: z.boolean().optional(),
+  doctorIds: z.array(z.string()).optional(),
+})
+
+// Error code to HTTP status mapping
+const errorStatusMap: Record<string, number> = {
+  NOT_FOUND: 404,
+  ALREADY_INACTIVE: 400,
+  ALREADY_ACTIVE: 400,
+  INVALID_PATIENT: 400,
+}
+
+// Error code to message mapping
+const errorMessageMap: Record<string, string> = {
+  NOT_FOUND: 'Labwork not found',
+  ALREADY_INACTIVE: 'Labwork is already deleted',
+  ALREADY_ACTIVE: 'Labwork is already active',
+  INVALID_PATIENT: 'Patient not found or does not belong to this clinic',
+}
+
+/**
+ * GET /api/labworks
+ * List labworks for the tenant
+ */
+labworksRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { limit, offset, patientId, isPaid, isDelivered, from, to, includeInactive } = req.query
+
+    const result = await listLabworks(tenantId, {
+      limit: limit ? Math.min(parseInt(String(limit), 10), 100) : undefined,
+      offset: offset ? parseInt(String(offset), 10) : undefined,
+      patientId: patientId ? String(patientId) : undefined,
+      isPaid: isPaid !== undefined ? isPaid === 'true' : undefined,
+      isDelivered: isDelivered !== undefined ? isDelivered === 'true' : undefined,
+      from: from ? new Date(String(from)) : undefined,
+      to: to ? new Date(String(to)) : undefined,
+      includeInactive: includeInactive === 'true',
+    })
+
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        limit: limit ? parseInt(String(limit), 10) : 50,
+        offset: offset ? parseInt(String(offset), 10) : 0,
+      },
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/labworks/stats
+ * Get labwork statistics
+ */
+labworksRouter.get('/stats', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { from, to } = req.query
+
+    const stats = await getLabworkStats(tenantId, {
+      from: from ? new Date(String(from)) : undefined,
+      to: to ? new Date(String(to)) : undefined,
+    })
+
+    res.json({ success: true, data: stats })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/labworks/:id
+ * Get a specific labwork
+ */
+labworksRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+
+    const result = await getLabworkById(tenantId, id)
+
+    if (!result.success) {
+      res.status(errorStatusMap[result.code] || 500).json({
+        success: false,
+        error: errorMessageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * POST /api/labworks
+ * Create a new labwork
+ */
+labworksRouter.post('/', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+
+    const parsed = createLabworkSchema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        details: parsed.error.flatten().fieldErrors,
+      })
+      return
+    }
+
+    const result = await createLabwork(tenantId, {
+      ...parsed.data,
+      date: new Date(parsed.data.date),
+    })
+
+    if (!result.success) {
+      res.status(errorStatusMap[result.code] || 500).json({
+        success: false,
+        error: errorMessageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.status(201).json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/labworks/:id
+ * Update a labwork
+ */
+labworksRouter.put('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+
+    const parsed = updateLabworkSchema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        details: parsed.error.flatten().fieldErrors,
+      })
+      return
+    }
+
+    const result = await updateLabwork(tenantId, id, {
+      ...parsed.data,
+      date: parsed.data.date ? new Date(parsed.data.date) : undefined,
+    })
+
+    if (!result.success) {
+      res.status(errorStatusMap[result.code] || 500).json({
+        success: false,
+        error: errorMessageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * DELETE /api/labworks/:id
+ * Soft delete a labwork
+ */
+labworksRouter.delete('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+
+    const result = await deleteLabwork(tenantId, id)
+
+    if (!result.success) {
+      res.status(errorStatusMap[result.code] || 500).json({
+        success: false,
+        error: errorMessageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/labworks/:id/restore
+ * Restore a soft-deleted labwork
+ */
+labworksRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+
+    const result = await restoreLabwork(tenantId, id)
+
+    if (!result.success) {
+      res.status(errorStatusMap[result.code] || 500).json({
+        success: false,
+        error: errorMessageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+export { labworksRouter }
+export default labworksRouter

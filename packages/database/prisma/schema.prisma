@@ -106,6 +106,8 @@ model Tenant {
   patients      Patient[]
   doctors       Doctor[]
   appointments  Appointment[]
+  labworks      Labwork[]
+  expenses      Expense[]
 
   @@index([slug])
   @@index([isActive])
@@ -179,6 +181,7 @@ model Patient {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  labworks     Labwork[]
 
   @@index([tenantId])
   @@index([lastName])
@@ -299,6 +302,99 @@ enum UserRole {
   ADMIN       // Administrative access
   DOCTOR      // Can manage patients and appointments
   STAFF       // Limited access
+}
+
+// ============================================================================
+// LABWORKS (Laboratory Work Orders)
+// ============================================================================
+
+model Labwork {
+  id          String   @id @default(cuid())
+  tenantId    String
+  
+  /// Optional reference to the patient this labwork is for
+  patientId   String?
+  
+  /// Name of the laboratory
+  lab         String
+  /// Contact phone for the laboratory
+  phoneNumber String?
+  
+  /// Date the labwork was ordered/due
+  date        DateTime
+  
+  /// Description or notes about the work
+  note        String?  @db.Text
+  
+  /// Cost of the labwork
+  price       Decimal  @db.Decimal(10, 2) @default(0)
+  /// Whether payment has been made
+  isPaid      Boolean  @default(false)
+  /// Whether the labwork has been delivered
+  isDelivered Boolean  @default(false)
+  
+  /// IDs of doctors associated with this labwork (stored as JSON array)
+  doctorIds   Json     @default("[]")
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([date])
+  @@index([isPaid])
+  @@index([isDelivered])
+  @@map("labworks")
+}
+
+// ============================================================================
+// EXPENSES (Clinic Expenses and Receipts)
+// ============================================================================
+
+model Expense {
+  id          String   @id @default(cuid())
+  tenantId    String
+  
+  /// Date of the expense
+  date        DateTime
+  
+  /// Amount of the expense
+  amount      Decimal  @db.Decimal(10, 2) @default(0)
+  
+  /// Who issued the receipt/invoice
+  issuer      String?
+  /// Contact phone number
+  phoneNumber String?
+  
+  /// Description or notes
+  note        String?  @db.Text
+  
+  /// List of items in this expense (stored as JSON array)
+  items       Json     @default("[]")
+  
+  /// Tags for categorization (stored as JSON array)
+  tags        Json     @default("[]")
+  
+  /// Whether the expense has been paid
+  isPaid      Boolean  @default(false)
+  
+  /// IDs of doctors/staff associated with this expense (stored as JSON array)
+  doctorIds   Json     @default("[]")
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([date])
+  @@index([isPaid])
+  @@map("expenses")
 }
 
 model RefreshToken {
