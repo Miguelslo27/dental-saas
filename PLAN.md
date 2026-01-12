@@ -330,26 +330,28 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ Accesibilidad: ARIA attributes, escape key handlers, stopPropagation
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/55
 
-### PR #56: Frontend - Patients Management ✅
-- ✅ Cliente API para pacientes (`patient-api.ts`)
-- ✅ Zustand store para gestión de estado (`patients.store.ts`)
-- ✅ PatientsPage con listado, búsqueda y filtros
-- ✅ PatientCard, PatientFormModal components
-- ✅ Validación de fecha de nacimiento (no futura)
-- ✅ Integración con límites de plan (15 pacientes free)
+### PR #56: Patients Management ✅
+- ✅ Backend CRUD completo con tenant isolation
+- ✅ Validación DOB (no fechas futuras)
+- ✅ Frontend: PatientsPage, PatientCard, PatientFormModal
+- ✅ Zustand store y API client
+- ✅ Plan limit banner (15 pacientes en plan free)
+- ✅ Email único por tenant
+- ✅ 136 tests totales en API
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/56
 
 ### PR #59: Phase 5 - Appointments Management ✅
 - ✅ Backend: appointment.service.ts con CRUD completo y detección de conflictos
-- ✅ Backend: 54 tests de integración (190 tests totales en API)
-- ✅ Backend: 7 tipos de status soportados
+- ✅ Backend: 54 tests de integración para citas
+- ✅ Backend: 7 tipos de estado (SCHEDULED, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW, RESCHEDULED)
+- ✅ Backend: Estadísticas de revenue y pagos pendientes
 - ✅ Frontend: appointment-api.ts con tipos TypeScript
 - ✅ Frontend: appointments.store.ts (Zustand)
 - ✅ Frontend: AppointmentsPage con navegación mensual
-- ✅ Frontend: AppointmentCard con badges de status
+- ✅ Frontend: AppointmentCard con badges de estado
 - ✅ Frontend: AppointmentFormModal con selectores de paciente/doctor
-- ✅ Fix: vitest.config.ts - zombie process issue resuelto
-- ✅ 14 comentarios de Copilot review atendidos
+- ✅ Fix: Vitest zombie process issue con fork pool configuration
+- ✅ 190 tests totales en API
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/59
 
 ---
@@ -839,25 +841,24 @@ interface CreateDoctorData {
 
 ## 📦 FASE 5: Gestión de Citas (con límites de storage) 🔄 EN PROGRESO
 **Rama:** `feature/phase5-appointments-management`  
-**PR:** #59 ✅ MERGED  
-**Duración estimada:** 4 días  
-**Fecha inicio:** 10 de Enero, 2026
+**Estado:** CRUD completado (PR #59), Imágenes pendientes  
+**Duración estimada:** 4 días
 
-### Tarea 5.1: Backend - CRUD Citas ✅ COMPLETADO
+### Tarea 5.1: Backend - CRUD Citas ✅ COMPLETADO (PR #59)
 - [x] 5.1.1: Crear esquemas Zod para Appointment
-- [x] 5.1.2: Crear servicio AppointmentService (`appointment.service.ts`)
+- [x] 5.1.2: Crear servicio AppointmentService
 - [x] 5.1.3: Crear endpoint GET /api/appointments
 - [x] 5.1.4: Crear endpoint GET /api/appointments/:id
 - [x] 5.1.5: Crear endpoint POST /api/appointments
 - [x] 5.1.6: Crear endpoint PUT /api/appointments/:id
-- [x] 5.1.7: Crear endpoint DELETE /api/appointments/:id (soft delete)
+- [x] 5.1.7: Crear endpoint DELETE /api/appointments/:id
 - [x] 5.1.8: Crear endpoint PUT /api/appointments/:id/mark-done
 - [x] 5.1.9: Crear endpoint GET /api/appointments/stats
 - [x] 5.1.10: Crear endpoint PUT /api/appointments/:id/restore
 - [x] 5.1.11: Detección de conflictos de horario por doctor
-- [x] 5.1.12: Tests unitarios (54 tests, 190 totales en API)
+- [x] 5.1.12: 54 tests de integración
 
-### Tarea 5.2: Backend - Imágenes de Citas ⏳ PENDIENTE
+### Tarea 5.2: Backend - Imágenes de Citas
 - [ ] 5.2.1: Configurar Multer para uploads
 - [ ] 5.2.2: Crear servicio de almacenamiento (S3)
 - [ ] 5.2.3: Crear servicio de tracking de storage por tenant
@@ -867,24 +868,24 @@ interface CreateDoctorData {
 - [ ] 5.2.7: Crear endpoint GET /api/appointments/:id/images
 - [ ] 5.2.8: Crear endpoint GET /api/storage/usage
 
-### Tarea 5.3: Frontend - Vista de Calendario ✅ COMPLETADO (Básico)
-- [ ] 5.3.1: Instalar y configurar FullCalendar (DIFERIDO - usando vista custom)
-- [x] 5.3.2: Crear página de calendario (AppointmentsPage.tsx)
-- [x] 5.3.3: Implementar vista mensual con navegación
-- [ ] 5.3.4: Implementar vista semanal (DIFERIDO)
-- [x] 5.3.5: Implementar navegación entre fechas (mes anterior/siguiente)
-- [x] 5.3.6: Mostrar citas con filtros de status
-- [x] 5.3.7: Filtrar por doctor y paciente
+### Tarea 5.3: Frontend - Vista de Calendario (Parcial)
+- [ ] 5.3.1: Instalar y configurar FullCalendar
+- [x] 5.3.2: Crear página de citas con vista de lista
+- [x] 5.3.3: Implementar navegación mensual
+- [ ] 5.3.4: Implementar vista semanal con FullCalendar
+- [x] 5.3.5: Implementar navegación entre fechas
+- [x] 5.3.6: Mostrar citas en el listado
+- [x] 5.3.7: Filtrar por estado
 
-### Tarea 5.4: Frontend - CRUD de Citas ✅ COMPLETADO
-- [x] 5.4.1: Crear store de citas (`appointments.store.ts` - Zustand)
-- [x] 5.4.2: Crear cliente API (`appointment-api.ts`)
-- [x] 5.4.3: Crear formulario de cita (`AppointmentFormModal.tsx`)
-- [x] 5.4.4: Crear componente AppointmentCard (`AppointmentCard.tsx`)
-- [x] 5.4.5: Implementar marcar cita como completada
-- [ ] 5.4.6: Implementar upload de imágenes (DEPENDE de 5.2)
-- [ ] 5.4.7: Implementar galería de imágenes (DEPENDE de 5.2)
-- [ ] 5.4.8: Crear componente de prescripciones (DIFERIDO)
+### Tarea 5.4: Frontend - CRUD de Citas ✅ COMPLETADO (PR #59)
+- [x] 5.4.1: Crear store de citas (appointments.store.ts)
+- [x] 5.4.2: Crear API client (appointment-api.ts)
+- [x] 5.4.3: Crear formulario de cita (AppointmentFormModal)
+- [x] 5.4.4: Crear componente AppointmentCard
+- [x] 5.4.5: Crear acciones de editar/eliminar/restaurar
+- [ ] 5.4.6: Implementar upload de imágenes
+- [ ] 5.4.7: Implementar galería de imágenes
+- [ ] 5.4.8: Crear componente de prescripciones
 
 ---
 
