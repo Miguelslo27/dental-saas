@@ -102,7 +102,7 @@ interface LabworkStatsResponse {
 
 export async function getLabworks(params?: LabworkListParams): Promise<LabworkListResponse> {
   const searchParams = new URLSearchParams()
-  
+
   if (params?.limit) searchParams.set('limit', String(params.limit))
   if (params?.offset) searchParams.set('offset', String(params.offset))
   if (params?.patientId) searchParams.set('patientId', params.patientId)
@@ -114,7 +114,7 @@ export async function getLabworks(params?: LabworkListParams): Promise<LabworkLi
 
   const query = searchParams.toString()
   const url = query ? `/labworks?${query}` : '/labworks'
-  
+
   const response = await apiClient.get<LabworkListResponse>(url)
   return response.data
 }
@@ -148,10 +148,10 @@ export async function getLabworkStats(params?: { from?: string; to?: string }): 
   const searchParams = new URLSearchParams()
   if (params?.from) searchParams.set('from', params.from)
   if (params?.to) searchParams.set('to', params.to)
-  
+
   const query = searchParams.toString()
   const url = query ? `/labworks/stats?${query}` : '/labworks/stats'
-  
+
   const response = await apiClient.get<LabworkStatsResponse>(url)
   return response.data
 }

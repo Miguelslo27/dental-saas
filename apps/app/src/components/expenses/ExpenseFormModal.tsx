@@ -198,9 +198,8 @@ export function ExpenseFormModal({
                   type="text"
                   id="issuer"
                   placeholder="Ej: Dental Supply Co."
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.issuer ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.issuer ? 'border-red-300' : 'border-gray-300'
+                    }`}
                 />
                 {errors.issuer && <p className="mt-1 text-sm text-red-500">{errors.issuer.message}</p>}
               </div>
@@ -215,9 +214,8 @@ export function ExpenseFormModal({
                     {...register('date')}
                     type="date"
                     id="date"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.date ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.date ? 'border-red-300' : 'border-gray-300'
+                      }`}
                   />
                   {errors.date && <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>}
                 </div>
@@ -233,9 +231,8 @@ export function ExpenseFormModal({
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.amount ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.amount ? 'border-red-300' : 'border-gray-300'
+                      }`}
                   />
                   {errors.amount && <p className="mt-1 text-sm text-red-500">{errors.amount.message}</p>}
                 </div>
@@ -345,9 +342,8 @@ export function ExpenseFormModal({
                   id="note"
                   rows={3}
                   placeholder="Notas adicionales..."
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
-                    errors.note ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${errors.note ? 'border-red-300' : 'border-gray-300'
+                    }`}
                 />
                 {errors.note && <p className="mt-1 text-sm text-red-500">{errors.note.message}</p>}
               </div>

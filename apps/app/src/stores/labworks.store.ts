@@ -20,14 +20,14 @@ interface LabworksState {
   labworks: Labwork[]
   stats: LabworkStats | null
   total: number
-  
+
   // UI State
   loading: boolean
   error: string | null
-  
+
   // Filters
   filters: LabworkListParams
-  
+
   // Actions
   fetchLabworks: (params?: LabworkListParams) => Promise<void>
   fetchStats: (params?: { from?: string; to?: string }) => Promise<void>

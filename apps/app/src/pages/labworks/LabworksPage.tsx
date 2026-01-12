@@ -253,11 +253,10 @@ export function LabworksPage() {
         {/* Filter toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg transition-colors ${
-            showFilters || filters.isPaid !== undefined || filters.isDelivered !== undefined
+          className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg transition-colors ${showFilters || filters.isPaid !== undefined || filters.isDelivered !== undefined
               ? 'bg-blue-50 border-blue-200 text-blue-700'
               : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-          }`}
+            }`}
         >
           <Filter className="h-5 w-5" />
           Filtros
@@ -272,31 +271,28 @@ export function LabworksPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => handleFilterChange('isPaid', undefined)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isPaid === undefined
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isPaid === undefined
                     ? 'bg-blue-50 border-blue-200 text-blue-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Todos
               </button>
               <button
                 onClick={() => handleFilterChange('isPaid', true)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isPaid === true
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isPaid === true
                     ? 'bg-green-50 border-green-200 text-green-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Pagados
               </button>
               <button
                 onClick={() => handleFilterChange('isPaid', false)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isPaid === false
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isPaid === false
                     ? 'bg-amber-50 border-amber-200 text-amber-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Pendientes
               </button>
@@ -308,31 +304,28 @@ export function LabworksPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => handleFilterChange('isDelivered', undefined)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isDelivered === undefined
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isDelivered === undefined
                     ? 'bg-blue-50 border-blue-200 text-blue-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Todos
               </button>
               <button
                 onClick={() => handleFilterChange('isDelivered', true)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isDelivered === true
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isDelivered === true
                     ? 'bg-green-50 border-green-200 text-green-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Entregados
               </button>
               <button
                 onClick={() => handleFilterChange('isDelivered', false)}
-                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  filters.isDelivered === false
+                className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${filters.isDelivered === false
                     ? 'bg-amber-50 border-amber-200 text-amber-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 Por Entregar
               </button>

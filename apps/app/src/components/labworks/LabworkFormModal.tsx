@@ -116,9 +116,8 @@ function PatientSearch({ value, onChange, selectedPatient, onSelectPatient, erro
           }}
           onFocus={() => setIsOpen(true)}
           placeholder="Buscar paciente por nombre..."
-          className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            error ? 'border-red-300' : 'border-gray-300'
-          }`}
+          className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-300' : 'border-gray-300'
+            }`}
         />
         {isSearching && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 animate-spin" />
@@ -328,9 +327,8 @@ export function LabworkFormModal({
                   type="text"
                   id="lab"
                   placeholder="Ej: Lab Dental Central"
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.lab ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.lab ? 'border-red-300' : 'border-gray-300'
+                    }`}
                 />
                 {errors.lab && <p className="mt-1 text-sm text-red-500">{errors.lab.message}</p>}
               </div>
@@ -345,9 +343,8 @@ export function LabworkFormModal({
                     {...register('date')}
                     type="date"
                     id="date"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.date ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.date ? 'border-red-300' : 'border-gray-300'
+                      }`}
                   />
                   {errors.date && <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>}
                 </div>
@@ -363,9 +360,8 @@ export function LabworkFormModal({
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.price ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.price ? 'border-red-300' : 'border-gray-300'
+                      }`}
                   />
                   {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price.message}</p>}
                 </div>
@@ -402,9 +398,8 @@ export function LabworkFormModal({
                   id="notes"
                   rows={3}
                   placeholder="Notas adicionales sobre el trabajo..."
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
-                    errors.notes ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${errors.notes ? 'border-red-300' : 'border-gray-300'
+                    }`}
                 />
                 {errors.notes && <p className="mt-1 text-sm text-red-500">{errors.notes.message}</p>}
               </div>

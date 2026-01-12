@@ -183,11 +183,11 @@ export async function listExpenses(
   // Tag filter using JSON contains
   const where: Prisma.ExpenseWhereInput = options?.tag
     ? {
-        ...baseWhere,
-        tags: {
-          array_contains: [options.tag],
-        },
-      }
+      ...baseWhere,
+      tags: {
+        array_contains: [options.tag],
+      },
+    }
     : baseWhere
 
   const [expenses, total] = await Promise.all([

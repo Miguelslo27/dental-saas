@@ -50,9 +50,8 @@ export function LabworkCard({
 
   return (
     <div
-      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
-        isDeleted ? 'border-orange-200 bg-orange-50/30' : 'border-gray-200'
-      }`}
+      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${isDeleted ? 'border-orange-200 bg-orange-50/30' : 'border-gray-200'
+        }`}
     >
       <div className="p-5">
         {/* Header */}
@@ -75,15 +74,14 @@ export function LabworkCard({
 
           {/* Status badge */}
           <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-              statusBadge.variant === 'success'
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge.variant === 'success'
                 ? 'bg-green-100 text-green-800'
                 : statusBadge.variant === 'warning'
-                ? 'bg-amber-100 text-amber-800'
-                : statusBadge.variant === 'destructive'
-                ? 'bg-red-100 text-red-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
+                  ? 'bg-amber-100 text-amber-800'
+                  : statusBadge.variant === 'destructive'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+              }`}
           >
             {statusBadge.label}
           </span>
@@ -110,11 +108,10 @@ export function LabworkCard({
           <button
             onClick={() => onTogglePaid?.(labwork)}
             disabled={isDeleted}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              labwork.isPaid
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${labwork.isPaid
                 ? 'bg-green-100 text-green-700 hover:bg-green-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {labwork.isPaid ? (
               <CheckCircle2 className="h-4 w-4" />
@@ -127,11 +124,10 @@ export function LabworkCard({
           <button
             onClick={() => onToggleDelivered?.(labwork)}
             disabled={isDeleted}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              labwork.isDelivered
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${labwork.isDelivered
                 ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Package className="h-4 w-4" />
             {labwork.isDelivered ? 'Entregado' : 'Por entregar'}

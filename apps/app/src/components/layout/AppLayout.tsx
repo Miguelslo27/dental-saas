@@ -60,9 +60,8 @@ export function AppLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Logo */}
@@ -100,11 +99,10 @@ export function AppLayout() {
                   <Link
                     to={item.path}
                     onClick={closeSidebar}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
                         ? 'bg-blue-50 text-blue-700 font-medium'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
+                      }`}
                   >
                     <item.icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : ''}`} />
                     {item.label}

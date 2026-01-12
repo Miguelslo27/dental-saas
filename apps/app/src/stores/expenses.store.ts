@@ -20,14 +20,14 @@ interface ExpensesState {
   expenses: Expense[]
   stats: ExpenseStats | null
   total: number
-  
+
   // UI State
   loading: boolean
   error: string | null
-  
+
   // Filters
   filters: ExpenseListParams
-  
+
   // Actions
   fetchExpenses: (params?: ExpenseListParams) => Promise<void>
   fetchStats: (params?: { from?: string; to?: string }) => Promise<void>

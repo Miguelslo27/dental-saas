@@ -40,9 +40,8 @@ export function ExpenseCard({
 
   return (
     <div
-      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${
-        isDeleted ? 'border-orange-200 bg-orange-50/30' : 'border-gray-200'
-      }`}
+      className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${isDeleted ? 'border-orange-200 bg-orange-50/30' : 'border-gray-200'
+        }`}
     >
       <div className="p-5">
         {/* Header */}
@@ -65,13 +64,12 @@ export function ExpenseCard({
 
           {/* Status badge */}
           <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-              statusBadge.variant === 'success'
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge.variant === 'success'
                 ? 'bg-green-100 text-green-800'
                 : statusBadge.variant === 'warning'
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
+                  ? 'bg-amber-100 text-amber-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
           >
             {statusBadge.label}
           </span>
@@ -112,11 +110,10 @@ export function ExpenseCard({
           <button
             onClick={() => onTogglePaid?.(expense)}
             disabled={isDeleted}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              expense.isPaid
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${expense.isPaid
                 ? 'bg-green-100 text-green-700 hover:bg-green-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {expense.isPaid ? (
               <CheckCircle2 className="h-4 w-4" />

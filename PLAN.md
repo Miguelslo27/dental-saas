@@ -892,7 +892,7 @@ interface CreateDoctorData {
 **Rama:** `feature/phase6-labworks-expenses`  
 **Duración estimada:** 2 días
 **Fecha de Implementación:** 12 de Enero, 2026
-**PR:** #60 (Pendiente de creación)
+**PR:** #60 (Merged)
 
 ### Tarea 6.1: Backend - Labworks ✅
 - [x] 6.1.1: Crear esquemas Zod para Labwork
