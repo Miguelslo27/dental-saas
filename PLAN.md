@@ -37,7 +37,7 @@ dental-saas/
 | 5 | Gestión de Citas | ✅ (CRUD) | #59 |
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
-| 8 | Suscripciones y Pagos (Stripe) | ⏳ | - |
+| 8 | Suscripciones y Pagos (dLocal) | ⏳ | #65 |
 | 9 | Configuración del Tenant | ⏳ | - |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 216 pasando | **Última actualización:** 13 de Enero, 2026
+**Tests:** 245 pasando | **Última actualización:** 13 de Enero, 2026
 
 ---
 
@@ -77,19 +77,11 @@ dental-saas/
 **Rama:** `feat/billing-dlocal`  
 **Duración estimada:** 3-4 días
 
-### Tarea 8.1: Backend - Servicio de Planes y Límites (EN PROGRESO)
-- [ ] 8.1.1: Actualizar schema Prisma (quitar campos Stripe, agregar dLocal)
-- [ ] 8.1.2: Crear seed de planes (free, basic, enterprise)
-- [ ] 8.1.3: Crear PlanService (CRUD de planes, obtener por nombre)
-- [ ] 8.1.4: Crear PlanLimitsService (verificar límites por recurso)
-- [ ] 8.1.5: Crear middleware checkPlanLimit para rutas protegidas
-- [ ] 8.1.6: Integrar middleware en rutas de doctors, patients
-- [ ] 8.1.7: Crear endpoints GET /api/plans, GET /api/billing/subscription
-- [ ] 8.1.8: Tests unitarios de PlanService y PlanLimitsService
+### ✅ Tarea 8.1: Backend - Servicio de Planes y Límites (PR #65)
 
 ### Tarea 8.2: Backend - Integración dLocal
-- [ ] 8.2.1: Crear DLocalService (cliente HTTP, firma de requests)
-- [ ] 8.2.2: Crear endpoint POST /api/billing/create-payment (genera link de pago)
+- [ ] 8.2.1: Configurar credenciales dLocal (sandbox)
+- [ ] 8.2.2: Implementar DLocalService real (API calls)
 - [ ] 8.2.3: Crear endpoint POST /api/billing/webhook (IPN handler)
 - [ ] 8.2.4: Implementar lógica de upgrade/downgrade de plan
 - [ ] 8.2.5: Crear cron job para cobros recurrentes mensuales
