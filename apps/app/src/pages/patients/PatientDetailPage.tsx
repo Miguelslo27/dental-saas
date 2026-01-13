@@ -420,33 +420,27 @@ export default function PatientDetailPage() {
           </label>
         </div>
 
-        {/* Permanent Teeth (always shown) */}
-        <div className="flex flex-col items-center gap-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 text-center mb-2">
-              Dientes Permanentes
-            </h3>
-            <Odontogram
-              onChange={handleOdontogramChange}
-              theme="light"
-              colors={{}}
-              notation="FDI"
-              maxTeeth={8}
-              showTooltip={true}
-              tooltip={{
-                placement: 'top',
-                margin: 8,
-              }}
-            />
-          </div>
-
-          {/* Primary Teeth (shown when checkbox is checked) */}
-          {showPrimaryTeeth && (
-            <div className="pt-4 border-t border-gray-200 w-full">
-              <h3 className="text-sm font-medium text-gray-500 text-center mb-2">
-                Dientes Temporales (de leche)
-              </h3>
-              <div className="flex justify-center">
+        {/* Combined Dental Chart - Permanent with Primary inside */}
+        <div className="flex flex-col items-center">
+          {/* Upper Arch */}
+          <div className="flex flex-col items-center">
+            {/* Upper Permanent Teeth */}
+            <div className="odontogram-upper-permanent">
+              <Odontogram
+                onChange={handleOdontogramChange}
+                theme="light"
+                colors={{}}
+                notation="FDI"
+                maxTeeth={8}
+                showTooltip={true}
+                showHalf="upper"
+                tooltip={{ placement: 'top', margin: 8 }}
+              />
+            </div>
+            
+            {/* Upper Primary Teeth (inside permanent) */}
+            {showPrimaryTeeth && (
+              <div className="odontogram-primary -mt-2 scale-75 origin-top">
                 <Odontogram
                   onChange={handleOdontogramChange}
                   theme="light"
@@ -454,12 +448,60 @@ export default function PatientDetailPage() {
                   notation="FDI"
                   maxTeeth={5}
                   showTooltip={true}
-                  tooltip={{
-                    placement: 'top',
-                    margin: 8,
-                  }}
+                  showHalf="upper"
+                  tooltip={{ placement: 'bottom', margin: 4 }}
                 />
               </div>
+            )}
+          </div>
+
+          {/* Visual separator between arches */}
+          <div className={`w-full max-w-md border-t border-dashed border-gray-300 ${showPrimaryTeeth ? 'my-2' : 'my-4'}`} />
+
+          {/* Lower Arch */}
+          <div className="flex flex-col items-center">
+            {/* Lower Primary Teeth (inside permanent) */}
+            {showPrimaryTeeth && (
+              <div className="odontogram-primary -mb-2 scale-75 origin-bottom">
+                <Odontogram
+                  onChange={handleOdontogramChange}
+                  theme="light"
+                  colors={{}}
+                  notation="FDI"
+                  maxTeeth={5}
+                  showTooltip={true}
+                  showHalf="lower"
+                  tooltip={{ placement: 'top', margin: 4 }}
+                />
+              </div>
+            )}
+            
+            {/* Lower Permanent Teeth */}
+            <div className="odontogram-lower-permanent">
+              <Odontogram
+                onChange={handleOdontogramChange}
+                theme="light"
+                colors={{}}
+                notation="FDI"
+                maxTeeth={8}
+                showTooltip={true}
+                showHalf="lower"
+                tooltip={{ placement: 'bottom', margin: 8 }}
+              />
+            </div>
+          </div>
+
+          {/* Legend when showing primary teeth */}
+          {showPrimaryTeeth && (
+            <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded border border-blue-400 bg-blue-100" />
+                Permanentes
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded border border-emerald-500 bg-emerald-100" />
+                Temporales
+              </span>
             </div>
           )}
         </div>
