@@ -420,76 +420,38 @@ export default function PatientDetailPage() {
           </label>
         </div>
 
-        {/* Combined Dental Chart - Permanent with Primary inside */}
-        <div className="flex flex-col items-center">
-          {/* Upper Arch */}
-          <div className="flex flex-col items-center">
-            {/* Upper Permanent Teeth */}
-            <div className="odontogram-upper-permanent">
+        {/* Combined Dental Chart - Permanent with Primary overlaid */}
+        <div className="relative flex flex-col items-center">
+          {/* Permanent Teeth (base layer) */}
+          <div className="odontogram-permanent">
+            <Odontogram
+              onChange={handleOdontogramChange}
+              theme="light"
+              colors={{}}
+              notation="FDI"
+              maxTeeth={8}
+              showTooltip={true}
+              tooltip={{ placement: 'top', margin: 8 }}
+            />
+          </div>
+          
+          {/* Primary Teeth (overlaid, smaller, centered) */}
+          {showPrimaryTeeth && (
+            <div 
+              className="odontogram-primary absolute inset-0 flex items-center justify-center pointer-events-none [&_.Odontogram_g]:pointer-events-auto"
+              style={{ transform: 'scale(0.55)' }}
+            >
               <Odontogram
                 onChange={handleOdontogramChange}
                 theme="light"
                 colors={{}}
                 notation="FDI"
-                maxTeeth={8}
+                maxTeeth={5}
                 showTooltip={true}
-                showHalf="upper"
-                tooltip={{ placement: 'top', margin: 8 }}
+                tooltip={{ placement: 'bottom', margin: 4 }}
               />
             </div>
-            
-            {/* Upper Primary Teeth (inside permanent) */}
-            {showPrimaryTeeth && (
-              <div className="odontogram-primary -mt-2 scale-75 origin-top">
-                <Odontogram
-                  onChange={handleOdontogramChange}
-                  theme="light"
-                  colors={{}}
-                  notation="FDI"
-                  maxTeeth={5}
-                  showTooltip={true}
-                  showHalf="upper"
-                  tooltip={{ placement: 'bottom', margin: 4 }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Visual separator between arches */}
-          <div className={`w-full max-w-md border-t border-dashed border-gray-300 ${showPrimaryTeeth ? 'my-2' : 'my-4'}`} />
-
-          {/* Lower Arch */}
-          <div className="flex flex-col items-center">
-            {/* Lower Primary Teeth (inside permanent) */}
-            {showPrimaryTeeth && (
-              <div className="odontogram-primary -mb-2 scale-75 origin-bottom">
-                <Odontogram
-                  onChange={handleOdontogramChange}
-                  theme="light"
-                  colors={{}}
-                  notation="FDI"
-                  maxTeeth={5}
-                  showTooltip={true}
-                  showHalf="lower"
-                  tooltip={{ placement: 'top', margin: 4 }}
-                />
-              </div>
-            )}
-            
-            {/* Lower Permanent Teeth */}
-            <div className="odontogram-lower-permanent">
-              <Odontogram
-                onChange={handleOdontogramChange}
-                theme="light"
-                colors={{}}
-                notation="FDI"
-                maxTeeth={8}
-                showTooltip={true}
-                showHalf="lower"
-                tooltip={{ placement: 'bottom', margin: 8 }}
-              />
-            </div>
-          </div>
+          )}
 
           {/* Legend when showing primary teeth */}
           {showPrimaryTeeth && (
