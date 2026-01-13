@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useId } from 'react'
 import { useParams, useNavigate, Link } from 'react-router'
 import {
   ArrowLeft,
@@ -11,8 +11,10 @@ import {
   AlertCircle,
   Loader2,
   ChevronRight,
+  X,
 } from 'lucide-react'
-import { DentalChart, ToothNoteModal } from '@/components/dental-chart'
+import { Odontogram } from 'react-odontogram'
+import '@/assets/odontogram.css'
 import {
   type Patient,
   getPatientById,
@@ -21,6 +23,161 @@ import {
   calculateAge,
   getPatientInitials,
 } from '@/lib/patient-api'
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface ToothDetail {
+  id: string
+  notations: {
+    fdi: string
+    universal: string
+    palmer: string
+  }
+  type: string
+}
+
+// ============================================================================
+// Tooth Note Modal Component
+// ============================================================================
+
+interface ToothNoteModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSave: (note: string) => void
+  onDelete?: () => void
+  toothNumber: string
+  toothType: string
+  currentNote?: string
+  isLoading?: boolean
+}
+
+function ToothNoteModal({
+  isOpen,
+  onClose,
+  onSave,
+  onDelete,
+  toothNumber,
+  toothType,
+  currentNote = '',
+  isLoading = false,
+}: ToothNoteModalProps) {
+  const [note, setNote] = useState(currentNote)
+  const titleId = useId()
+  const textareaId = useId()
+
+  useEffect(() => {
+    setNote(currentNote)
+  }, [currentNote, toothNumber])
+
+  if (!isOpen) return null
+
+  const handleSave = () => {
+    onSave(note.trim())
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+    }
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={onClose}
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 id={titleId} className="text-lg font-semibold text-gray-900">
+              Diente #{toothNumber}
+            </h2>
+            <p className="text-sm text-gray-500">{toothType}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-4">
+          <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-2">
+            Notas clínicas
+          </label>
+          <textarea
+            id={textareaId}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Ingrese observaciones sobre este diente..."
+            rows={4}
+            maxLength={1000}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            disabled={isLoading}
+            autoFocus
+          />
+          <p className="text-xs text-gray-400 mt-1 text-right">
+            {note.length}/1000 caracteres
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div>
+            {currentNote && onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isLoading}
+                className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+              >
+                Eliminar nota
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isLoading}
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isLoading || (!note.trim() && !currentNote)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ============================================================================
 // Patient Detail Page
@@ -36,6 +193,7 @@ export default function PatientDetailPage() {
 
   // Dental chart state
   const [selectedTooth, setSelectedTooth] = useState<string | null>(null)
+  const [selectedToothType, setSelectedToothType] = useState<string>('')
   const [isToothModalOpen, setIsToothModalOpen] = useState(false)
   const [isSavingTooth, setIsSavingTooth] = useState(false)
   const [showPrimaryTeeth, setShowPrimaryTeeth] = useState(false)
@@ -68,10 +226,16 @@ export default function PatientDetailPage() {
     fetchPatient()
   }, [id])
 
-  // Handle tooth selection
-  const handleToothSelect = useCallback((toothNumber: string) => {
-    setSelectedTooth(toothNumber)
-    setIsToothModalOpen(true)
+  // Handle odontogram change - when a tooth is clicked
+  const handleOdontogramChange = useCallback((selected: ToothDetail[]) => {
+    // When user clicks a tooth, the last selected tooth is the one we want
+    if (selected.length > 0) {
+      const lastTooth = selected[selected.length - 1]
+      const fdiNumber = lastTooth.notations.fdi
+      setSelectedTooth(fdiNumber)
+      setSelectedToothType(lastTooth.type)
+      setIsToothModalOpen(true)
+    }
   }, [])
 
   // Handle save tooth note
@@ -84,6 +248,7 @@ export default function PatientDetailPage() {
       setPatient(updated)
       setIsToothModalOpen(false)
       setSelectedTooth(null)
+      setSelectedToothType('')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al guardar la nota')
     } finally {
@@ -101,6 +266,7 @@ export default function PatientDetailPage() {
       setPatient(updated)
       setIsToothModalOpen(false)
       setSelectedTooth(null)
+      setSelectedToothType('')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al eliminar la nota')
     } finally {
@@ -268,12 +434,53 @@ export default function PatientDetailPage() {
           </label>
         </div>
 
-        <DentalChart
-          teeth={teeth}
-          onToothSelect={handleToothSelect}
-          selectedTooth={selectedTooth}
-          showPrimary={showPrimaryTeeth}
-        />
+        {/* Combined Dental Chart - Permanent with Primary overlaid */}
+        <div className="relative flex flex-col items-center">
+          {/* Permanent Teeth (base layer) */}
+          <div className="odontogram-permanent">
+            <Odontogram
+              onChange={handleOdontogramChange}
+              theme="light"
+              colors={{}}
+              notation="FDI"
+              maxTeeth={8}
+              showTooltip={true}
+              tooltip={{ placement: 'top', margin: 8 }}
+            />
+          </div>
+          
+          {/* Primary Teeth (overlaid, smaller, centered) */}
+          {showPrimaryTeeth && (
+            <div 
+              className="odontogram-primary absolute inset-0 flex items-center justify-center pointer-events-none [&_.Odontogram_g]:pointer-events-auto"
+              style={{ transform: 'scale(0.55)' }}
+            >
+              <Odontogram
+                onChange={handleOdontogramChange}
+                theme="light"
+                colors={{}}
+                notation="FDI"
+                maxTeeth={5}
+                showTooltip={true}
+                tooltip={{ placement: 'bottom', margin: 4 }}
+              />
+            </div>
+          )}
+
+          {/* Legend when showing primary teeth */}
+          {showPrimaryTeeth && (
+            <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded border border-blue-400 bg-blue-100" />
+                Permanentes
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded border border-emerald-500 bg-emerald-100" />
+                Temporales
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* Teeth notes summary */}
         {Object.keys(teeth).length > 0 && (
@@ -285,7 +492,11 @@ export default function PatientDetailPage() {
               {Object.entries(teeth).map(([toothNumber, note]) => (
                 <button
                   key={toothNumber}
-                  onClick={() => handleToothSelect(toothNumber)}
+                  onClick={() => {
+                    setSelectedTooth(toothNumber)
+                    setSelectedToothType('')
+                    setIsToothModalOpen(true)
+                  }}
                   className="text-left p-3 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors"
                 >
                   <span className="text-sm font-medium text-amber-800">
@@ -305,10 +516,12 @@ export default function PatientDetailPage() {
         onClose={() => {
           setIsToothModalOpen(false)
           setSelectedTooth(null)
+          setSelectedToothType('')
         }}
         onSave={handleSaveToothNote}
         onDelete={teeth[selectedTooth || ''] ? handleDeleteToothNote : undefined}
         toothNumber={selectedTooth || ''}
+        toothType={selectedToothType}
         currentNote={selectedTooth ? teeth[selectedTooth] || '' : ''}
         isLoading={isSavingTooth}
       />
