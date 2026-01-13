@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import { X } from 'lucide-react'
+import { getToothDisplayName } from './constants'
 
 // ============================================================================
 // Types
@@ -16,40 +17,6 @@ interface ToothNoteModalProps {
 }
 
 // ============================================================================
-// Helper Functions
-// ============================================================================
-
-const TOOTH_NAMES: Record<string, string> = {
-  '1': 'Incisivo Central',
-  '2': 'Incisivo Lateral',
-  '3': 'Canino',
-  '4': 'Primer Premolar',
-  '5': 'Segundo Premolar',
-  '6': 'Primer Molar',
-  '7': 'Segundo Molar',
-  '8': 'Tercer Molar',
-}
-
-const QUADRANT_NAMES: Record<string, string> = {
-  '1': 'Superior Derecho',
-  '2': 'Superior Izquierdo',
-  '3': 'Inferior Izquierdo',
-  '4': 'Inferior Derecho',
-  '5': 'Superior Derecho (Temporal)',
-  '6': 'Superior Izquierdo (Temporal)',
-  '7': 'Inferior Izquierdo (Temporal)',
-  '8': 'Inferior Derecho (Temporal)',
-}
-
-function getToothDisplayName(toothNumber: string): string {
-  const quadrant = toothNumber[0]
-  const position = toothNumber[1]
-  const quadrantName = QUADRANT_NAMES[quadrant] || ''
-  const toothName = TOOTH_NAMES[position] || ''
-  return `${quadrantName} - ${toothName}`
-}
-
-// ============================================================================
 // Component
 // ============================================================================
 
@@ -63,6 +30,7 @@ export default function ToothNoteModal({
   isLoading = false,
 }: ToothNoteModalProps) {
   const [note, setNote] = useState(currentNote)
+  const titleId = useId()
 
   useEffect(() => {
     setNote(currentNote)
@@ -88,6 +56,9 @@ export default function ToothNoteModal({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
       onKeyDown={handleKeyDown}
@@ -99,7 +70,7 @@ export default function ToothNoteModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 id={titleId} className="text-lg font-semibold text-gray-900">
               Diente #{toothNumber}
             </h2>
             <p className="text-sm text-gray-500">

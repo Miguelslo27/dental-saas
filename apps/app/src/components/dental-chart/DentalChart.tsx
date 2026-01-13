@@ -1,4 +1,15 @@
 import { cn } from '@/lib/utils'
+import {
+  UPPER_RIGHT_PERMANENT,
+  UPPER_LEFT_PERMANENT,
+  LOWER_LEFT_PERMANENT,
+  LOWER_RIGHT_PERMANENT,
+  UPPER_RIGHT_PRIMARY,
+  UPPER_LEFT_PRIMARY,
+  LOWER_LEFT_PRIMARY,
+  LOWER_RIGHT_PRIMARY,
+  getToothName,
+} from './constants'
 
 // ============================================================================
 // Types
@@ -11,58 +22,6 @@ export interface DentalChartProps {
   showPrimary?: boolean
   readOnly?: boolean
   className?: string
-}
-
-// ============================================================================
-// Constants - ISO 3950 (FDI) Notation
-// ============================================================================
-
-// Permanent teeth (32 total)
-const UPPER_RIGHT_PERMANENT = ['18', '17', '16', '15', '14', '13', '12', '11']
-const UPPER_LEFT_PERMANENT = ['21', '22', '23', '24', '25', '26', '27', '28']
-const LOWER_LEFT_PERMANENT = ['31', '32', '33', '34', '35', '36', '37', '38']
-const LOWER_RIGHT_PERMANENT = ['48', '47', '46', '45', '44', '43', '42', '41']
-
-// Primary teeth (20 total)
-const UPPER_RIGHT_PRIMARY = ['55', '54', '53', '52', '51']
-const UPPER_LEFT_PRIMARY = ['61', '62', '63', '64', '65']
-const LOWER_LEFT_PRIMARY = ['71', '72', '73', '74', '75']
-const LOWER_RIGHT_PRIMARY = ['85', '84', '83', '82', '81']
-
-// Tooth names for display
-const TOOTH_NAMES: Record<string, string> = {
-  // Permanent teeth - names based on position (1-8)
-  '1': 'Incisivo Central',
-  '2': 'Incisivo Lateral',
-  '3': 'Canino',
-  '4': 'Primer Premolar',
-  '5': 'Segundo Premolar',
-  '6': 'Primer Molar',
-  '7': 'Segundo Molar',
-  '8': 'Tercer Molar',
-}
-
-const QUADRANT_NAMES: Record<string, string> = {
-  '1': 'Superior Derecho',
-  '2': 'Superior Izquierdo',
-  '3': 'Inferior Izquierdo',
-  '4': 'Inferior Derecho',
-  '5': 'Superior Derecho (Temporal)',
-  '6': 'Superior Izquierdo (Temporal)',
-  '7': 'Inferior Izquierdo (Temporal)',
-  '8': 'Inferior Derecho (Temporal)',
-}
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-function getToothName(toothNumber: string): string {
-  const quadrant = toothNumber[0]
-  const position = toothNumber[1]
-  const quadrantName = QUADRANT_NAMES[quadrant] || ''
-  const toothName = TOOTH_NAMES[position] || ''
-  return `${toothNumber} - ${quadrantName} ${toothName}`
 }
 
 // ============================================================================

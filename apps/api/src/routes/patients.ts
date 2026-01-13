@@ -387,7 +387,7 @@ patientsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) =>
 
 // Teeth update schema - object with tooth numbers as keys and notes as values
 const teethUpdateSchema = z.record(
-  z.string().regex(/^[1-8][1-8]$/, 'Invalid tooth number format'),
+  z.string().regex(/^\d{2}$/, 'Invalid tooth number format'),
   z.string().max(1000, 'Note cannot exceed 1000 characters')
 )
 
