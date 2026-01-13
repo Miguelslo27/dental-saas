@@ -129,6 +129,9 @@ importers:
       react-hook-form:
         specifier: ^7.69.0
         version: 7.69.0(react@19.2.3)
+      react-odontogram:
+        specifier: ^0.4.1
+        version: 0.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-router:
         specifier: ^7.6.1
         version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3016,6 +3019,13 @@ packages:
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+
+  react-odontogram@0.4.1:
+    resolution: {integrity: sha512-lm6UDDj08KouAzoLDM0Pm5c4vlmO3/dTA66ZB0i+zbei0Prhi+1UGR0Q3eh3zsRHzwaLQLH2kSkVqtEGLSCZ2A==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
 
   react-redux@9.2.0:
     resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
@@ -6266,6 +6276,11 @@ snapshots:
       react: 19.2.3
 
   react-is@17.0.2: {}
+
+  react-odontogram@0.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
 
   react-redux@9.2.0(@types/react@19.2.7)(react@19.2.3)(redux@5.0.1):
     dependencies:
