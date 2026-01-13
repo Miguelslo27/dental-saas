@@ -20,6 +20,7 @@ const PATIENT_SELECT = {
   gender: true,
   address: true,
   notes: true,
+  teeth: true,
   isActive: true,
   createdAt: true,
   updatedAt: true,
@@ -36,6 +37,7 @@ export type SafePatient = {
   gender: string | null
   address: string | null
   notes: Prisma.JsonValue
+  teeth: Prisma.JsonValue
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -350,4 +352,111 @@ export async function getPatientAppointments(
   })
 
   return appointments
+}
+
+// Valid tooth numbers based on ISO 3950 (FDI) notation
+const VALID_PERMANENT_TEETH = [
+  '11', '12', '13', '14', '15', '16', '17', '18',
+  '21', '22', '23', '24', '25', '26', '27', '28',
+  '31', '32', '33', '34', '35', '36', '37', '38',
+  '41', '42', '43', '44', '45', '46', '47', '48',
+]
+
+const VALID_PRIMARY_TEETH = [
+  '51', '52', '53', '54', '55',
+  '61', '62', '63', '64', '65',
+  '71', '72', '73', '74', '75',
+  '81', '82', '83', '84', '85',
+]
+
+const VALID_TEETH = [...VALID_PERMANENT_TEETH, ...VALID_PRIMARY_TEETH]
+
+/**
+ * Validate teeth data format
+ * @returns Error message if invalid, null if valid
+ */
+export function validateTeethData(teeth: Record<string, string>): string | null {
+  for (const [toothNumber, note] of Object.entries(teeth)) {
+    if (!VALID_TEETH.includes(toothNumber)) {
+      return `Invalid tooth number: ${toothNumber}. Must be a valid ISO 3950 (FDI) notation.`
+    }
+    if (typeof note !== 'string') {
+      return `Note for tooth ${toothNumber} must be a string.`
+    }
+    if (note.length > 1000) {
+      return `Note for tooth ${toothNumber} exceeds maximum length of 1000 characters.`
+    }
+  }
+  return null
+}
+
+/**
+ * Update teeth notes for a patient
+ * Merges new teeth data with existing data
+ */
+export async function updatePatientTeeth(
+  tenantId: string,
+  patientId: string,
+  teeth: Record<string, string>
+): Promise<{ success: true; patient: SafePatient } | { success: false; error: string; errorCode: PatientErrorCode | 'INVALID_DATA' }> {
+  // Validate teeth data
+  const validationError = validateTeethData(teeth)
+  if (validationError) {
+    return { success: false, error: validationError, errorCode: 'INVALID_DATA' }
+  }
+
+  // Get existing patient
+  const existing = await prisma.patient.findFirst({
+    where: { id: patientId, tenantId },
+    select: { ...PATIENT_SELECT },
+  })
+
+  if (!existing) {
+    return { success: false, error: 'Patient not found', errorCode: 'NOT_FOUND' }
+  }
+
+  // Merge existing teeth with new teeth
+  // Empty string values will remove the tooth note
+  const existingTeeth = (existing.teeth as Record<string, string>) || {}
+  const mergedTeeth: Record<string, string> = { ...existingTeeth }
+
+  for (const [toothNumber, note] of Object.entries(teeth)) {
+    if (note === '') {
+      delete mergedTeeth[toothNumber]
+    } else {
+      mergedTeeth[toothNumber] = note
+    }
+  }
+
+  // Update patient
+  const updated = await prisma.patient.update({
+    where: { id: patientId },
+    data: {
+      teeth: Object.keys(mergedTeeth).length > 0 ? mergedTeeth : JsonNull,
+    },
+    select: PATIENT_SELECT,
+  })
+
+  logger.info(`Updated teeth for patient ${patientId} - tenantId: ${tenantId}, teethCount: ${Object.keys(mergedTeeth).length}`)
+
+  return { success: true, patient: updated }
+}
+
+/**
+ * Get teeth data for a patient
+ */
+export async function getPatientTeeth(
+  tenantId: string,
+  patientId: string
+): Promise<{ success: true; teeth: Record<string, string> } | { success: false; error: string; errorCode: PatientErrorCode }> {
+  const existing = await prisma.patient.findFirst({
+    where: { id: patientId, tenantId },
+    select: { teeth: true },
+  })
+
+  if (!existing) {
+    return { success: false, error: 'Patient not found', errorCode: 'NOT_FOUND' }
+  }
+
+  return { success: true, teeth: (existing.teeth as Record<string, string>) || {} }
 }

@@ -11,6 +11,8 @@ import {
   checkPatientLimit,
   getPatientStats,
   getPatientAppointments,
+  updatePatientTeeth,
+  getPatientTeeth,
 } from '../services/patient.service.js'
 
 const patientsRouter: IRouter = Router()
@@ -373,6 +375,81 @@ patientsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) =>
     res.json({
       success: true,
       message: 'Patient deleted successfully',
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+// ============================================================================
+// Dental Chart (Teeth) Routes
+// ============================================================================
+
+// Teeth update schema - object with tooth numbers as keys and notes as values
+const teethUpdateSchema = z.record(
+  z.string().regex(/^[1-8][1-8]$/, 'Invalid tooth number format'),
+  z.string().max(1000, 'Note cannot exceed 1000 characters')
+)
+
+/**
+ * GET /api/patients/:id/teeth
+ * Get dental chart (teeth notes) for a patient (STAFF+ required)
+ */
+patientsRouter.get('/:id/teeth', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await getPatientTeeth(tenantId, id)
+
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        error: { message: result.error, code: result.errorCode },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: result.teeth,
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PATCH /api/patients/:id/teeth
+ * Update dental chart (teeth notes) for a patient (STAFF+ required)
+ * Merges with existing data. Empty string removes the note.
+ */
+patientsRouter.patch('/:id/teeth', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    // Validate request body
+    const parsed = teethUpdateSchema.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid teeth data', code: 'INVALID_DATA', details: parsed.error.errors },
+      })
+    }
+
+    const result = await updatePatientTeeth(tenantId, id, parsed.data)
+
+    if (!result.success) {
+      const statusCode = result.errorCode === 'NOT_FOUND' ? 404 : 400
+      return res.status(statusCode).json({
+        success: false,
+        error: { message: result.error, code: result.errorCode },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: result.patient,
     })
   } catch (e) {
     next(e)

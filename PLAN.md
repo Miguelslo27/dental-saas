@@ -828,12 +828,111 @@ interface CreateDoctorData {
 - [x] 4.2.8: Integrar en App.tsx con ProtectedRoute
 - [x] 4.2.9: Validación de email único por tenant
 
-### Tarea 4.3: Dental Chart (DIFERIDO) ⏳
-**Estado:** Diferido a fase posterior
-- [ ] 4.3.1: Crear componente visual DentalChart
-- [ ] 4.3.2: Implementar selección de dientes
-- [ ] 4.3.3: Implementar notas por diente
-- [ ] 4.3.4: Integrar en vista de paciente
+### Tarea 4.3: Dental Chart (Odontograma) 🔄 EN PROGRESO
+**Estado:** Implementación con JSON en Patient
+**Rama:** `feature/phase4-dental-chart`
+
+#### Implementación Actual (v1 - JSON)
+- [ ] 4.3.1: Añadir campo `teeth Json?` al modelo Patient
+- [ ] 4.3.2: Crear endpoint PATCH /api/patients/:id/teeth
+- [ ] 4.3.3: Crear componente visual DentalChart (SVG interactivo)
+- [ ] 4.3.4: Implementar selección de dientes con notación ISO 3950 (FDI)
+- [ ] 4.3.5: Implementar modal de notas por diente
+- [ ] 4.3.6: Integrar en vista de detalle de paciente
+- [ ] 4.3.7: Añadir toggle dientes permanentes/temporales
+
+#### Notación ISO 3950 (FDI)
+```
+Permanentes (32 dientes):
+  Superior derecho: 18-17-16-15-14-13-12-11
+  Superior izquierdo: 21-22-23-24-25-26-27-28
+  Inferior izquierdo: 31-32-33-34-35-36-37-38
+  Inferior derecho: 48-47-46-45-44-43-42-41
+
+Temporales (20 dientes):
+  Superior derecho: 55-54-53-52-51
+  Superior izquierdo: 61-62-63-64-65
+  Inferior izquierdo: 71-72-73-74-75
+  Inferior derecho: 85-84-83-82-81
+```
+
+---
+
+### 📋 MEJORA FUTURA: Tabla Separada para Dental Chart (v2)
+
+**Cuándo migrar:** Cuando se necesite historial de tratamientos, condiciones estructuradas o reportes agregados.
+
+#### Beneficios de tabla separada (`ToothRecord`)
+1. **Historial:** Mantener versiones de cada nota (quién la modificó, cuándo)
+2. **Estructura:** Campos específicos (condition, treatment, severity, etc.)
+3. **Reportes:** Queries SQL directas ("pacientes con caries en molar 16")
+4. **Integraciones:** Vincular tratamientos/citas a dientes específicos
+5. **Imágenes:** Asociar radiografías/fotos a dientes individuales
+
+#### Arquitectura Propuesta (v2)
+
+```prisma
+model ToothRecord {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  toothNumber String   // "11", "21", "55", etc. (ISO 3950)
+  
+  // Información estructurada
+  condition   ToothCondition?  // HEALTHY, CARIES, MISSING, CROWN, etc.
+  notes       String?
+  treatment   String?
+  severity    Int?             // 1-5 scale
+  
+  // Historial
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String   // userId
+  
+  // Índices
+  @@unique([patientId, toothNumber])  // Un registro por diente por paciente
+  @@index([patientId])
+  @@index([condition])
+}
+
+enum ToothCondition {
+  HEALTHY
+  CARIES
+  FILLED
+  CROWN
+  EXTRACTION_NEEDED
+  MISSING
+  IMPLANT
+  ROOT_CANAL
+  BRIDGE
+}
+```
+
+#### Endpoints v2
+- GET /api/patients/:id/dental-chart → Lista completa de registros
+- GET /api/patients/:id/teeth/:toothNumber → Registro específico
+- PUT /api/patients/:id/teeth/:toothNumber → Crear/actualizar registro
+- GET /api/patients/:id/teeth/:toothNumber/history → Historial de cambios
+- GET /api/reports/dental?condition=CARIES → Reporte agregado
+
+#### Migración de v1 a v2
+```typescript
+// Script de migración
+for (const patient of patients) {
+  if (patient.teeth) {
+    for (const [toothNumber, notes] of Object.entries(patient.teeth)) {
+      await prisma.toothRecord.create({
+        data: {
+          patientId: patient.id,
+          toothNumber,
+          notes,
+          createdBy: 'migration'
+        }
+      });
+    }
+  }
+}
+```
 
 ---
 
