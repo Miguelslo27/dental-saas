@@ -828,18 +828,20 @@ interface CreateDoctorData {
 - [x] 4.2.8: Integrar en App.tsx con ProtectedRoute
 - [x] 4.2.9: Validación de email único por tenant
 
-### Tarea 4.3: Dental Chart (Odontograma) 🔄 EN PROGRESO
-**Estado:** Implementación con JSON en Patient
+### Tarea 4.3: Dental Chart (Odontograma) ✅ COMPLETADO
+**Estado:** Implementado con JSON en Patient
 **Rama:** `feature/phase4-dental-chart`
+**PR:** #63
 
 #### Implementación Actual (v1 - JSON)
-- [ ] 4.3.1: Añadir campo `teeth Json?` al modelo Patient
-- [ ] 4.3.2: Crear endpoint PATCH /api/patients/:id/teeth
-- [ ] 4.3.3: Crear componente visual DentalChart (SVG interactivo)
-- [ ] 4.3.4: Implementar selección de dientes con notación ISO 3950 (FDI)
-- [ ] 4.3.5: Implementar modal de notas por diente
-- [ ] 4.3.6: Integrar en vista de detalle de paciente
-- [ ] 4.3.7: Añadir toggle dientes permanentes/temporales
+- [x] 4.3.1: Añadir campo `teeth Json?` al modelo Patient
+- [x] 4.3.2: Crear endpoint GET/PATCH /api/patients/:id/teeth
+- [x] 4.3.3: Crear componente visual DentalChart (interactivo)
+- [x] 4.3.4: Implementar selección de dientes con notación ISO 3950 (FDI)
+- [x] 4.3.5: Implementar modal de notas por diente (ToothNoteModal)
+- [x] 4.3.6: Integrar en vista de detalle de paciente (PatientDetailPage)
+- [x] 4.3.7: Añadir toggle dientes permanentes/temporales
+- [x] 4.3.8: Tests de API (12 nuevos tests, 216 total)
 
 #### Notación ISO 3950 (FDI)
 ```
