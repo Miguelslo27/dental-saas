@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useId } from 'react'
 import { useParams, useNavigate, Link } from 'react-router'
 import {
   ArrowLeft,
@@ -64,6 +64,8 @@ function ToothNoteModal({
   isLoading = false,
 }: ToothNoteModalProps) {
   const [note, setNote] = useState(currentNote)
+  const titleId = useId()
+  const textareaId = useId()
 
   useEffect(() => {
     setNote(currentNote)
@@ -85,7 +87,7 @@ function ToothNoteModal({
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="tooth-modal-title"
+      aria-labelledby={titleId}
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
       onKeyDown={handleKeyDown}
@@ -97,12 +99,13 @@ function ToothNoteModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h2 id="tooth-modal-title" className="text-lg font-semibold text-gray-900">
+            <h2 id={titleId} className="text-lg font-semibold text-gray-900">
               Diente #{toothNumber}
             </h2>
             <p className="text-sm text-gray-500">{toothType}</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -112,10 +115,11 @@ function ToothNoteModal({
 
         {/* Content */}
         <div className="px-6 py-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-2">
             Notas clínicas
           </label>
           <textarea
+            id={textareaId}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Ingrese observaciones sobre este diente..."
@@ -123,6 +127,7 @@ function ToothNoteModal({
             maxLength={1000}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
             disabled={isLoading}
+            autoFocus
           />
           <p className="text-xs text-gray-400 mt-1 text-right">
             {note.length}/1000 caracteres
@@ -132,8 +137,9 @@ function ToothNoteModal({
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
           <div>
-            {onDelete && (
+            {currentNote && onDelete && (
               <button
+                type="button"
                 onClick={onDelete}
                 disabled={isLoading}
                 className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
@@ -144,6 +150,7 @@ function ToothNoteModal({
           </div>
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={onClose}
               disabled={isLoading}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
@@ -151,12 +158,19 @@ function ToothNoteModal({
               Cancelar
             </button>
             <button
+              type="button"
               onClick={handleSave}
-              disabled={isLoading || !note.trim()}
+              disabled={isLoading || (!note.trim() && !currentNote)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Guardar
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar'
+              )}
             </button>
           </div>
         </div>
