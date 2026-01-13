@@ -352,6 +352,15 @@ Dental es una aplicación de gestión para clínicas dentales con las siguientes
 - ✅ 14 comentarios de Copilot review atendidos
 - ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/59
 
+### PR #64: Upgrade Dental Chart to react-odontogram ✅
+- ✅ Reemplazado componente DentalChart custom por librería `react-odontogram`
+- ✅ Visualización SVG realista de dientes con notación FDI
+- ✅ Soporte para dientes primarios (temporales)
+- ✅ ToothNoteModal inline con accesibilidad mejorada (useId, autoFocus, type="button")
+- ✅ 7 comentarios de Copilot review atendidos
+- ✅ ~300 líneas de código custom eliminadas
+- ✅ PR: https://github.com/Miguelslo27/dental-saas/pull/64
+
 ---
 
 ## Notas Técnicas: Super Admin
