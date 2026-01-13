@@ -15,6 +15,7 @@ export interface Patient {
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null
   address: string | null
   notes: Record<string, unknown> | null
+  teeth: Record<string, string> | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -195,6 +196,51 @@ export function getPatientFullName(patient: Pick<Patient, 'firstName' | 'lastNam
  */
 export function getPatientInitials(patient: Pick<Patient, 'firstName' | 'lastName'>): string {
   return `${patient.firstName.charAt(0)}${patient.lastName.charAt(0)}`.toUpperCase()
+}
+
+// ============================================================================
+// Dental Chart (Teeth) API Functions
+// ============================================================================
+
+/**
+ * Get dental chart (teeth notes) for a patient
+ */
+export async function getPatientTeeth(patientId: string): Promise<Record<string, string>> {
+  const response = await apiClient.get<ApiResponse<Record<string, string>>>(`/patients/${patientId}/teeth`)
+  return response.data.data
+}
+
+/**
+ * Update dental chart (teeth notes) for a patient
+ * Merges with existing data. Empty string removes the note.
+ */
+export async function updatePatientTeeth(
+  patientId: string,
+  teeth: Record<string, string>
+): Promise<Patient> {
+  const response = await apiClient.patch<ApiResponse<Patient>>(`/patients/${patientId}/teeth`, teeth)
+  return response.data.data
+}
+
+/**
+ * Update a single tooth note
+ */
+export async function updateToothNote(
+  patientId: string,
+  toothNumber: string,
+  note: string
+): Promise<Patient> {
+  return updatePatientTeeth(patientId, { [toothNumber]: note })
+}
+
+/**
+ * Delete a tooth note (set to empty string)
+ */
+export async function deleteToothNote(
+  patientId: string,
+  toothNumber: string
+): Promise<Patient> {
+  return updatePatientTeeth(patientId, { [toothNumber]: '' })
 }
 
 // ============================================================================
