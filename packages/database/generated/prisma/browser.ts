@@ -28,6 +28,11 @@ export type Plan = Prisma.PlanModel
  */
 export type Subscription = Prisma.SubscriptionModel
 /**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
  * Model Tenant
  * 
  */
