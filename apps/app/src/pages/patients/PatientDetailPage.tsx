@@ -420,19 +420,48 @@ export default function PatientDetailPage() {
           </label>
         </div>
 
-        <div className="flex justify-center">
-          <Odontogram
-            onChange={handleOdontogramChange}
-            theme="light"
-            colors={{}}
-            notation="FDI"
-            maxTeeth={showPrimaryTeeth ? 5 : 8}
-            showTooltip={true}
-            tooltip={{
-              placement: 'top',
-              margin: 8,
-            }}
-          />
+        {/* Permanent Teeth (always shown) */}
+        <div className="flex flex-col items-center gap-6">
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 text-center mb-2">
+              Dientes Permanentes
+            </h3>
+            <Odontogram
+              onChange={handleOdontogramChange}
+              theme="light"
+              colors={{}}
+              notation="FDI"
+              maxTeeth={8}
+              showTooltip={true}
+              tooltip={{
+                placement: 'top',
+                margin: 8,
+              }}
+            />
+          </div>
+
+          {/* Primary Teeth (shown when checkbox is checked) */}
+          {showPrimaryTeeth && (
+            <div className="pt-4 border-t border-gray-200 w-full">
+              <h3 className="text-sm font-medium text-gray-500 text-center mb-2">
+                Dientes Temporales (de leche)
+              </h3>
+              <div className="flex justify-center">
+                <Odontogram
+                  onChange={handleOdontogramChange}
+                  theme="light"
+                  colors={{}}
+                  notation="FDI"
+                  maxTeeth={5}
+                  showTooltip={true}
+                  tooltip={{
+                    placement: 'top',
+                    margin: 8,
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Teeth notes summary */}
