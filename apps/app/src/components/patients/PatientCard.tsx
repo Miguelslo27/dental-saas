@@ -1,4 +1,5 @@
-import { Phone, Mail, Calendar, Pencil, Trash2, RotateCcw } from 'lucide-react'
+import { Phone, Mail, Calendar, Pencil, Trash2, RotateCcw, ExternalLink } from 'lucide-react'
+import { Link } from 'react-router'
 import type { Patient } from '@/lib/patient-api'
 import { calculateAge, getPatientInitials } from '@/lib/patient-api'
 
@@ -105,7 +106,15 @@ export function PatientCard({ patient, onEdit, onDelete, onRestore }: PatientCar
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex justify-end gap-2">
+      <div className="px-6 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex justify-between">
+        <Link
+          to={`/patients/${patient.id}`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Ver ficha
+        </Link>
+        <div className="flex gap-2">
         {!patient.isActive && onRestore ? (
           <button
             onClick={() => onRestore(patient)}
@@ -132,6 +141,7 @@ export function PatientCard({ patient, onEdit, onDelete, onRestore }: PatientCar
             </button>
           </>
         )}
+        </div>
       </div>
     </div>
   )

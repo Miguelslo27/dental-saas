@@ -702,4 +702,184 @@ describe('Patients API', () => {
       expect(response.status).toBe(403)
     })
   })
+
+  // ==========================================================================
+  // DENTAL CHART (TEETH) TESTS
+  // ==========================================================================
+
+  describe('GET /api/patients/:id/teeth', () => {
+    let patientId: string
+
+    beforeEach(async () => {
+      const patient = await prisma.patient.create({
+        data: {
+          tenantId,
+          firstName: 'Teeth',
+          lastName: 'Test',
+          teeth: { '11': 'Crown needed', '21': 'Healthy' },
+        },
+      })
+      patientId = patient.id
+    })
+
+    it('should return teeth data for a patient', async () => {
+      const response = await request(app)
+        .get(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toEqual({
+        '11': 'Crown needed',
+        '21': 'Healthy',
+      })
+    })
+
+    it('should return empty object for patient without teeth data', async () => {
+      const patientNoTeeth = await prisma.patient.create({
+        data: {
+          tenantId,
+          firstName: 'No',
+          lastName: 'Teeth',
+        },
+      })
+
+      const response = await request(app)
+        .get(`/api/patients/${patientNoTeeth.id}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toEqual({})
+    })
+
+    it('should return 404 for non-existent patient', async () => {
+      const response = await request(app)
+        .get('/api/patients/non-existent-id/teeth')
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(response.status).toBe(404)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return 401 for unauthenticated request', async () => {
+      const response = await request(app)
+        .get(`/api/patients/${patientId}/teeth`)
+
+      expect(response.status).toBe(401)
+    })
+  })
+
+  describe('PATCH /api/patients/:id/teeth', () => {
+    let patientId: string
+
+    beforeEach(async () => {
+      const patient = await prisma.patient.create({
+        data: {
+          tenantId,
+          firstName: 'Teeth',
+          lastName: 'Update',
+          teeth: { '11': 'Existing note' },
+        },
+      })
+      patientId = patient.id
+    })
+
+    it('should update teeth notes for a patient', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '21': 'New cavity', '31': 'Root canal' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.teeth).toEqual({
+        '11': 'Existing note',
+        '21': 'New cavity',
+        '31': 'Root canal',
+      })
+    })
+
+    it('should merge new teeth data with existing', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '11': 'Updated note', '22': 'Another note' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.teeth).toEqual({
+        '11': 'Updated note',
+        '22': 'Another note',
+      })
+    })
+
+    it('should remove tooth note when value is empty string', async () => {
+      // First add a note
+      await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '21': 'To be removed' })
+
+      // Then remove it
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '21': '' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.teeth['21']).toBeUndefined()
+      expect(response.body.data.teeth['11']).toBe('Existing note')
+    })
+
+    it('should return 400 for invalid tooth number', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '99': 'Invalid tooth' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return 400 for note exceeding 1000 characters', async () => {
+      const longNote = 'a'.repeat(1001)
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '11': longNote })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return 404 for non-existent patient', async () => {
+      const response = await request(app)
+        .patch('/api/patients/non-existent-id/teeth')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '11': 'Test' })
+
+      expect(response.status).toBe(404)
+    })
+
+    it('should allow ADMIN to update teeth', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ '41': 'Admin note' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.teeth['41']).toBe('Admin note')
+    })
+
+    it('should support primary teeth notation (51-85)', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '51': 'Primary tooth note', '75': 'Another primary' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.teeth['51']).toBe('Primary tooth note')
+      expect(response.body.data.teeth['75']).toBe('Another primary')
+    })
+  })
 })
