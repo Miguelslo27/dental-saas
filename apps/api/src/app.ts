@@ -11,6 +11,7 @@ import { usersRouter } from './routes/users.js'
 import { labworksRouter } from './routes/labworks.js'
 import { expensesRouter } from './routes/expenses.js'
 import { statsRouter } from './routes/stats.js'
+import billingRouter from './routes/billing.js'
 import { errorHandler } from './middleware/error-handler.js'
 import { requireAuthWithTenant } from './middleware/auth.js'
 import { logger } from './utils/logger.js'
@@ -32,6 +33,7 @@ app.use((req, _res, next) => {
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/tenants', tenantsRouter)
+app.use('/api', billingRouter) // /api/plans is public, /api/billing/* requires auth
 
 // Admin routes (super admin only)
 app.use('/api/admin', adminRouter)

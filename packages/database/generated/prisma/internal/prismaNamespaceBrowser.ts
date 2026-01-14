@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Plan: 'Plan',
   Subscription: 'Subscription',
+  Payment: 'Payment',
   Tenant: 'Tenant',
   User: 'User',
   Patient: 'Patient',
@@ -102,8 +103,8 @@ export const SubscriptionScalarFieldEnum = {
   tenantId: 'tenantId',
   planId: 'planId',
   status: 'status',
-  stripeCustomerId: 'stripeCustomerId',
-  stripeSubscriptionId: 'stripeSubscriptionId',
+  dlocalCustomerId: 'dlocalCustomerId',
+  dlocalCardId: 'dlocalCardId',
   currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',
   cancelAtPeriodEnd: 'cancelAtPeriodEnd',
@@ -112,6 +113,25 @@ export const SubscriptionScalarFieldEnum = {
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  subscriptionId: 'subscriptionId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  dlocalPaymentId: 'dlocalPaymentId',
+  dlocalOrderId: 'dlocalOrderId',
+  paymentMethod: 'paymentMethod',
+  description: 'description',
+  failureReason: 'failureReason',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
 export const TenantScalarFieldEnum = {

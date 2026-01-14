@@ -43,9 +43,9 @@ model Subscription {
   planId               String
   status               SubscriptionStatus @default(ACTIVE)
   
-  // Stripe integration
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
+  // dLocal integration
+  dlocalCustomerId     String?
+  dlocalCardId         String?            // Tokenized card for recurring
   
   // Billing period
   currentPeriodStart   DateTime
@@ -55,15 +55,52 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id], onDelete: Restrict)
+  payments Payment[]
 
   @@unique([tenantId])
   @@index([planId])
   @@index([status])
-  @@index([stripeCustomerId])
-  @@index([stripeSubscriptionId])
+  @@index([dlocalCustomerId])
   @@map("subscriptions")
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  subscriptionId   String
+  
+  amount           Decimal       @db.Decimal(10, 2)
+  currency         String        @db.Char(3) // Inherited from tenant settings
+  status           PaymentStatus @default(PENDING)
+  
+  // dLocal fields
+  dlocalPaymentId  String?       @unique
+  dlocalOrderId    String?       @unique
+  paymentMethod    String?       // CARD, BANK_TRANSFER, etc.
+  
+  // Metadata
+  description      String?
+  failureReason    String?
+  paidAt           DateTime?
+  
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
 }
 
 enum SubscriptionStatus {

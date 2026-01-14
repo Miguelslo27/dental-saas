@@ -37,7 +37,7 @@ dental-saas/
 | 5 | Gestión de Citas | ✅ (CRUD) | #59 |
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
-| 8 | Suscripciones y Pagos (Stripe) | ⏳ | - |
+| 8 | Suscripciones y Pagos (dLocal) | ⏳ | #65 |
 | 9 | Configuración del Tenant | ⏳ | - |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 216 pasando | **Última actualización:** 13 de Enero, 2026
+**Tests:** 245 pasando | **Última actualización:** 13 de Enero, 2026
 
 ---
 
@@ -73,31 +73,29 @@ dental-saas/
 
 ---
 
-## 📦 FASE 8: Suscripciones y Pagos (Stripe) ⏳
-**Rama:** `feature/billing-stripe`  
+## 📦 FASE 8: Suscripciones y Pagos (dLocal) ⏳
+**Rama:** `feat/billing-dlocal`  
 **Duración estimada:** 3-4 días
 
-### Tarea 8.1: Backend - Integración Stripe
-- [ ] 8.1.1: Instalar Stripe SDK
-- [ ] 8.1.2: Crear servicio StripeService
-- [ ] 8.1.3: Crear endpoint POST /api/billing/create-checkout-session
-- [ ] 8.1.4: Crear endpoint POST /api/billing/create-portal-session
-- [ ] 8.1.5: Crear endpoint POST /api/billing/webhook
-- [ ] 8.1.6-8.1.10: Implementar handlers de webhook
-- [ ] 8.1.11: Crear endpoint GET /api/billing/subscription
-- [ ] 8.1.12: Crear endpoint GET /api/billing/invoices
-- [ ] 8.1.13: Crear job para emails de recordatorio de pago
+### ✅ Tarea 8.1: Backend - Servicio de Planes y Límites (PR #65)
 
-### Tarea 8.2: Backend - Gestión de Límites por Plan
-- [ ] 8.2.1: Crear servicio PlanLimitsService
-- [ ] 8.2.2-8.2.6: Implementar métodos de verificación de límites
-- [ ] 8.2.7: Crear cron job para verificar suscripciones vencidas
+### Tarea 8.2: Backend - Integración dLocal
+- [ ] 8.2.1: Configurar credenciales dLocal (sandbox)
+- [ ] 8.2.2: Implementar DLocalService real (API calls)
+- [ ] 8.2.3: Crear endpoint POST /api/billing/webhook (IPN handler)
+- [ ] 8.2.4: Implementar lógica de upgrade/downgrade de plan
+- [ ] 8.2.5: Crear cron job para cobros recurrentes mensuales
+- [ ] 8.2.6: Crear cron job para verificar suscripciones vencidas
+- [ ] 8.2.7: Tests de integración con mocks de dLocal
 
-### Tarea 8.3: Frontend - Billing
-- [ ] 8.3.1: Crear página de billing/suscripción
-- [ ] 8.3.2: Mostrar plan actual y uso
-- [ ] 8.3.3: Crear componente de comparación de planes
-- [ ] 8.3.4-8.3.8: UI de upgrade, portal, facturas, banners
+### Tarea 8.3: Frontend - Billing UI
+- [ ] 8.3.1: Crear página /settings/billing
+- [ ] 8.3.2: Mostrar plan actual y uso (doctores, pacientes, storage)
+- [ ] 8.3.3: Crear componente PlanComparisonCard
+- [ ] 8.3.4: Crear flujo de upgrade (selección -> pago -> confirmación)
+- [ ] 8.3.5: Mostrar historial de pagos
+- [ ] 8.3.6: Crear banner de límite alcanzado
+- [ ] 8.3.7: Crear banner de suscripción por vencer
 
 ---
 
