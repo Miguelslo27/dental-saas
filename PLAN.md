@@ -74,7 +74,6 @@ dental-saas/
 ---
 
 ## 📦 FASE 8: Suscripciones y Pagos (dLocal) ⏳
-**Rama:** `feat/billing-dlocal`  
 **Duración estimada:** 3-4 días
 
 ### ✅ Tarea 8.1: Backend - Servicio de Planes y Límites (PR #65)
