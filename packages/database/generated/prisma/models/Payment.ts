@@ -363,7 +363,7 @@ export type PaymentScalarWhereWithAggregatesInput = {
 export type PaymentCreateInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null
@@ -380,7 +380,7 @@ export type PaymentUncheckedCreateInput = {
   id?: string
   subscriptionId: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null
@@ -428,7 +428,7 @@ export type PaymentCreateManyInput = {
   id?: string
   subscriptionId: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null
@@ -590,7 +590,7 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 export type PaymentCreateWithoutSubscriptionInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null
@@ -605,7 +605,7 @@ export type PaymentCreateWithoutSubscriptionInput = {
 export type PaymentUncheckedCreateWithoutSubscriptionInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null
@@ -665,7 +665,7 @@ export type PaymentScalarWhereInput = {
 export type PaymentCreateManySubscriptionInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currency?: string
+  currency: string
   status?: $Enums.PaymentStatus
   dlocalPaymentId?: string | null
   dlocalOrderId?: string | null

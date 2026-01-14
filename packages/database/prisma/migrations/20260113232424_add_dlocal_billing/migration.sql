@@ -4,6 +4,11 @@
   - You are about to drop the column `stripeCustomerId` on the `subscriptions` table. All the data in the column will be lost.
   - You are about to drop the column `stripeSubscriptionId` on the `subscriptions` table. All the data in the column will be lost.
 
+  BREAKING CHANGE NOTE:
+  This migration removes Stripe integration in favor of dLocal.
+  Since this is a new system with no production Stripe data yet, this is safe.
+  For systems with existing Stripe subscriptions, a data migration strategy would be required.
+
 */
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PAID', 'FAILED', 'REFUNDED', 'CANCELLED');

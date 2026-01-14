@@ -71,7 +71,7 @@ model Payment {
   subscriptionId   String
   
   amount           Decimal       @db.Decimal(10, 2)
-  currency         String        @db.Char(3) @default("USD")
+  currency         String        @db.Char(3) // Inherited from tenant settings
   status           PaymentStatus @default(PENDING)
   
   // dLocal fields
