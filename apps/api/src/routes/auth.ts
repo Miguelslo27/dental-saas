@@ -86,10 +86,30 @@ authRouter.post('/register', async (req, res, next) => {
     if (!tenant) {
       // Create new tenant - user will be OWNER
       isNewTenant = true
+      
+      // Get enterprise plan for new tenants (free unlimited during beta)
+      const enterprisePlan = await prisma.plan.findUnique({ where: { name: 'enterprise' } })
+      if (!enterprisePlan) {
+        return res.status(500).json({
+          success: false,
+          error: { message: 'System configuration error. Please contact support.', code: 'PLAN_NOT_FOUND' },
+        })
+      }
+      
+      // Create tenant with subscription in a transaction
       tenant = await prisma.tenant.create({
         data: {
           name: clinicName || `${firstName} Clinic`,
           slug: clinicSlug,
+          subscription: {
+            create: {
+              planId: enterprisePlan.id,
+              status: 'ACTIVE',
+              currentPeriodStart: new Date(),
+              // Set far future date for unlimited access during beta
+              currentPeriodEnd: new Date('2099-12-31'),
+            },
+          },
         },
       })
     } else if (!tenant.isActive) {

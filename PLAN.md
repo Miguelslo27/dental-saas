@@ -37,7 +37,7 @@ dental-saas/
 | 5 | Gestión de Citas | ✅ (CRUD) | #59 |
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
-| 8 | Suscripciones y Pagos (dLocal) | ⏳ | #65 |
+| 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
 | 9 | Configuración del Tenant | ⏳ | - |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
@@ -73,28 +73,27 @@ dental-saas/
 
 ---
 
-## 📦 FASE 8: Suscripciones y Pagos (dLocal) ⏳
-**Duración estimada:** 3-4 días
+## 📦 FASE 8: Suscripciones y Pagos (dLocal) ⏸️ DIFERIDO
+
+> **⚠️ DECISIÓN DE NEGOCIO (13 Enero 2026):**  
+> Las suscripciones serán **gratuitas por tiempo ilimitado** hasta que el proyecto alcance una versión estable.
+> Todos los tenants tendrán acceso al plan "enterprise" sin restricciones de límites.
+> La integración con dLocal se retomará cuando el producto esté listo para monetización.
 
 ### ✅ Tarea 8.1: Backend - Servicio de Planes y Límites (PR #65)
+- Infraestructura de billing creada (esquema, servicios, rutas)
+- PlanService y PlanLimitsService funcionando
+- Middleware checkPlanLimit disponible pero NO aplicado
+- DLocalService skeleton listo para cuando se necesite
 
-### Tarea 8.2: Backend - Integración dLocal
-- [ ] 8.2.1: Configurar credenciales dLocal (sandbox)
-- [ ] 8.2.2: Implementar DLocalService real (API calls)
-- [ ] 8.2.3: Crear endpoint POST /api/billing/webhook (IPN handler)
-- [ ] 8.2.4: Implementar lógica de upgrade/downgrade de plan
-- [ ] 8.2.5: Crear cron job para cobros recurrentes mensuales
-- [ ] 8.2.6: Crear cron job para verificar suscripciones vencidas
-- [ ] 8.2.7: Tests de integración con mocks de dLocal
+### ⏸️ Tarea 8.2: Backend - Integración dLocal (DIFERIDO)
+Retomar cuando:
+- El producto esté en versión estable (v1.0)
+- Se tengan las credenciales de dLocal
+- Se defina estrategia de pricing
 
-### Tarea 8.3: Frontend - Billing UI
-- [ ] 8.3.1: Crear página /settings/billing
-- [ ] 8.3.2: Mostrar plan actual y uso (doctores, pacientes, storage)
-- [ ] 8.3.3: Crear componente PlanComparisonCard
-- [ ] 8.3.4: Crear flujo de upgrade (selección -> pago -> confirmación)
-- [ ] 8.3.5: Mostrar historial de pagos
-- [ ] 8.3.6: Crear banner de límite alcanzado
-- [ ] 8.3.7: Crear banner de suscripción por vencer
+### ⏸️ Tarea 8.3: Frontend - Billing UI (DIFERIDO)
+Retomar junto con Tarea 8.2
 
 ---
 
