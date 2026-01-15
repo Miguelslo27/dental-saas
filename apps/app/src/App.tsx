@@ -12,6 +12,7 @@ import PatientDetailPage from '@pages/patients/PatientDetailPage'
 import AppointmentsPage from '@pages/appointments/AppointmentsPage'
 import { LabworksPage } from '@pages/labworks/LabworksPage'
 import { ExpensesPage } from '@pages/expenses/ExpensesPage'
+import SettingsPage from '@pages/settings/SettingsPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AppLayout from '@/components/layout/AppLayout'
 
@@ -55,7 +56,7 @@ function App() {
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/labworks" element={<LabworksPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
-        {/* Future routes: /settings */}
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       {/* Admin routes (separate auth flow) */}

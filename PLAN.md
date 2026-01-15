@@ -110,7 +110,17 @@ Retomar junto con Tarea 8.2
 - 33 new tests (10 service + 23 routes)
 
 ### Tarea 9.2: Frontend - Página de Settings
-- [ ] 9.2.1-9.2.8: Página de configuración con moneda, idioma, formato fecha, usuarios
+**Rama:** `feat/settings-page`
+
+#### Subtareas:
+- [ ] 9.2.1: Crear settings-api.ts con funciones para GET/PUT settings y tenant profile
+- [ ] 9.2.2: Crear settings.store.ts con Zustand para estado de settings
+- [ ] 9.2.3: Crear SettingsPage.tsx con layout de tabs (Clinic Profile | Preferences | Business Hours)
+- [ ] 9.2.4: Crear ClinicProfileForm.tsx (nombre, email, teléfono, dirección, logo, timezone, moneda)
+- [ ] 9.2.5: Crear PreferencesForm.tsx (idioma, formatos fecha/hora, notificaciones)
+- [ ] 9.2.6: Crear BusinessHoursForm.tsx (días laborables, horarios por día)
+- [ ] 9.2.7: Agregar ruta /settings en App.tsx
+- [ ] 9.2.8: Tests unitarios para SettingsPage y formularios
 
 ---
 
