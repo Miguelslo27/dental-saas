@@ -21,8 +21,31 @@ const updateSettingsSchema = z.object({
         end: z.string().regex(/^\d{2}:\d{2}$/),
       })
     )
+    .refine(
+      (hours) => {
+        // Validate that end time is after start time for each entry
+        for (const [, value] of Object.entries(hours)) {
+          const startMinutes =
+            parseInt(value.start.split(':')[0]) * 60 +
+            parseInt(value.start.split(':')[1])
+          const endMinutes =
+            parseInt(value.end.split(':')[0]) * 60 +
+            parseInt(value.end.split(':')[1])
+          if (endMinutes <= startMinutes) {
+            return false
+          }
+        }
+        return true
+      },
+      { message: 'End time must be after start time for all business hours' }
+    )
     .optional(),
-  workingDays: z.array(z.number().min(0).max(6)).optional(),
+  workingDays: z
+    .array(z.number().min(0).max(6))
+    .refine((days) => new Set(days).size === days.length, {
+      message: 'Working days must be unique',
+    })
+    .optional(),
   emailNotifications: z.boolean().optional(),
   smsNotifications: z.boolean().optional(),
   appointmentReminders: z.boolean().optional(),

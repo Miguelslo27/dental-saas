@@ -245,6 +245,72 @@ describe('Settings Routes', () => {
 
       expect(res.status).toBe(400)
     })
+
+    it('should reject businessHours where end time is before start time', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          businessHours: {
+            1: { start: '18:00', end: '09:00' },
+          },
+        })
+
+      expect(res.status).toBe(400)
+      expect(res.body.details).toBeDefined()
+      expect(res.body.details[0].message).toContain(
+        'End time must be after start time'
+      )
+    })
+
+    it('should reject businessHours where end time equals start time', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          businessHours: {
+            1: { start: '09:00', end: '09:00' },
+          },
+        })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should reject workingDays with duplicate values', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ workingDays: [1, 1, 2, 2] })
+
+      expect(res.status).toBe(400)
+      expect(res.body.details).toBeDefined()
+      expect(res.body.details[0].message).toContain('Working days must be unique')
+    })
+
+    it('should accept valid businessHours with end after start', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          businessHours: {
+            1: { start: '09:00', end: '18:00' },
+            2: { start: '08:30', end: '17:30' },
+          },
+        })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.businessHours['1'].start).toBe('09:00')
+    })
+
+    it('should accept valid unique workingDays', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ workingDays: [0, 1, 2, 3, 4] })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.workingDays).toEqual([0, 1, 2, 3, 4])
+    })
   })
 
   describe('GET /api/tenant/profile', () => {
