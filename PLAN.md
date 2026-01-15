@@ -120,15 +120,21 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 10: Backups ⏳
-**Rama:** `feature/backups`  
-**Duración estimada:** 1-2 días
+## 📦 FASE 10: Export Data ⏳
+**Rama:** `feat/export-data`  
+**Duración estimada:** 1 día
 
-### Tarea 10.1: Backend - Backups
-- [ ] 10.1.1-10.1.8: Servicio de backup, endpoints CRUD, cron jobs
+> **Decisión:** Implementar "Export My Data" en lugar de backups server-side para evitar consumo de recursos mientras el servicio es gratuito.
 
-### Tarea 10.2: Frontend - Gestión de Backups
-- [ ] 10.2.1-10.2.5: UI de backups en settings
+### Tarea 10.1: Backend - Export Endpoint
+- [ ] 10.1.1: Crear ExportService (recopilar patients, doctors, appointments, labworks, expenses)
+- [ ] 10.1.2: GET /api/export (OWNER/ADMIN) - retorna JSON con todos los datos
+- [ ] 10.1.3: Tests unitarios para servicio y ruta
+
+### Tarea 10.2: Frontend - Export Button
+- [ ] 10.2.1: export-api.ts con función de descarga
+- [ ] 10.2.2: Sección "Data Export" en SettingsPage con botón de descarga
+- [ ] 10.2.3: Tests del componente
 
 ---
 
