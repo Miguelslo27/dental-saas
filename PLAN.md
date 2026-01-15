@@ -39,14 +39,14 @@ dental-saas/
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
 | 9 | Configuración del Tenant | ✅ | #66, #67 |
-| 10 | Backups | ⏳ | - |
+| 10 | Export Data | ✅ | #68 |
 | 11 | Generación de PDFs | ⏳ | - |
 | 12 | Internacionalización (i18n) | ⏳ | - |
 | 13 | Landing Page completa | ⏳ | - |
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 295 pasando | **Última actualización:** 15 de Enero, 2026
+**Tests:** 306 pasando | **Última actualización:** 15 de Enero, 2026
 
 ---
 
@@ -120,21 +120,22 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 10: Export Data ⏳
+## 📦 FASE 10: Export Data ✅
 **Rama:** `feat/export-data`  
 **Duración estimada:** 1 día
 
 > **Decisión:** Implementar "Export My Data" en lugar de backups server-side para evitar consumo de recursos mientras el servicio es gratuito.
 
-### Tarea 10.1: Backend - Export Endpoint
-- [ ] 10.1.1: Crear ExportService (recopilar patients, doctors, appointments, labworks, expenses)
-- [ ] 10.1.2: GET /api/export (OWNER/ADMIN) - retorna JSON con todos los datos
-- [ ] 10.1.3: Tests unitarios para servicio y ruta
+### ✅ Tarea 10.1: Backend - Export Endpoint (PR #68)
+- ExportService to collect all tenant data
+- GET /api/export (OWNER/ADMIN) returns JSON with Content-Disposition
+- 8 unit tests
 
-### Tarea 10.2: Frontend - Export Button
-- [ ] 10.2.1: export-api.ts con función de descarga
-- [ ] 10.2.2: Sección "Data Export" en SettingsPage con botón de descarga
-- [ ] 10.2.3: Tests del componente
+### ✅ Tarea 10.2: Frontend - Export Button (PR #68)
+- export-api.ts with download function
+- DataExportForm component in Settings
+- New "Datos" tab (4th tab)
+- 3 new tests
 
 ---
 
