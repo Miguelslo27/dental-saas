@@ -139,6 +139,7 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   subscription  Subscription?
+  settings      TenantSettings?
   users         User[]
   patients      Patient[]
   doctors       Doctor[]
@@ -149,6 +150,39 @@ model Tenant {
   @@index([slug])
   @@index([isActive])
   @@map("tenants")
+}
+
+model TenantSettings {
+  id        String @id @default(cuid())
+  tenantId  String @unique
+  
+  // Localization
+  language      String @default("es") // ISO 639-1: es, en, pt
+  dateFormat    String @default("DD/MM/YYYY") // DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+  timeFormat    String @default("24h") // 12h, 24h
+  
+  // Appointment defaults
+  defaultAppointmentDuration Int @default(30) // minutes
+  appointmentBuffer          Int @default(0)  // minutes between appointments
+  
+  // Business hours (JSON: { mon: { start: "09:00", end: "18:00" }, ... })
+  businessHours Json @default("{}")
+  
+  // Working days (array of day numbers: 0=Sunday, 1=Monday, etc.)
+  workingDays Json @default("[1,2,3,4,5]") // Mon-Fri by default
+  
+  // Notifications
+  emailNotifications    Boolean @default(true)
+  smsNotifications      Boolean @default(false)
+  appointmentReminders  Boolean @default(true)
+  reminderHoursBefore   Int     @default(24)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_settings")
 }
 
 // ============================================================================

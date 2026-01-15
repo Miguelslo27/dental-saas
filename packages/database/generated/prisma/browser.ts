@@ -38,6 +38,11 @@ export type Payment = Prisma.PaymentModel
  */
 export type Tenant = Prisma.TenantModel
 /**
+ * Model TenantSettings
+ * 
+ */
+export type TenantSettings = Prisma.TenantSettingsModel
+/**
  * Model User
  * 
  */

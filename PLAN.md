@@ -38,7 +38,7 @@ dental-saas/
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
-| 9 | Configuración del Tenant | ⏳ | - |
+| 9 | Configuración del Tenant | ⏳ | #66 |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
 | 12 | Internacionalización (i18n) | ⏳ | - |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 245 pasando | **Última actualización:** 13 de Enero, 2026
+**Tests:** 283 pasando | **Última actualización:** 14 de Enero, 2026
 
 ---
 
@@ -98,13 +98,16 @@ Retomar junto con Tarea 8.2
 ---
 
 ## 📦 FASE 9: Configuración del Tenant (Settings) ⏳
-**Rama:** `feature/settings`  
+**Rama:** `feat/tenant-settings`  
 **Duración estimada:** 1-2 días
 
-### Tarea 9.1: Backend - Settings del Tenant
-- [ ] 9.1.1: Crear endpoints CRUD /api/settings
-- [ ] 9.1.2: Implementar settings por defecto al crear tenant
-- [ ] 9.1.3: Crear endpoint PUT /api/tenant/profile
+### ✅ Tarea 9.1: Backend - Settings del Tenant (PR #66)
+- TenantSettings model added to Prisma schema
+- TenantSettingsService with CRUD and defaults
+- GET/PUT /api/settings (OWNER/ADMIN for PUT)
+- GET/PUT /api/tenant/profile (OWNER only for PUT)
+- Auto-creation of default settings on tenant registration
+- 33 new tests (10 service + 23 routes)
 
 ### Tarea 9.2: Frontend - Página de Settings
 - [ ] 9.2.1-9.2.8: Página de configuración con moneda, idioma, formato fecha, usuarios
