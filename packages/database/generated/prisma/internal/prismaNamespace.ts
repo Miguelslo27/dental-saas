@@ -388,6 +388,7 @@ export const ModelName = {
   Subscription: 'Subscription',
   Payment: 'Payment',
   Tenant: 'Tenant',
+  TenantSettings: 'TenantSettings',
   User: 'User',
   Patient: 'Patient',
   Doctor: 'Doctor',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "subscription" | "payment" | "tenant" | "user" | "patient" | "doctor" | "appointment" | "labwork" | "expense" | "refreshToken" | "passwordResetToken"
+    modelProps: "plan" | "subscription" | "payment" | "tenant" | "tenantSettings" | "user" | "patient" | "doctor" | "appointment" | "labwork" | "expense" | "refreshToken" | "passwordResetToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -708,6 +709,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TenantCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TenantCountAggregateOutputType> | number
+        }
+      }
+    }
+    TenantSettings: {
+      payload: Prisma.$TenantSettingsPayload<ExtArgs>
+      fields: Prisma.TenantSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TenantSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TenantSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.TenantSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TenantSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.TenantSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.TenantSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.TenantSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TenantSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.TenantSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        update: {
+          args: Prisma.TenantSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.TenantSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TenantSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TenantSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.TenantSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TenantSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.TenantSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTenantSettings>
+        }
+        groupBy: {
+          args: Prisma.TenantSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TenantSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TenantSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TenantSettingsCountAggregateOutputType> | number
         }
       }
     }
@@ -1413,6 +1488,27 @@ export const TenantScalarFieldEnum = {
 export type TenantScalarFieldEnum = (typeof TenantScalarFieldEnum)[keyof typeof TenantScalarFieldEnum]
 
 
+export const TenantSettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  language: 'language',
+  dateFormat: 'dateFormat',
+  timeFormat: 'timeFormat',
+  defaultAppointmentDuration: 'defaultAppointmentDuration',
+  appointmentBuffer: 'appointmentBuffer',
+  businessHours: 'businessHours',
+  workingDays: 'workingDays',
+  emailNotifications: 'emailNotifications',
+  smsNotifications: 'smsNotifications',
+  appointmentReminders: 'appointmentReminders',
+  reminderHoursBefore: 'reminderHoursBefore',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TenantSettingsScalarFieldEnum = (typeof TenantSettingsScalarFieldEnum)[keyof typeof TenantSettingsScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -1860,6 +1956,7 @@ export type GlobalOmitConfig = {
   subscription?: Prisma.SubscriptionOmit
   payment?: Prisma.PaymentOmit
   tenant?: Prisma.TenantOmit
+  tenantSettings?: Prisma.TenantSettingsOmit
   user?: Prisma.UserOmit
   patient?: Prisma.PatientOmit
   doctor?: Prisma.DoctorOmit

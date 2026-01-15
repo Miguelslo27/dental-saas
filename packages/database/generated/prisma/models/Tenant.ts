@@ -239,6 +239,7 @@ export type TenantWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  settings?: Prisma.XOR<Prisma.TenantSettingsNullableScalarRelationFilter, Prisma.TenantSettingsWhereInput> | null
   users?: Prisma.UserListRelationFilter
   patients?: Prisma.PatientListRelationFilter
   doctors?: Prisma.DoctorListRelationFilter
@@ -261,6 +262,7 @@ export type TenantOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   subscription?: Prisma.SubscriptionOrderByWithRelationInput
+  settings?: Prisma.TenantSettingsOrderByWithRelationInput
   users?: Prisma.UserOrderByRelationAggregateInput
   patients?: Prisma.PatientOrderByRelationAggregateInput
   doctors?: Prisma.DoctorOrderByRelationAggregateInput
@@ -286,6 +288,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  settings?: Prisma.XOR<Prisma.TenantSettingsNullableScalarRelationFilter, Prisma.TenantSettingsWhereInput> | null
   users?: Prisma.UserListRelationFilter
   patients?: Prisma.PatientListRelationFilter
   doctors?: Prisma.DoctorListRelationFilter
@@ -344,6 +347,7 @@ export type TenantCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
@@ -366,6 +370,7 @@ export type TenantUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
@@ -388,6 +393,7 @@ export type TenantUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
@@ -410,6 +416,7 @@ export type TenantUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
@@ -532,6 +539,20 @@ export type TenantUpdateOneRequiredWithoutSubscriptionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSubscriptionInput, Prisma.TenantUpdateWithoutSubscriptionInput>, Prisma.TenantUncheckedUpdateWithoutSubscriptionInput>
 }
 
+export type TenantCreateNestedOneWithoutSettingsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSettingsInput, Prisma.TenantUncheckedCreateWithoutSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSettingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSettingsInput, Prisma.TenantUncheckedCreateWithoutSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSettingsInput
+  upsert?: Prisma.TenantUpsertWithoutSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSettingsInput, Prisma.TenantUpdateWithoutSettingsInput>, Prisma.TenantUncheckedUpdateWithoutSettingsInput>
+}
+
 export type TenantCreateNestedOneWithoutUsersInput = {
   create?: Prisma.XOR<Prisma.TenantCreateWithoutUsersInput, Prisma.TenantUncheckedCreateWithoutUsersInput>
   connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUsersInput
@@ -631,6 +652,7 @@ export type TenantCreateWithoutSubscriptionInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
@@ -652,6 +674,7 @@ export type TenantUncheckedCreateWithoutSubscriptionInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
@@ -689,6 +712,7 @@ export type TenantUpdateWithoutSubscriptionInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
@@ -710,6 +734,111 @@ export type TenantUncheckedUpdateWithoutSubscriptionInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
+  labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSettingsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
+  labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSettingsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
+  labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSettingsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSettingsInput, Prisma.TenantUncheckedCreateWithoutSettingsInput>
+}
+
+export type TenantUpsertWithoutSettingsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSettingsInput, Prisma.TenantUncheckedUpdateWithoutSettingsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSettingsInput, Prisma.TenantUncheckedCreateWithoutSettingsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSettingsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSettingsInput, Prisma.TenantUncheckedUpdateWithoutSettingsInput>
+}
+
+export type TenantUpdateWithoutSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
+  labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
@@ -732,6 +861,7 @@ export type TenantCreateWithoutUsersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
@@ -753,6 +883,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
@@ -790,6 +921,7 @@ export type TenantUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
@@ -811,6 +943,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
@@ -832,6 +965,7 @@ export type TenantCreateWithoutPatientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
@@ -853,6 +987,7 @@ export type TenantUncheckedCreateWithoutPatientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
@@ -890,6 +1025,7 @@ export type TenantUpdateWithoutPatientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
@@ -911,6 +1047,7 @@ export type TenantUncheckedUpdateWithoutPatientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
@@ -932,6 +1069,7 @@ export type TenantCreateWithoutDoctorsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
@@ -953,6 +1091,7 @@ export type TenantUncheckedCreateWithoutDoctorsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
@@ -990,6 +1129,7 @@ export type TenantUpdateWithoutDoctorsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
@@ -1011,6 +1151,7 @@ export type TenantUncheckedUpdateWithoutDoctorsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
@@ -1032,6 +1173,7 @@ export type TenantCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
@@ -1053,6 +1195,7 @@ export type TenantUncheckedCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
@@ -1090,6 +1233,7 @@ export type TenantUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
@@ -1111,6 +1255,7 @@ export type TenantUncheckedUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
@@ -1132,6 +1277,7 @@ export type TenantCreateWithoutLabworksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
@@ -1153,6 +1299,7 @@ export type TenantUncheckedCreateWithoutLabworksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
@@ -1190,6 +1337,7 @@ export type TenantUpdateWithoutLabworksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
@@ -1211,6 +1359,7 @@ export type TenantUncheckedUpdateWithoutLabworksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
@@ -1232,6 +1381,7 @@ export type TenantCreateWithoutExpensesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
@@ -1253,6 +1403,7 @@ export type TenantUncheckedCreateWithoutExpensesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
@@ -1290,6 +1441,7 @@ export type TenantUpdateWithoutExpensesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
@@ -1311,6 +1463,7 @@ export type TenantUncheckedUpdateWithoutExpensesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
@@ -1408,6 +1561,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   updatedAt?: boolean
   subscription?: boolean | Prisma.Tenant$subscriptionArgs<ExtArgs>
+  settings?: boolean | Prisma.Tenant$settingsArgs<ExtArgs>
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   patients?: boolean | Prisma.Tenant$patientsArgs<ExtArgs>
   doctors?: boolean | Prisma.Tenant$doctorsArgs<ExtArgs>
@@ -1465,6 +1619,7 @@ export type TenantSelectScalar = {
 export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "email" | "phone" | "address" | "logo" | "timezone" | "currency" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscription?: boolean | Prisma.Tenant$subscriptionArgs<ExtArgs>
+  settings?: boolean | Prisma.Tenant$settingsArgs<ExtArgs>
   users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   patients?: boolean | Prisma.Tenant$patientsArgs<ExtArgs>
   doctors?: boolean | Prisma.Tenant$doctorsArgs<ExtArgs>
@@ -1480,6 +1635,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Tenant"
   objects: {
     subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+    settings: Prisma.$TenantSettingsPayload<ExtArgs> | null
     users: Prisma.$UserPayload<ExtArgs>[]
     patients: Prisma.$PatientPayload<ExtArgs>[]
     doctors: Prisma.$DoctorPayload<ExtArgs>[]
@@ -1905,6 +2061,7 @@ readonly fields: TenantFieldRefs;
 export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   subscription<T extends Prisma.Tenant$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  settings<T extends Prisma.Tenant$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$settingsArgs<ExtArgs>>): Prisma.Prisma__TenantSettingsClient<runtime.Types.Result.GetResult<Prisma.$TenantSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   users<T extends Prisma.Tenant$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   patients<T extends Prisma.Tenant$patientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$patientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   doctors<T extends Prisma.Tenant$doctorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$doctorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2356,6 +2513,25 @@ export type Tenant$subscriptionArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   include?: Prisma.SubscriptionInclude<ExtArgs> | null
   where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * Tenant.settings
+ */
+export type Tenant$settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TenantSettings
+   */
+  select?: Prisma.TenantSettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TenantSettings
+   */
+  omit?: Prisma.TenantSettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TenantSettingsInclude<ExtArgs> | null
+  where?: Prisma.TenantSettingsWhereInput
 }
 
 /**

@@ -96,7 +96,7 @@ authRouter.post('/register', async (req, res, next) => {
         })
       }
       
-      // Create tenant with subscription in a transaction
+      // Create tenant with subscription and default settings in a transaction
       tenant = await prisma.tenant.create({
         data: {
           name: clinicName || `${firstName} Clinic`,
@@ -108,6 +108,19 @@ authRouter.post('/register', async (req, res, next) => {
               currentPeriodStart: new Date(),
               // Set far future date for unlimited access during beta
               currentPeriodEnd: new Date('2099-12-31'),
+            },
+          },
+          settings: {
+            create: {
+              // Use defaults from schema
+              businessHours: {
+                1: { start: '09:00', end: '18:00' },
+                2: { start: '09:00', end: '18:00' },
+                3: { start: '09:00', end: '18:00' },
+                4: { start: '09:00', end: '18:00' },
+                5: { start: '09:00', end: '18:00' },
+              },
+              workingDays: [1, 2, 3, 4, 5],
             },
           },
         },

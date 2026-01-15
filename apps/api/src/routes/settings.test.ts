@@ -1,0 +1,357 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import request from 'supertest'
+import jwt from 'jsonwebtoken'
+import { prisma } from '@dental/database'
+import { app } from '../app.js'
+
+describe('Settings Routes', () => {
+  let tenantId: string
+  let planId: string
+  let ownerToken: string
+  let staffToken: string
+  let ownerId: string
+  let staffId: string
+
+  function generateToken(payload: {
+    userId: string
+    tenantId: string
+    email: string
+    role: string
+  }) {
+    return jwt.sign(payload, process.env.JWT_SECRET || 'test-jwt-secret-minimum-32-characters-here')
+  }
+
+  beforeAll(async () => {
+    // Create plan
+    const plan = await prisma.plan.upsert({
+      where: { name: 'enterprise' },
+      update: {},
+      create: {
+        name: 'enterprise',
+        displayName: 'Enterprise',
+        price: 0,
+        maxAdmins: 5,
+        maxDoctors: 10,
+        maxPatients: 60,
+        features: [],
+      },
+    })
+    planId = plan.id
+
+    // Create tenant
+    const tenant = await prisma.tenant.create({
+      data: {
+        name: 'Settings Test Clinic',
+        slug: `settings-routes-test-${Date.now()}`,
+        subscription: {
+          create: {
+            planId,
+            status: 'ACTIVE',
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: new Date('2099-12-31'),
+          },
+        },
+      },
+    })
+    tenantId = tenant.id
+
+    // Create owner user
+    const owner = await prisma.user.create({
+      data: {
+        tenantId,
+        email: `owner-settings-${Date.now()}@test.com`,
+        passwordHash: 'hashed',
+        firstName: 'Owner',
+        lastName: 'User',
+        role: 'OWNER',
+      },
+    })
+    ownerId = owner.id
+    ownerToken = generateToken({
+      userId: ownerId,
+      tenantId,
+      email: owner.email,
+      role: 'OWNER',
+    })
+
+    // Create staff user
+    const staff = await prisma.user.create({
+      data: {
+        tenantId,
+        email: `staff-settings-${Date.now()}@test.com`,
+        passwordHash: 'hashed',
+        firstName: 'Staff',
+        lastName: 'User',
+        role: 'STAFF',
+      },
+    })
+    staffId = staff.id
+    staffToken = generateToken({
+      userId: staffId,
+      tenantId,
+      email: staff.email,
+      role: 'STAFF',
+    })
+  })
+
+  afterAll(async () => {
+    await prisma.tenantSettings.deleteMany({ where: { tenantId } })
+    await prisma.user.deleteMany({ where: { tenantId } })
+    await prisma.subscription.deleteMany({ where: { tenantId } })
+    await prisma.tenant.delete({ where: { id: tenantId } })
+  })
+
+  describe('GET /api/settings', () => {
+    it('should return 401 without auth', async () => {
+      const res = await request(app).get('/api/settings')
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return default settings for new tenant', async () => {
+      const res = await request(app)
+        .get('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings).toBeDefined()
+      expect(res.body.settings.language).toBe('es')
+      expect(res.body.settings.dateFormat).toBe('DD/MM/YYYY')
+      expect(res.body.settings.timeFormat).toBe('24h')
+      expect(res.body.settings.defaultAppointmentDuration).toBe(30)
+      expect(res.body.settings.emailNotifications).toBe(true)
+      expect(res.body.settings.workingDays).toEqual([1, 2, 3, 4, 5])
+    })
+
+    it('should allow staff to read settings', async () => {
+      const res = await request(app)
+        .get('/api/settings')
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings).toBeDefined()
+    })
+  })
+
+  describe('PUT /api/settings', () => {
+    it('should return 401 without auth', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .send({ language: 'en' })
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return 403 for staff trying to update', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ language: 'en' })
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should update language setting', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ language: 'en' })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.language).toBe('en')
+    })
+
+    it('should update multiple settings', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          dateFormat: 'MM/DD/YYYY',
+          timeFormat: '12h',
+          defaultAppointmentDuration: 45,
+        })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.dateFormat).toBe('MM/DD/YYYY')
+      expect(res.body.settings.timeFormat).toBe('12h')
+      expect(res.body.settings.defaultAppointmentDuration).toBe(45)
+    })
+
+    it('should update notification settings', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          emailNotifications: false,
+          smsNotifications: true,
+          appointmentReminders: false,
+        })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.emailNotifications).toBe(false)
+      expect(res.body.settings.smsNotifications).toBe(true)
+      expect(res.body.settings.appointmentReminders).toBe(false)
+    })
+
+    it('should update business hours', async () => {
+      const businessHours = {
+        '1': { start: '08:00', end: '17:00' },
+        '2': { start: '08:00', end: '17:00' },
+      }
+
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ businessHours })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.businessHours).toEqual(businessHours)
+    })
+
+    it('should update working days', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ workingDays: [1, 2, 3, 4, 5, 6] })
+
+      expect(res.status).toBe(200)
+      expect(res.body.settings.workingDays).toEqual([1, 2, 3, 4, 5, 6])
+    })
+
+    it('should reject invalid language', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ language: 'invalid' })
+
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Validation Error')
+    })
+
+    it('should reject invalid date format', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ dateFormat: 'invalid' })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should reject appointment duration out of range', async () => {
+      const res = await request(app)
+        .put('/api/settings')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ defaultAppointmentDuration: 500 })
+
+      expect(res.status).toBe(400)
+    })
+  })
+
+  describe('GET /api/tenant/profile', () => {
+    it('should return 401 without auth', async () => {
+      const res = await request(app).get('/api/tenant/profile')
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return tenant profile', async () => {
+      const res = await request(app)
+        .get('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.tenant).toBeDefined()
+      expect(res.body.tenant.id).toBe(tenantId)
+      expect(res.body.tenant.name).toBe('Settings Test Clinic')
+      expect(res.body.tenant.slug).toBeDefined()
+      expect(res.body.tenant.timezone).toBeDefined()
+      expect(res.body.tenant.currency).toBeDefined()
+    })
+
+    it('should allow staff to read profile', async () => {
+      const res = await request(app)
+        .get('/api/tenant/profile')
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.tenant).toBeDefined()
+    })
+  })
+
+  describe('PUT /api/tenant/profile', () => {
+    it('should return 401 without auth', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .send({ name: 'New Name' })
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return 403 for staff trying to update', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ name: 'New Name' })
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should update tenant name', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ name: 'Updated Clinic Name' })
+
+      expect(res.status).toBe(200)
+      expect(res.body.tenant.name).toBe('Updated Clinic Name')
+    })
+
+    it('should update tenant contact info', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          email: 'clinic@example.com',
+          phone: '+1234567890',
+          address: '123 Main St, City',
+        })
+
+      expect(res.status).toBe(200)
+      expect(res.body.tenant.email).toBe('clinic@example.com')
+      expect(res.body.tenant.phone).toBe('+1234567890')
+      expect(res.body.tenant.address).toBe('123 Main St, City')
+    })
+
+    it('should update timezone and currency', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({
+          timezone: 'America/Montevideo',
+          currency: 'UYU',
+        })
+
+      expect(res.status).toBe(200)
+      expect(res.body.tenant.timezone).toBe('America/Montevideo')
+      expect(res.body.tenant.currency).toBe('UYU')
+    })
+
+    it('should reject invalid email', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ email: 'not-an-email' })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should reject invalid currency length', async () => {
+      const res = await request(app)
+        .put('/api/tenant/profile')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ currency: 'INVALID' })
+
+      expect(res.status).toBe(400)
+    })
+  })
+})

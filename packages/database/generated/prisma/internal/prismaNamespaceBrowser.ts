@@ -55,6 +55,7 @@ export const ModelName = {
   Subscription: 'Subscription',
   Payment: 'Payment',
   Tenant: 'Tenant',
+  TenantSettings: 'TenantSettings',
   User: 'User',
   Patient: 'Patient',
   Doctor: 'Doctor',
@@ -150,6 +151,27 @@ export const TenantScalarFieldEnum = {
 } as const
 
 export type TenantScalarFieldEnum = (typeof TenantScalarFieldEnum)[keyof typeof TenantScalarFieldEnum]
+
+
+export const TenantSettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  language: 'language',
+  dateFormat: 'dateFormat',
+  timeFormat: 'timeFormat',
+  defaultAppointmentDuration: 'defaultAppointmentDuration',
+  appointmentBuffer: 'appointmentBuffer',
+  businessHours: 'businessHours',
+  workingDays: 'workingDays',
+  emailNotifications: 'emailNotifications',
+  smsNotifications: 'smsNotifications',
+  appointmentReminders: 'appointmentReminders',
+  reminderHoursBefore: 'reminderHoursBefore',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TenantSettingsScalarFieldEnum = (typeof TenantSettingsScalarFieldEnum)[keyof typeof TenantSettingsScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
