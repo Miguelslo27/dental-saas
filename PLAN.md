@@ -38,7 +38,7 @@ dental-saas/
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
-| 9 | Configuración del Tenant | ⏳ | #66 |
+| 9 | Configuración del Tenant | ✅ | #66, #67 |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
 | 12 | Internacionalización (i18n) | ⏳ | - |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 283 pasando | **Última actualización:** 14 de Enero, 2026
+**Tests:** 295 pasando | **Última actualización:** 15 de Enero, 2026
 
 ---
 
@@ -97,8 +97,7 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 9: Configuración del Tenant (Settings) ⏳
-**Rama:** `feat/tenant-settings`  
+## 📦 FASE 9: Configuración del Tenant (Settings) ✅
 **Duración estimada:** 1-2 días
 
 ### ✅ Tarea 9.1: Backend - Settings del Tenant (PR #66)
@@ -109,8 +108,15 @@ Retomar junto con Tarea 8.2
 - Auto-creation of default settings on tenant registration
 - 33 new tests (10 service + 23 routes)
 
-### Tarea 9.2: Frontend - Página de Settings
-- [ ] 9.2.1-9.2.8: Página de configuración con moneda, idioma, formato fecha, usuarios
+### ✅ Tarea 9.2: Frontend - Página de Settings (PR #67)
+- settings-api.ts with GET/PUT for /api/settings and /api/tenant/profile
+- settings.store.ts with Zustand for state management
+- SettingsPage with 3 tabs: Clinic Profile, Preferences, Business Hours
+- ClinicProfileForm for tenant profile (OWNER only)
+- PreferencesForm for localization and notifications (OWNER/ADMIN)
+- BusinessHoursForm for working days and hours (OWNER/ADMIN)
+- Route /settings registered in App.tsx
+- 12 unit tests for SettingsPage
 
 ---
 
