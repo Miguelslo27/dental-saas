@@ -38,7 +38,7 @@ dental-saas/
 | 6 | Labworks y Expenses | ✅ | #60 |
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
-| 9 | Configuración del Tenant | ⏳ | #66 |
+| 9 | Configuración del Tenant | ✅ | #66, #67 |
 | 10 | Backups | ⏳ | - |
 | 11 | Generación de PDFs | ⏳ | - |
 | 12 | Internacionalización (i18n) | ⏳ | - |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 283 pasando | **Última actualización:** 14 de Enero, 2026
+**Tests:** 295 pasando | **Última actualización:** 15 de Enero, 2026
 
 ---
 
@@ -97,8 +97,7 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 9: Configuración del Tenant (Settings) ⏳
-**Rama:** `feat/tenant-settings`  
+## 📦 FASE 9: Configuración del Tenant (Settings) ✅
 **Duración estimada:** 1-2 días
 
 ### ✅ Tarea 9.1: Backend - Settings del Tenant (PR #66)
@@ -109,18 +108,15 @@ Retomar junto con Tarea 8.2
 - Auto-creation of default settings on tenant registration
 - 33 new tests (10 service + 23 routes)
 
-### Tarea 9.2: Frontend - Página de Settings
-**Rama:** `feat/settings-page`
-
-#### Subtareas:
-- [ ] 9.2.1: Crear settings-api.ts con funciones para GET/PUT settings y tenant profile
-- [ ] 9.2.2: Crear settings.store.ts con Zustand para estado de settings
-- [ ] 9.2.3: Crear SettingsPage.tsx con layout de tabs (Clinic Profile | Preferences | Business Hours)
-- [ ] 9.2.4: Crear ClinicProfileForm.tsx (nombre, email, teléfono, dirección, logo, timezone, moneda)
-- [ ] 9.2.5: Crear PreferencesForm.tsx (idioma, formatos fecha/hora, notificaciones)
-- [ ] 9.2.6: Crear BusinessHoursForm.tsx (días laborables, horarios por día)
-- [ ] 9.2.7: Agregar ruta /settings en App.tsx
-- [ ] 9.2.8: Tests unitarios para SettingsPage y formularios
+### ✅ Tarea 9.2: Frontend - Página de Settings (PR #67)
+- settings-api.ts with GET/PUT for /api/settings and /api/tenant/profile
+- settings.store.ts with Zustand for state management
+- SettingsPage with 3 tabs: Clinic Profile, Preferences, Business Hours
+- ClinicProfileForm for tenant profile (OWNER only)
+- PreferencesForm for localization and notifications (OWNER/ADMIN)
+- BusinessHoursForm for working days and hours (OWNER/ADMIN)
+- Route /settings registered in App.tsx
+- 12 unit tests for SettingsPage
 
 ---
 
