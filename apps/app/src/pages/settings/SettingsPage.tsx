@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Settings, Building2, Clock, Bell, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Settings, Building2, Clock, Bell, Loader2, AlertCircle, CheckCircle2, Database } from 'lucide-react'
 import { useSettingsStore } from '@/stores/settings.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { ClinicProfileForm } from '@/components/settings/ClinicProfileForm'
 import { PreferencesForm } from '@/components/settings/PreferencesForm'
 import { BusinessHoursForm } from '@/components/settings/BusinessHoursForm'
+import { DataExportForm } from '@/components/settings/DataExportForm'
 
-type TabId = 'profile' | 'preferences' | 'hours'
+type TabId = 'profile' | 'preferences' | 'hours' | 'data'
 
 interface Tab {
   id: TabId
@@ -33,6 +34,12 @@ const tabs: Tab[] = [
     label: 'Horarios',
     icon: Clock,
     description: 'Días y horarios de atención',
+  },
+  {
+    id: 'data',
+    label: 'Datos',
+    icon: Database,
+    description: 'Exportar datos de la clínica',
   },
 ]
 
@@ -156,6 +163,14 @@ export function SettingsPage() {
               settings={settings}
               canEdit={canEditSettings}
             />
+          )}
+          {activeTab === 'data' && canEditSettings && (
+            <DataExportForm />
+          )}
+          {activeTab === 'data' && !canEditSettings && (
+            <div className="text-center py-8 text-gray-500">
+              No tienes permisos para exportar datos
+            </div>
           )}
         </div>
       </div>
