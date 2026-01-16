@@ -140,33 +140,21 @@ Retomar junto con Tarea 8.2
 ---
 
 ## 📦 FASE 11: Generación de PDFs ⏳
-**Rama:** `feat/pdf-generation`  
+**Rama:** `feat/pdf-service`  
 **Duración estimada:** 1-2 días
 
 > **Librería elegida:** `@react-pdf/renderer` - Permite crear PDFs con componentes React.
 > Compatible con el stack actual (ya usamos React para emails con @react-email/components).
 
-### Tarea 11.1: Backend - PDF Service y Endpoints
-**Rama:** `feat/pdf-service`
-
-#### Subtareas:
-- [ ] 11.1.1: Instalar dependencias (`@react-pdf/renderer`)
-- [ ] 11.1.2: Crear `PdfService` con método genérico `generatePdf(template, data): Buffer`
-- [ ] 11.1.3: Crear template `AppointmentReceiptPdf` (Comprobante de cita/tratamiento)
-  - Header: Logo clínica, nombre, dirección, teléfono
-  - Datos paciente: Nombre, teléfono
-  - Datos cita: Fecha, doctor, tipo, notas de tratamiento
-  - Costo y estado de pago
-  - Footer: Firma doctor, fecha de emisión
-- [ ] 11.1.4: Crear template `PatientHistoryPdf` (Historial del paciente)
-  - Header: Logo clínica
-  - Datos paciente: Nombre, email, teléfono, fecha nacimiento
-  - Dental chart summary (si existe)
-  - Lista de citas con notas
-- [ ] 11.1.5: Endpoint `GET /api/appointments/:id/pdf` (Comprobante)
-- [ ] 11.1.6: Endpoint `GET /api/patients/:id/history-pdf` (Historial)
-- [ ] 11.1.7: Tests unitarios para PdfService (8+ tests)
-- [ ] 11.1.8: Tests de integración para endpoints (4+ tests)
+### ✅ Tarea 11.1: Backend - PDF Service y Endpoints (PR #69)
+- @react-pdf/renderer installed
+- PdfService with generatePdf(template, data): Buffer
+- AppointmentReceiptPdf template (clinic header, patient info, appointment details, cost, doctor signature)
+- PatientHistoryPdf template (patient data, dental chart summary, appointment history table)
+- GET /api/appointments/:id/pdf endpoint (STAFF+)
+- GET /api/patients/:id/history-pdf endpoint (STAFF+)
+- 20 unit tests for PdfService
+- 11 integration tests for PDF endpoints
 
 ### Tarea 11.2: Frontend - Botones de Descarga
 **Rama:** `feat/pdf-download-buttons`
