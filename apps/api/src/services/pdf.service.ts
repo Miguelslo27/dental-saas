@@ -1,6 +1,6 @@
 import ReactPDF from '@react-pdf/renderer'
+import React from 'react'
 import { prisma, AppointmentStatus } from '@dental/database'
-import type { ReactElement } from 'react'
 import { logger } from '../utils/logger.js'
 
 // Re-export types for templates to use
@@ -101,7 +101,8 @@ export const PdfService = {
   /**
    * Generate PDF buffer from a React PDF document
    */
-  async generatePdf(document: ReactElement): Promise<Buffer> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async generatePdf(document: React.ReactElement<any>): Promise<Buffer> {
     try {
       // renderToBuffer returns a NodeJS.ReadableStream, we need to collect it
       const pdfStream = await ReactPDF.renderToStream(document)
