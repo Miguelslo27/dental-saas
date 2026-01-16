@@ -140,14 +140,43 @@ Retomar junto con Tarea 8.2
 ---
 
 ## 📦 FASE 11: Generación de PDFs ⏳
-**Rama:** `feature/pdf-generation`  
-**Duración estimada:** 1 día
+**Rama:** `feat/pdf-generation`  
+**Duración estimada:** 1-2 días
 
-### Tarea 11.1: Backend
-- [ ] 11.1.1-11.1.4: Servicio de PDF, endpoint, template de prescripción
+> **Librería elegida:** `@react-pdf/renderer` - Permite crear PDFs con componentes React.
+> Compatible con el stack actual (ya usamos React para emails con @react-email/components).
 
-### Tarea 11.2: Frontend
-- [ ] 11.2.1-11.2.2: Botón y preview de descarga
+### Tarea 11.1: Backend - PDF Service y Endpoints
+**Rama:** `feat/pdf-service`
+
+#### Subtareas:
+- [ ] 11.1.1: Instalar dependencias (`@react-pdf/renderer`)
+- [ ] 11.1.2: Crear `PdfService` con método genérico `generatePdf(template, data): Buffer`
+- [ ] 11.1.3: Crear template `AppointmentReceiptPdf` (Comprobante de cita/tratamiento)
+  - Header: Logo clínica, nombre, dirección, teléfono
+  - Datos paciente: Nombre, teléfono
+  - Datos cita: Fecha, doctor, tipo, notas de tratamiento
+  - Costo y estado de pago
+  - Footer: Firma doctor, fecha de emisión
+- [ ] 11.1.4: Crear template `PatientHistoryPdf` (Historial del paciente)
+  - Header: Logo clínica
+  - Datos paciente: Nombre, email, teléfono, fecha nacimiento
+  - Dental chart summary (si existe)
+  - Lista de citas con notas
+- [ ] 11.1.5: Endpoint `GET /api/appointments/:id/pdf` (Comprobante)
+- [ ] 11.1.6: Endpoint `GET /api/patients/:id/history-pdf` (Historial)
+- [ ] 11.1.7: Tests unitarios para PdfService (8+ tests)
+- [ ] 11.1.8: Tests de integración para endpoints (4+ tests)
+
+### Tarea 11.2: Frontend - Botones de Descarga
+**Rama:** `feat/pdf-download-buttons`
+
+#### Subtareas:
+- [ ] 11.2.1: Crear `pdf-api.ts` con funciones de descarga
+- [ ] 11.2.2: Añadir botón "Descargar Comprobante" en `AppointmentDetailModal`
+- [ ] 11.2.3: Añadir botón "Exportar Historial PDF" en `PatientDetailPage`
+- [ ] 11.2.4: Loading state mientras se genera el PDF
+- [ ] 11.2.5: Tests unitarios (4+ tests)
 
 ---
 
@@ -295,4 +324,4 @@ enum ToothCondition {
 
 ---
 
-*Última actualización: 13 de Enero, 2026*
+*Última actualización: 16 de Enero, 2026*
