@@ -139,11 +139,12 @@ describe('SettingsPage', () => {
     expect(mockFetchAll).toHaveBeenCalled()
   })
 
-  it('should render three tabs', () => {
+  it('should render four tabs', () => {
     renderPage()
     expect(screen.getByText('Perfil de Clínica')).toBeInTheDocument()
     expect(screen.getByText('Preferencias')).toBeInTheDocument()
     expect(screen.getByText('Horarios')).toBeInTheDocument()
+    expect(screen.getByText('Datos')).toBeInTheDocument()
   })
 
   it('should switch tabs when clicked', async () => {
@@ -244,6 +245,44 @@ describe('SettingsPage', () => {
     await waitFor(() => {
       const languageSelect = screen.getByLabelText('Idioma')
       expect(languageSelect).toBeDisabled()
+    })
+  })
+
+  it('should show data export form for OWNER', async () => {
+    renderPage()
+    fireEvent.click(screen.getByText('Datos'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Exportar Datos')).toBeInTheDocument()
+      expect(screen.getByText('Descargar Datos')).toBeInTheDocument()
+    })
+  })
+
+  it('should show data export form for ADMIN', async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      ...useAuthStore(),
+      user: mockAdminUser,
+    } as ReturnType<typeof useAuthStore>)
+
+    renderPage()
+    fireEvent.click(screen.getByText('Datos'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Exportar Datos')).toBeInTheDocument()
+    })
+  })
+
+  it('should not allow STAFF to access data export', async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      ...useAuthStore(),
+      user: mockStaffUser,
+    } as ReturnType<typeof useAuthStore>)
+
+    renderPage()
+    fireEvent.click(screen.getByText('Datos'))
+
+    await waitFor(() => {
+      expect(screen.getByText('No tienes permisos para exportar datos')).toBeInTheDocument()
     })
   })
 })

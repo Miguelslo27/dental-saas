@@ -39,14 +39,14 @@ dental-saas/
 | 7 | Estadísticas y Dashboard | ✅ | #61, #62 |
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
 | 9 | Configuración del Tenant | ✅ | #66, #67 |
-| 10 | Backups | ⏳ | - |
+| 10 | Export Data | ✅ | #68 |
 | 11 | Generación de PDFs | ⏳ | - |
 | 12 | Internacionalización (i18n) | ⏳ | - |
 | 13 | Landing Page completa | ⏳ | - |
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 295 pasando | **Última actualización:** 15 de Enero, 2026
+**Tests:** 306 pasando | **Última actualización:** 15 de Enero, 2026
 
 ---
 
@@ -120,15 +120,22 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 10: Backups ⏳
-**Rama:** `feature/backups`  
-**Duración estimada:** 1-2 días
+## 📦 FASE 10: Export Data ✅
+**Rama:** `feat/export-data`  
+**Duración estimada:** 1 día
 
-### Tarea 10.1: Backend - Backups
-- [ ] 10.1.1-10.1.8: Servicio de backup, endpoints CRUD, cron jobs
+> **Decisión:** Implementar "Export My Data" en lugar de backups server-side para evitar consumo de recursos mientras el servicio es gratuito.
 
-### Tarea 10.2: Frontend - Gestión de Backups
-- [ ] 10.2.1-10.2.5: UI de backups en settings
+### ✅ Tarea 10.1: Backend - Export Endpoint (PR #68)
+- ExportService to collect all tenant data
+- GET /api/export (OWNER/ADMIN) returns JSON with Content-Disposition
+- 8 unit tests
+
+### ✅ Tarea 10.2: Frontend - Export Button (PR #68)
+- export-api.ts with download function
+- DataExportForm component in Settings
+- New "Datos" tab (4th tab)
+- 3 new tests
 
 ---
 
