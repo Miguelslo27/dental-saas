@@ -215,12 +215,12 @@ export function AppointmentsPage() {
     tomorrow.setDate(tomorrow.getDate() + 1)
 
     if (date.toDateString() === today.toDateString()) {
-      return 'Hoy'
+      return t('common.today')
     }
     if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Mañana'
+      return t('dates.tomorrow')
     }
-    return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
+    return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
   }
 
   return (
@@ -268,7 +268,7 @@ export function AppointmentsPage() {
               if (localError) setLocalError(null)
             }}
             className="text-red-500 hover:text-red-700 p-1"
-            aria-label="Cerrar"
+            aria-label={t('common.close')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -282,7 +282,7 @@ export function AppointmentsPage() {
             <button
               onClick={handlePreviousMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="Mes anterior"
+              aria-label={t('appointments.previousMonth')}
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -294,7 +294,7 @@ export function AppointmentsPage() {
             <button
               onClick={handleNextMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="Mes siguiente"
+              aria-label={t('appointments.nextMonth')}
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -303,7 +303,7 @@ export function AppointmentsPage() {
               onClick={handleToday}
               className="ml-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              Hoy
+              {t('common.today')}
             </button>
           </div>
 
@@ -314,7 +314,7 @@ export function AppointmentsPage() {
             }`}
           >
             <Filter className="h-4 w-4" />
-            Filtros
+            {t('common.filter')}
             {(selectedDoctorId || selectedStatus || showInactive) && (
               <span className="bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {[selectedDoctorId, selectedStatus, showInactive].filter(Boolean).length}
@@ -327,13 +327,13 @@ export function AppointmentsPage() {
         {showFilters && (
           <div className="mt-4 pt-4 border-t border-gray-200 grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('appointments.statusLabel')}</label>
               <select
                 value={selectedStatus || ''}
                 onChange={(e) => setSelectedStatus((e.target.value as AppointmentStatus) || null)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Todos los estados</option>
+                <option value="">{t('appointments.allStatuses')}</option>
                 {STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
                     {getStatusLabel(status)}
@@ -350,7 +350,7 @@ export function AppointmentsPage() {
                   onChange={(e) => setShowInactive(e.target.checked)}
                   className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                Mostrar canceladas
+                {t('appointments.showCancelled')}
               </label>
             </div>
 
@@ -363,7 +363,7 @@ export function AppointmentsPage() {
                 }}
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
-                Limpiar filtros
+                {t('common.clearFilters')}
               </button>
             </div>
           </div>
@@ -384,17 +384,17 @@ export function AppointmentsPage() {
             <Calendar className="h-8 w-8 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900">
-            No hay citas para este período
+            {t('appointments.noAppointments')}
           </h3>
           <p className="text-gray-600 mt-1">
-            No se encontraron citas en {formatMonthYear(currentDate)}
+            {t('appointments.noAppointmentsInMonth', { month: formatMonthYear(currentDate) })}
           </p>
           <button
             onClick={handleOpenCreate}
             className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="h-5 w-5" />
-            Agregar Cita
+            {t('appointments.addAppointment')}
           </button>
         </div>
       )}
@@ -442,10 +442,10 @@ export function AppointmentsPage() {
         isOpen={!!appointmentToDelete}
         onClose={() => setAppointmentToDelete(null)}
         onConfirm={handleConfirmDelete}
-        title="Cancelar Cita"
-        message="¿Estás seguro de que deseas cancelar esta cita? La cita será marcada como cancelada pero podrá ser restaurada posteriormente."
-        confirmText="Cancelar Cita"
-        cancelText="Mantener"
+        title={t('appointments.cancelAppointment')}
+        message={t('appointments.confirmCancel')}
+        confirmText={t('appointments.cancelAppointment')}
+        cancelText={t('appointments.keep')}
         variant="danger"
         isLoading={isDeleting}
       />

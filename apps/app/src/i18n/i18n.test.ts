@@ -49,7 +49,7 @@ describe('i18n configuration', () => {
     })
 
     it('should have navigation translations', () => {
-      expect(i18n.t('nav.dashboard')).toBe('Dashboard')
+      expect(i18n.t('nav.dashboard')).toBe('Panel de Control')
       expect(i18n.t('nav.appointments')).toBe('Citas')
       expect(i18n.t('nav.patients')).toBe('Pacientes')
     })

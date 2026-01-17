@@ -72,6 +72,10 @@
     "appointmentCancelled": "تم إلغاء الموعد",
     "showCancelled": "عرض الملغاة",
     "allStatuses": "جميع الحالات",
+    "statusLabel": "الحالة",
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "noAppointmentsInMonth": "لا توجد مواعيد في {{month}}",
     "status": {
       "scheduled": "مجدول",
       "confirmed": "مؤكد",
@@ -177,6 +181,42 @@
     "exportData": "تصدير البيانات",
     "exportDescription": "تحميل جميع بيانات عيادتك بصيغة JSON",
     "export": "تصدير",
+    "localization": "التوطين",
+    "dateFormat": "تنسيق التاريخ",
+    "timeFormat": "تنسيق الوقت",
+    "appointmentsSection": "المواعيد",
+    "defaultDuration": "المدة الافتراضية",
+    "bufferTime": "الوقت بين المواعيد (دقائق)",
+    "bufferTimeHelp": "وقت الراحة بين المواعيد المتتالية",
+    "notifications": "الإشعارات",
+    "emailNotifications": "استلام إشعارات البريد الإلكتروني",
+    "smsNotifications": "استلام إشعارات الرسائل النصية",
+    "comingSoon": "قريباً",
+    "appointmentReminders": "إرسال تذكيرات المواعيد للمرضى",
+    "sendReminder": "إرسال تذكير",
+    "saveChanges": "حفظ التغييرات",
+    "readOnlyNotice": "فقط المالك أو المسؤولين يمكنهم تعديل التفضيلات",
+    "duration": {
+      "15min": "15 دقيقة",
+      "30min": "30 دقيقة",
+      "45min": "45 دقيقة",
+      "1h": "ساعة واحدة",
+      "1h30": "ساعة ونصف",
+      "2h": "ساعتان"
+    },
+    "reminder": {
+      "1h": "قبل ساعة",
+      "2h": "قبل ساعتين",
+      "4h": "قبل 4 ساعات",
+      "12h": "قبل 12 ساعة",
+      "24h": "قبل 24 ساعة",
+      "48h": "قبل 48 ساعة",
+      "72h": "قبل 72 ساعة"
+    },
+    "timeFormats": {
+      "24h": "24 ساعة",
+      "12h": "12 ساعة"
+    },
     "form": {
       "clinicName": "اسم العيادة",
       "email": "البريد الإلكتروني",

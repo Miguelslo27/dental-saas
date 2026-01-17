@@ -33,7 +33,7 @@ describe('HomePage', () => {
       </BrowserRouter>
     )
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(screen.getByText('Cargando...')).toBeInTheDocument()
   })
 
   it('should display health data when API responds', async () => {

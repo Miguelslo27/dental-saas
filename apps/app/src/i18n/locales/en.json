@@ -72,6 +72,10 @@
     "appointmentCancelled": "Appointment cancelled",
     "showCancelled": "Show cancelled",
     "allStatuses": "All statuses",
+    "statusLabel": "Status",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "noAppointmentsInMonth": "No appointments found in {{month}}",
     "status": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
@@ -177,6 +181,42 @@
     "exportData": "Export Data",
     "exportDescription": "Download all your clinic data in JSON format",
     "export": "Export",
+    "localization": "Localization",
+    "dateFormat": "Date Format",
+    "timeFormat": "Time Format",
+    "appointmentsSection": "Appointments",
+    "defaultDuration": "Default duration",
+    "bufferTime": "Buffer time (minutes)",
+    "bufferTimeHelp": "Rest time between consecutive appointments",
+    "notifications": "Notifications",
+    "emailNotifications": "Receive email notifications",
+    "smsNotifications": "Receive SMS notifications",
+    "comingSoon": "Coming soon",
+    "appointmentReminders": "Send appointment reminders to patients",
+    "sendReminder": "Send reminder",
+    "saveChanges": "Save Changes",
+    "readOnlyNotice": "Only the owner or administrators can edit preferences",
+    "duration": {
+      "15min": "15 minutes",
+      "30min": "30 minutes",
+      "45min": "45 minutes",
+      "1h": "1 hour",
+      "1h30": "1.5 hours",
+      "2h": "2 hours"
+    },
+    "reminder": {
+      "1h": "1 hour before",
+      "2h": "2 hours before",
+      "4h": "4 hours before",
+      "12h": "12 hours before",
+      "24h": "24 hours before",
+      "48h": "48 hours before",
+      "72h": "72 hours before"
+    },
+    "timeFormats": {
+      "24h": "24 hours",
+      "12h": "12 hours"
+    },
     "form": {
       "clinicName": "Clinic name",
       "email": "Email",

@@ -22,6 +22,15 @@ export type LanguageCode = (typeof languages)[number]['code']
 
 export const defaultLanguage: LanguageCode = 'es'
 
+// Update document direction when language changes
+const updateDocumentDirection = (lng: string) => {
+  const language = languages.find((l) => l.code === lng)
+  if (language) {
+    document.documentElement.dir = language.dir
+    document.documentElement.lang = lng
+  }
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -37,20 +46,15 @@ i18n
       caches: ['localStorage'],
       lookupLocalStorage: 'language',
     },
+    // Ensure synchronous initialization when resources are bundled
+    initImmediate: false,
+  })
+  .then(() => {
+    // Set initial direction after i18n is fully initialized
+    updateDocumentDirection(i18n.language)
   })
 
 // Update document direction when language changes
-i18n.on('languageChanged', (lng) => {
-  const language = languages.find((l) => l.code === lng)
-  if (language) {
-    document.documentElement.dir = language.dir
-    document.documentElement.lang = lng
-  }
-})
-
-// Set initial direction
-const initialLang = languages.find((l) => l.code === i18n.language) || languages[0]
-document.documentElement.dir = initialLang.dir
-document.documentElement.lang = initialLang.code
+i18n.on('languageChanged', updateDocumentDirection)
 
 export default i18n

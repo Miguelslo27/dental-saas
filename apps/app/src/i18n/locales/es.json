@@ -28,7 +28,7 @@
     "required": "Requerido"
   },
   "nav": {
-    "dashboard": "Dashboard",
+    "dashboard": "Panel de Control",
     "appointments": "Citas",
     "patients": "Pacientes",
     "doctors": "Doctores",
@@ -69,9 +69,13 @@
     "appointmentCompleted": "Cita marcada como completada",
     "appointmentCreated": "Cita creada exitosamente",
     "appointmentUpdated": "Cita actualizada exitosamente",
-    "appointmentCancelled": "Cita eliminada",
+    "appointmentCancelled": "Cita cancelada",
     "showCancelled": "Mostrar canceladas",
     "allStatuses": "Todos los estados",
+    "statusLabel": "Estado",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "noAppointmentsInMonth": "No se encontraron citas en {{month}}",
     "status": {
       "scheduled": "Programada",
       "confirmed": "Confirmada",
@@ -177,6 +181,42 @@
     "exportData": "Exportar Datos",
     "exportDescription": "Descarga todos los datos de tu clínica en formato JSON",
     "export": "Exportar",
+    "localization": "Localización",
+    "dateFormat": "Formato de Fecha",
+    "timeFormat": "Formato de Hora",
+    "appointmentsSection": "Citas",
+    "defaultDuration": "Duración por defecto",
+    "bufferTime": "Tiempo entre citas (minutos)",
+    "bufferTimeHelp": "Tiempo de descanso entre citas consecutivas",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Recibir notificaciones por email",
+    "smsNotifications": "Recibir notificaciones por SMS",
+    "comingSoon": "Próximamente",
+    "appointmentReminders": "Enviar recordatorios de citas a pacientes",
+    "sendReminder": "Enviar recordatorio",
+    "saveChanges": "Guardar Cambios",
+    "readOnlyNotice": "Solo el propietario o administradores pueden editar las preferencias",
+    "duration": {
+      "15min": "15 minutos",
+      "30min": "30 minutos",
+      "45min": "45 minutos",
+      "1h": "1 hora",
+      "1h30": "1.5 horas",
+      "2h": "2 horas"
+    },
+    "reminder": {
+      "1h": "1 hora antes",
+      "2h": "2 horas antes",
+      "4h": "4 horas antes",
+      "12h": "12 horas antes",
+      "24h": "24 horas antes",
+      "48h": "48 horas antes",
+      "72h": "72 horas antes"
+    },
+    "timeFormats": {
+      "24h": "24 horas",
+      "12h": "12 horas"
+    },
     "form": {
       "clinicName": "Nombre de la clínica",
       "email": "Correo electrónico",
