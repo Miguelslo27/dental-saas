@@ -46,6 +46,7 @@ export function AppointmentsPage() {
   const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
 
   // Calculate date range for current week/month view
@@ -84,6 +85,14 @@ export function AppointmentsPage() {
       return () => clearTimeout(timer)
     }
   }, [successMessage])
+
+  // Clear local error after 5 seconds
+  useEffect(() => {
+    if (localError) {
+      const timer = setTimeout(() => setLocalError(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [localError])
 
   const handlePreviousMonth = () => {
     const newDate = new Date(currentDate)
@@ -245,14 +254,17 @@ export function AppointmentsPage() {
       )}
 
       {/* Error message */}
-      {error && (
+      {(error || localError) && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-red-800">{error}</p>
+            <p className="text-red-800">{error || localError}</p>
           </div>
           <button
-            onClick={clearError}
+            onClick={() => {
+              if (error) clearError()
+              if (localError) setLocalError(null)
+            }}
             className="text-red-500 hover:text-red-700 p-1"
             aria-label="Cerrar"
           >
@@ -402,6 +414,7 @@ export function AppointmentsPage() {
                     onDelete={handleDelete}
                     onRestore={handleRestore}
                     onComplete={handleComplete}
+                    onError={setLocalError}
                   />
                 ))}
               </div>

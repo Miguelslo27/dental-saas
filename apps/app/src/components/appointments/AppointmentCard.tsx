@@ -17,6 +17,7 @@ interface AppointmentCardProps {
   onDelete: (appointment: Appointment) => void
   onRestore: (appointment: Appointment) => void
   onComplete: (appointment: Appointment) => void
+  onError?: (message: string) => void
 }
 
 export function AppointmentCard({
@@ -25,6 +26,7 @@ export function AppointmentCard({
   onDelete,
   onRestore,
   onComplete,
+  onError,
 }: AppointmentCardProps) {
   const [showMenu, setShowMenu] = useState(false)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
@@ -152,7 +154,8 @@ export function AppointmentCard({
                       try {
                         await downloadAppointmentPdf(appointment.id)
                       } catch (e) {
-                        console.error('Error downloading PDF:', e)
+                        const message = e instanceof Error ? e.message : 'Error al descargar el PDF'
+                        onError?.(message)
                       } finally {
                         setIsDownloadingPdf(false)
                         setShowMenu(false)

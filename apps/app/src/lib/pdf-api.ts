@@ -1,29 +1,27 @@
 import { apiClient } from './api'
 
 // ============================================================================
-// PDF Download Functions
+// Helper Functions
 // ============================================================================
 
 /**
- * Download appointment receipt as PDF
+ * Extract filename from Content-Disposition header
  */
-export async function downloadAppointmentPdf(appointmentId: string): Promise<void> {
-  const response = await apiClient.get(`/appointments/${appointmentId}/pdf`, {
-    responseType: 'blob',
-  })
-
-  const blob = new Blob([response.data], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-
-  // Extract filename from Content-Disposition header or use default
-  const contentDisposition = response.headers['content-disposition']
-  let filename = `appointment-receipt-${appointmentId}.pdf`
+function extractFilename(contentDisposition: string | undefined, defaultFilename: string): string {
   if (contentDisposition) {
     const match = contentDisposition.match(/filename="(.+)"/)
     if (match) {
-      filename = match[1]
+      return match[1]
     }
   }
+  return defaultFilename
+}
+
+/**
+ * Trigger browser download for a blob
+ */
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
 
   const link = document.createElement('a')
   link.href = url
@@ -36,32 +34,39 @@ export async function downloadAppointmentPdf(appointmentId: string): Promise<voi
 }
 
 /**
- * Download patient history as PDF
+ * Generic PDF download function
  */
-export async function downloadPatientHistoryPdf(patientId: string): Promise<void> {
-  const response = await apiClient.get(`/patients/${patientId}/history-pdf`, {
+async function downloadPdf(endpoint: string, defaultFilename: string): Promise<void> {
+  const response = await apiClient.get(endpoint, {
     responseType: 'blob',
   })
 
   const blob = new Blob([response.data], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
+  const filename = extractFilename(response.headers['content-disposition'], defaultFilename)
 
-  // Extract filename from Content-Disposition header or use default
-  const contentDisposition = response.headers['content-disposition']
-  let filename = `patient-history-${patientId}.pdf`
-  if (contentDisposition) {
-    const match = contentDisposition.match(/filename="(.+)"/)
-    if (match) {
-      filename = match[1]
-    }
-  }
+  triggerBlobDownload(blob, filename)
+}
 
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+// ============================================================================
+// PDF Download Functions
+// ============================================================================
 
-  URL.revokeObjectURL(url)
+/**
+ * Download appointment receipt as PDF
+ */
+export async function downloadAppointmentPdf(appointmentId: string): Promise<void> {
+  await downloadPdf(
+    `/appointments/${appointmentId}/pdf`,
+    `appointment-receipt-${appointmentId}.pdf`
+  )
+}
+
+/**
+ * Download patient history as PDF
+ */
+export async function downloadPatientHistoryPdf(patientId: string): Promise<void> {
+  await downloadPdf(
+    `/patients/${patientId}/history-pdf`,
+    `patient-history-${patientId}.pdf`
+  )
 }

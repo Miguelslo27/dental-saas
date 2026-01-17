@@ -80,6 +80,12 @@ describe('pdf-api', () => {
       expect(removeChildSpy).toHaveBeenCalled()
       expect(mockRevokeObjectURL).toHaveBeenCalled()
     })
+
+    it('should handle API errors', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error('API Error'))
+
+      await expect(downloadAppointmentPdf('error')).rejects.toThrow('API Error')
+    })
   })
 
   describe('downloadPatientHistoryPdf', () => {
