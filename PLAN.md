@@ -140,14 +140,31 @@ Retomar junto con Tarea 8.2
 ---
 
 ## 📦 FASE 11: Generación de PDFs ⏳
-**Rama:** `feature/pdf-generation`  
-**Duración estimada:** 1 día
+**Rama:** `feat/pdf-service`  
+**Duración estimada:** 1-2 días
 
-### Tarea 11.1: Backend
-- [ ] 11.1.1-11.1.4: Servicio de PDF, endpoint, template de prescripción
+> **Librería elegida:** `@react-pdf/renderer` - Permite crear PDFs con componentes React.
+> Compatible con el stack actual (ya usamos React para emails con @react-email/components).
 
-### Tarea 11.2: Frontend
-- [ ] 11.2.1-11.2.2: Botón y preview de descarga
+### ✅ Tarea 11.1: Backend - PDF Service y Endpoints (PR #69)
+- @react-pdf/renderer installed
+- PdfService with generatePdf(template, data): Buffer
+- AppointmentReceiptPdf template (clinic header, patient info, appointment details, cost, doctor signature)
+- PatientHistoryPdf template (patient data, dental chart summary, appointment history table)
+- GET /api/appointments/:id/pdf endpoint (STAFF+)
+- GET /api/patients/:id/history-pdf endpoint (STAFF+)
+- 20 unit tests for PdfService
+- 11 integration tests for PDF endpoints
+
+### Tarea 11.2: Frontend - Botones de Descarga
+**Rama:** `feat/pdf-download-buttons`
+
+#### Subtareas:
+- [ ] 11.2.1: Crear `pdf-api.ts` con funciones de descarga
+- [ ] 11.2.2: Añadir botón "Descargar Comprobante" en `AppointmentDetailModal`
+- [ ] 11.2.3: Añadir botón "Exportar Historial PDF" en `PatientDetailPage`
+- [ ] 11.2.4: Loading state mientras se genera el PDF
+- [ ] 11.2.5: Tests unitarios (4+ tests)
 
 ---
 
@@ -295,4 +312,4 @@ enum ToothCondition {
 
 ---
 
-*Última actualización: 13 de Enero, 2026*
+*Última actualización: 16 de Enero, 2026*

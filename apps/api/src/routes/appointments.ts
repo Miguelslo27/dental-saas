@@ -1,5 +1,6 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
+import React from 'react'
 import { AppointmentStatus } from '@dental/database'
 import { requireMinRole } from '../middleware/auth.js'
 import {
@@ -15,6 +16,8 @@ import {
   getAppointmentsByDoctor,
   getAppointmentsByPatient,
 } from '../services/appointment.service.js'
+import { PdfService } from '../services/pdf.service.js'
+import { AppointmentReceiptPdf } from '../pdfs/AppointmentReceiptPdf.js'
 
 const appointmentsRouter: IRouter = Router()
 
@@ -419,6 +422,40 @@ appointmentsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res,
     }
 
     res.json({ success: true, data: result.appointment })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/appointments/:id/pdf
+ * Download appointment receipt as PDF
+ * Requires: STAFF role or higher
+ */
+appointmentsRouter.get('/:id/pdf', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const result = await PdfService.getAppointmentReceiptData(tenantId, id)
+
+    if ('error' in result) {
+      const status = result.error === 'NOT_FOUND' ? 404 : 400
+      return res.status(status).json({
+        success: false,
+        error: { code: result.error, message: result.message },
+      })
+    }
+
+    const pdfBuffer = await PdfService.generatePdf(
+      React.createElement(AppointmentReceiptPdf, { data: result.data })
+    )
+
+    const filename = `appointment-receipt-${id}.pdf`
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Length', pdfBuffer.length)
+    res.send(pdfBuffer)
   } catch (e) {
     next(e)
   }
