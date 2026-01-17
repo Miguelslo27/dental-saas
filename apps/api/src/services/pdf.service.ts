@@ -95,7 +95,7 @@ export interface PatientHistoryData {
   generatedAt: Date
 }
 
-export type PdfErrorCode = 'NOT_FOUND' | 'GENERATION_FAILED' | 'INVALID_TENANT'
+export type PdfErrorCode = 'NOT_FOUND' | 'INVALID_TENANT'
 
 export const PdfService = {
   /**
@@ -242,7 +242,8 @@ export const PdfService = {
       return { error: 'INVALID_TENANT', message: 'Tenant not found' }
     }
 
-    // Get all appointments for this patient, ordered by date desc
+    // Get appointments for this patient, ordered by date desc
+    // Limit to 100 to prevent performance issues (PDF only displays 25)
     const appointments = await prisma.appointment.findMany({
       where: {
         patientId,
@@ -258,6 +259,7 @@ export const PdfService = {
         },
       },
       orderBy: { startTime: 'desc' },
+      take: 100,
     })
 
     const appointmentSummaries: AppointmentSummary[] = appointments.map((apt) => ({

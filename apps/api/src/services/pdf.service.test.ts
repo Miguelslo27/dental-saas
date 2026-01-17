@@ -348,7 +348,7 @@ describe('PdfService', () => {
       const appointments = Array.from({ length: 50 }, (_, i) =>
         createMockAppointmentSummary({
           id: `appointment-${i}`,
-          date: new Date(`2026-01-${String(i + 1).padStart(2, '0')}T10:00:00Z`),
+          date: new Date(2026, 0, (i % 28) + 1, 10, 0, 0),
         })
       )
 

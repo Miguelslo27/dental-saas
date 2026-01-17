@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
-import type { AppointmentReceiptData, AppointmentStatus } from '../services/pdf.service.js'
+import type { AppointmentReceiptData } from '../services/pdf.service.js'
+import { formatDate, formatTime, formatStatus } from './pdf-utils.js'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -129,37 +130,6 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
 })
-
-// Helper function to format date
-function formatDate(date: Date, timezone: string): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: timezone,
-  })
-}
-
-function formatTime(date: Date, timezone: string): string {
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: timezone,
-  })
-}
-
-function formatStatus(status: AppointmentStatus): string {
-  const statusMap: Record<AppointmentStatus, string> = {
-    SCHEDULED: 'Scheduled',
-    CONFIRMED: 'Confirmed',
-    IN_PROGRESS: 'In Progress',
-    COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled',
-    NO_SHOW: 'No Show',
-    RESCHEDULED: 'Rescheduled',
-  }
-  return statusMap[status] || status
-}
 
 interface AppointmentReceiptPdfProps {
   data: AppointmentReceiptData

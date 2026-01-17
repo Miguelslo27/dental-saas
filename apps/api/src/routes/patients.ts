@@ -16,7 +16,7 @@ import {
   getPatientTeeth,
 } from '../services/patient.service.js'
 import { PdfService } from '../services/pdf.service.js'
-import { PatientHistoryPdf } from '../pdfs/PatientHistoryPdf.js'
+import { PatientHistoryPdf, sanitizeFilename } from '../pdfs/index.js'
 
 const patientsRouter: IRouter = Router()
 
@@ -525,7 +525,7 @@ patientsRouter.get('/:id/history-pdf', requireMinRole('STAFF'), async (req, res,
       React.createElement(PatientHistoryPdf, { data: result.data })
     )
 
-    const patientName = `${result.data.patient.firstName}-${result.data.patient.lastName}`.toLowerCase()
+    const patientName = sanitizeFilename(`${result.data.patient.firstName}-${result.data.patient.lastName}`)
     const filename = `patient-history-${patientName}-${id}.pdf`
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)

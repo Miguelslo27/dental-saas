@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import type { PatientHistoryData, AppointmentStatus } from '../services/pdf.service.js'
+import { formatDate, formatDateTime, formatStatus } from './pdf-utils.js'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -186,40 +187,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// Helper functions
-function formatDate(date: Date, timezone: string): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    timeZone: timezone,
-  })
-}
-
-function formatDateTime(date: Date, timezone: string): string {
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: timezone,
-  })
-}
-
-function formatStatus(status: AppointmentStatus): string {
-  const statusMap: Record<AppointmentStatus, string> = {
-    SCHEDULED: 'Scheduled',
-    CONFIRMED: 'Confirmed',
-    IN_PROGRESS: 'In Progress',
-    COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled',
-    NO_SHOW: 'No Show',
-    RESCHEDULED: 'Rescheduled',
-  }
-  return statusMap[status] || status
-}
-
 function getStatusStyle(status: AppointmentStatus) {
   switch (status) {
     case 'COMPLETED':
@@ -361,7 +328,7 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
                   key={apt.id}
                   style={[styles.tableRow, index % 2 === 1 ? styles.tableRowAlt : {}]}
                 >
-                  <Text style={styles.colDate}>{formatDate(apt.date, timezone)}</Text>
+                  <Text style={styles.colDate}>{formatDate(apt.date, timezone, 'short')}</Text>
                   <Text style={styles.colType}>{apt.type || '-'}</Text>
                   <Text style={styles.colDoctor}>{apt.doctorName}</Text>
                   <View style={styles.colStatus}>
