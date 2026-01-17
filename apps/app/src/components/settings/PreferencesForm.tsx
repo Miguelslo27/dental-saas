@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Loader2, Lock } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/settings.store'
 import type { TenantSettings, UpdateSettingsData } from '@/lib/settings-api'
+import { languages, type LanguageCode } from '@/i18n'
 
-const LANGUAGES = [
-  { value: 'es', label: 'Español' },
-  { value: 'en', label: 'English' },
-  { value: 'pt', label: 'Português' },
-]
+const LANGUAGES = languages.map((l) => ({ value: l.code, label: l.nativeName }))
 
 const DATE_FORMATS = [
   { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (31/12/2025)' },
@@ -46,6 +44,7 @@ interface PreferencesFormProps {
 
 export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
   const { updateSettings, isSaving } = useSettingsStore()
+  const { i18n, t } = useTranslation()
 
   const [formData, setFormData] = useState<UpdateSettingsData>({
     language: 'es',
@@ -79,6 +78,11 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
+
+    // If language changes, also update i18n
+    if (name === 'language') {
+      i18n.changeLanguage(value as LanguageCode)
+    }
 
     setFormData((prev) => ({
       ...prev,

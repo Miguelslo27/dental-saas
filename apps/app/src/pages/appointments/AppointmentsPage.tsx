@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Plus, AlertCircle, Calendar, Loader2, X, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
 import { useAppointmentsStore } from '@/stores/appointments.store'
 import { AppointmentCard } from '@/components/appointments/AppointmentCard'
@@ -18,6 +19,7 @@ const STATUS_OPTIONS: AppointmentStatus[] = [
 ]
 
 export function AppointmentsPage() {
+  const { t } = useTranslation()
   const {
     appointments,
     stats,
@@ -127,7 +129,7 @@ export function AppointmentsPage() {
   const handleRestore = async (appointment: Appointment) => {
     try {
       await restoreDeletedAppointment(appointment.id)
-      setSuccessMessage('Cita restaurada exitosamente')
+      setSuccessMessage(t('appointments.appointmentRestored'))
     } catch {
       // Error is handled by store
     }
@@ -136,7 +138,7 @@ export function AppointmentsPage() {
   const handleComplete = async (appointment: Appointment) => {
     try {
       await completeAppointment(appointment.id)
-      setSuccessMessage('Cita marcada como completada')
+      setSuccessMessage(t('appointments.appointmentCompleted'))
     } catch {
       // Error is handled by store
     }
@@ -147,10 +149,10 @@ export function AppointmentsPage() {
       try {
         if (selectedAppointment) {
           await editAppointment(selectedAppointment.id, data as UpdateAppointmentData)
-          setSuccessMessage('Cita actualizada exitosamente')
+          setSuccessMessage(t('appointments.appointmentUpdated'))
         } else {
           await addAppointment(data as CreateAppointmentData)
-          setSuccessMessage('Cita creada exitosamente')
+          setSuccessMessage(t('appointments.appointmentCreated'))
         }
         setIsFormOpen(false)
         setSelectedAppointment(null)
@@ -166,7 +168,7 @@ export function AppointmentsPage() {
     setIsDeleting(true)
     try {
       await removeAppointment(appointmentToDelete.id)
-      setSuccessMessage('Cita eliminada')
+      setSuccessMessage(t('appointments.appointmentCancelled'))
       setAppointmentToDelete(null)
     } catch {
       // Error is handled by store
@@ -226,12 +228,12 @@ export function AppointmentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Citas</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('appointments.title')}</h1>
           <p className="text-gray-600 mt-1">
-            Gestiona las citas de tu clínica
+            {t('appointments.subtitle')}
             {stats && (
               <span className="text-gray-500 ml-1">
-                ({stats.scheduled} programadas, {stats.completed} completadas)
+                ({stats.scheduled} {t('appointments.scheduled')}, {stats.completed} {t('appointments.completed')})
               </span>
             )}
           </p>
@@ -242,7 +244,7 @@ export function AppointmentsPage() {
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="h-5 w-5" />
-          Nueva Cita
+          {t('appointments.newAppointment')}
         </button>
       </div>
 
