@@ -41,7 +41,7 @@ dental-saas/
 | 9 | Configuración del Tenant | ✅ | #66, #67 |
 | 10 | Export Data | ✅ | #68 |
 | 11 | Generación de PDFs | ✅ | #69, #70 |
-| 12 | Internacionalización (i18n) | ⏳ | - |
+| 12 | Internacionalización (i18n) | ✅ | #71 |
 | 13 | Landing Page completa | ⏳ | - |
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
@@ -165,15 +165,22 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 12: Internacionalización (i18n) ⏳
-**Rama:** `feature/i18n`  
+## 📦 FASE 12: Internacionalización (i18n) ✅
+**Rama:** `feature/i18n`
 **Duración estimada:** 1-2 días
 
-### Tarea 12.1: Configurar i18n
-- [ ] 12.1.1-12.1.6: react-i18next, traducciones EN/ES/AR
+### ✅ Tarea 12.1: Configurar i18n (PR #71)
+- react-i18next + i18next + i18next-browser-languagedetector installed
+- i18n configuration with language detection and localStorage persistence
+- Translation files for ES (Spanish), EN (English), AR (Arabic)
+- 150+ translation keys per language
 
-### Tarea 12.2: Implementar i18n
-- [ ] 12.2.1-12.2.3: Reemplazar strings, selector idioma, RTL
+### ✅ Tarea 12.2: Implementar i18n (PR #71)
+- LanguageSelector component (dropdown + buttons variants)
+- RTL support for Arabic (dir attribute, CSS adjustments)
+- PreferencesForm integrated with i18n language switching
+- AppointmentsPage translated as example
+- 8 unit tests for i18n configuration
 
 ---
 

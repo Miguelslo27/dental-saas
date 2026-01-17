@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Loader2, Lock } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/settings.store'
 import type { TenantSettings, UpdateSettingsData } from '@/lib/settings-api'
+import { languages, type LanguageCode } from '@/i18n'
 
-const LANGUAGES = [
-  { value: 'es', label: 'Español' },
-  { value: 'en', label: 'English' },
-  { value: 'pt', label: 'Português' },
-]
+const LANGUAGES = languages.map((l) => ({ value: l.code, label: l.nativeName }))
 
 const DATE_FORMATS = [
   { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (31/12/2025)' },
@@ -15,28 +13,28 @@ const DATE_FORMATS = [
   { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (2025-12-31)' },
 ]
 
-const TIME_FORMATS = [
-  { value: '24h', label: '24 horas (14:30)' },
-  { value: '12h', label: '12 horas (2:30 PM)' },
+const TIME_FORMAT_KEYS = [
+  { value: '24h', labelKey: 'settings.timeFormats.24h', example: '(14:30)' },
+  { value: '12h', labelKey: 'settings.timeFormats.12h', example: '(2:30 PM)' },
 ]
 
-const APPOINTMENT_DURATIONS = [
-  { value: 15, label: '15 minutos' },
-  { value: 30, label: '30 minutos' },
-  { value: 45, label: '45 minutos' },
-  { value: 60, label: '1 hora' },
-  { value: 90, label: '1.5 horas' },
-  { value: 120, label: '2 horas' },
+const DURATION_KEYS = [
+  { value: 15, labelKey: 'settings.duration.15min' },
+  { value: 30, labelKey: 'settings.duration.30min' },
+  { value: 45, labelKey: 'settings.duration.45min' },
+  { value: 60, labelKey: 'settings.duration.1h' },
+  { value: 90, labelKey: 'settings.duration.1h30' },
+  { value: 120, labelKey: 'settings.duration.2h' },
 ]
 
-const REMINDER_HOURS = [
-  { value: 1, label: '1 hora antes' },
-  { value: 2, label: '2 horas antes' },
-  { value: 4, label: '4 horas antes' },
-  { value: 12, label: '12 horas antes' },
-  { value: 24, label: '24 horas antes' },
-  { value: 48, label: '48 horas antes' },
-  { value: 72, label: '72 horas antes' },
+const REMINDER_KEYS = [
+  { value: 1, labelKey: 'settings.reminder.1h' },
+  { value: 2, labelKey: 'settings.reminder.2h' },
+  { value: 4, labelKey: 'settings.reminder.4h' },
+  { value: 12, labelKey: 'settings.reminder.12h' },
+  { value: 24, labelKey: 'settings.reminder.24h' },
+  { value: 48, labelKey: 'settings.reminder.48h' },
+  { value: 72, labelKey: 'settings.reminder.72h' },
 ]
 
 interface PreferencesFormProps {
@@ -46,6 +44,7 @@ interface PreferencesFormProps {
 
 export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
   const { updateSettings, isSaving } = useSettingsStore()
+  const { i18n, t } = useTranslation()
 
   const [formData, setFormData] = useState<UpdateSettingsData>({
     language: 'es',
@@ -59,7 +58,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
     reminderHoursBefore: 24,
   })
 
-  // Sync form data when settings load
+  // Sync form data and i18n language when settings load
   useEffect(() => {
     if (settings) {
       setFormData({
@@ -73,12 +72,21 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
         appointmentReminders: settings.appointmentReminders,
         reminderHoursBefore: settings.reminderHoursBefore,
       })
+      // Sync i18n language with saved settings
+      if (settings.language !== i18n.language) {
+        i18n.changeLanguage(settings.language as LanguageCode)
+      }
     }
-  }, [settings])
+  }, [settings, i18n])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
+
+    // If language changes, also update i18n
+    if (name === 'language') {
+      i18n.changeLanguage(value as LanguageCode)
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -106,18 +114,18 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
       {!canEdit && (
         <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
           <Lock className="h-4 w-4" />
-          Solo el propietario o administradores pueden editar las preferencias
+          {t('settings.readOnlyNotice')}
         </div>
       )}
 
       {/* Localization Section */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Localización</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">{t('settings.localization')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Language */}
           <div>
             <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-              Idioma
+              {t('settings.language')}
             </label>
             <select
               id="language"
@@ -138,7 +146,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
           {/* Date Format */}
           <div>
             <label htmlFor="dateFormat" className="block text-sm font-medium text-gray-700">
-              Formato de Fecha
+              {t('settings.dateFormat')}
             </label>
             <select
               id="dateFormat"
@@ -159,7 +167,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
           {/* Time Format */}
           <div>
             <label htmlFor="timeFormat" className="block text-sm font-medium text-gray-700">
-              Formato de Hora
+              {t('settings.timeFormat')}
             </label>
             <select
               id="timeFormat"
@@ -169,9 +177,9 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               disabled={!canEdit}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
-              {TIME_FORMATS.map((fmt) => (
+              {TIME_FORMAT_KEYS.map((fmt) => (
                 <option key={fmt.value} value={fmt.value}>
-                  {fmt.label}
+                  {t(fmt.labelKey)} {fmt.example}
                 </option>
               ))}
             </select>
@@ -181,7 +189,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
 
       {/* Appointments Section */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Citas</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">{t('settings.appointmentsSection')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Default Duration */}
           <div>
@@ -189,7 +197,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               htmlFor="defaultAppointmentDuration"
               className="block text-sm font-medium text-gray-700"
             >
-              Duración por defecto
+              {t('settings.defaultDuration')}
             </label>
             <select
               id="defaultAppointmentDuration"
@@ -199,9 +207,9 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               disabled={!canEdit}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
-              {APPOINTMENT_DURATIONS.map((dur) => (
+              {DURATION_KEYS.map((dur) => (
                 <option key={dur.value} value={dur.value}>
-                  {dur.label}
+                  {t(dur.labelKey)}
                 </option>
               ))}
             </select>
@@ -213,7 +221,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               htmlFor="appointmentBuffer"
               className="block text-sm font-medium text-gray-700"
             >
-              Tiempo entre citas (minutos)
+              {t('settings.bufferTime')}
             </label>
             <input
               type="number"
@@ -227,7 +235,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Tiempo de descanso entre citas consecutivas
+              {t('settings.bufferTimeHelp')}
             </p>
           </div>
         </div>
@@ -235,7 +243,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
 
       {/* Notifications Section */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Notificaciones</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">{t('settings.notifications')}</h3>
         <div className="space-y-4">
           {/* Email Notifications */}
           <label className="flex items-center gap-3">
@@ -248,7 +256,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed"
             />
             <span className="text-sm text-gray-700">
-              Recibir notificaciones por email
+              {t('settings.emailNotifications')}
             </span>
           </label>
 
@@ -263,9 +271,9 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed"
             />
             <span className="text-sm text-gray-700">
-              Recibir notificaciones por SMS
+              {t('settings.smsNotifications')}
             </span>
-            <span className="text-xs text-gray-400">(Próximamente)</span>
+            <span className="text-xs text-gray-400">({t('settings.comingSoon')})</span>
           </label>
 
           {/* Appointment Reminders */}
@@ -279,7 +287,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed"
             />
             <span className="text-sm text-gray-700">
-              Enviar recordatorios de citas a pacientes
+              {t('settings.appointmentReminders')}
             </span>
           </label>
 
@@ -290,7 +298,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
                 htmlFor="reminderHoursBefore"
                 className="block text-sm font-medium text-gray-700"
               >
-                Enviar recordatorio
+                {t('settings.sendReminder')}
               </label>
               <select
                 id="reminderHoursBefore"
@@ -300,9 +308,9 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
                 disabled={!canEdit}
                 className="mt-1 block w-48 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
-                {REMINDER_HOURS.map((h) => (
+                {REMINDER_KEYS.map((h) => (
                   <option key={h.value} value={h.value}>
-                    {h.label}
+                    {t(h.labelKey)}
                   </option>
                 ))}
               </select>
@@ -320,7 +328,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
-            Guardar Cambios
+            {t('settings.saveChanges')}
           </button>
         </div>
       )}
