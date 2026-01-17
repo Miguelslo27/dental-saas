@@ -40,7 +40,7 @@ dental-saas/
 | 8 | Suscripciones y Pagos (dLocal) | ⏸️ DIFERIDO | #65 |
 | 9 | Configuración del Tenant | ✅ | #66, #67 |
 | 10 | Export Data | ✅ | #68 |
-| 11 | Generación de PDFs | ⏳ | - |
+| 11 | Generación de PDFs | ✅ | #69, #70 |
 | 12 | Internacionalización (i18n) | ⏳ | - |
 | 13 | Landing Page completa | ⏳ | - |
 | 14 | Testing E2E | ⏳ | - |
@@ -139,7 +139,7 @@ Retomar junto con Tarea 8.2
 
 ---
 
-## 📦 FASE 11: Generación de PDFs ⏳
+## 📦 FASE 11: Generación de PDFs ✅
 **Rama:** `feat/pdf-service`  
 **Duración estimada:** 1-2 días
 
@@ -156,15 +156,12 @@ Retomar junto con Tarea 8.2
 - 20 unit tests for PdfService
 - 11 integration tests for PDF endpoints
 
-### Tarea 11.2: Frontend - Botones de Descarga
-**Rama:** `feat/pdf-download-buttons`
-
-#### Subtareas:
-- [ ] 11.2.1: Crear `pdf-api.ts` con funciones de descarga
-- [ ] 11.2.2: Añadir botón "Descargar Comprobante" en `AppointmentDetailModal`
-- [ ] 11.2.3: Añadir botón "Exportar Historial PDF" en `PatientDetailPage`
-- [ ] 11.2.4: Loading state mientras se genera el PDF
-- [ ] 11.2.5: Tests unitarios (4+ tests)
+### ✅ Tarea 11.2: Frontend - Botones de Descarga (PR #70)
+- pdf-api.ts with downloadAppointmentPdf and downloadPatientHistoryPdf
+- "Descargar PDF" button in AppointmentCard menu
+- "Exportar PDF" button in PatientDetailPage header
+- Loading states while PDFs are generated
+- 7 unit tests for pdf-api functions
 
 ---
 
