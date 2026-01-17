@@ -1,5 +1,6 @@
-import { Clock, User, Stethoscope, MoreVertical, Edit, Trash2, RotateCcw, CheckCircle } from 'lucide-react'
+import { Clock, User, Stethoscope, MoreVertical, Edit, Trash2, RotateCcw, CheckCircle, FileText, Loader2 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { downloadAppointmentPdf } from '@/lib/pdf-api'
 import type { Appointment } from '@/lib/appointment-api'
 import {
   getStatusLabel,
@@ -26,6 +27,7 @@ export function AppointmentCard({
   onComplete,
 }: AppointmentCardProps) {
   const [showMenu, setShowMenu] = useState(false)
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Close menu when clicking outside
@@ -142,6 +144,29 @@ export function AppointmentCard({
                   >
                     <Edit className="h-4 w-4" />
                     Editar
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setIsDownloadingPdf(true)
+                      try {
+                        await downloadAppointmentPdf(appointment.id)
+                      } catch (e) {
+                        console.error('Error downloading PDF:', e)
+                      } finally {
+                        setIsDownloadingPdf(false)
+                        setShowMenu(false)
+                      }
+                    }}
+                    disabled={isDownloadingPdf}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    {isDownloadingPdf ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileText className="h-4 w-4" />
+                    )}
+                    Descargar PDF
                   </button>
 
                   {canComplete && (

@@ -12,6 +12,7 @@ import {
   Loader2,
   ChevronRight,
   X,
+  FileText,
 } from 'lucide-react'
 import { Odontogram } from 'react-odontogram'
 import '@/assets/odontogram.css'
@@ -23,6 +24,7 @@ import {
   calculateAge,
   getPatientInitials,
 } from '@/lib/patient-api'
+import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
 
 // ============================================================================
 // Types
@@ -197,6 +199,7 @@ export default function PatientDetailPage() {
   const [isToothModalOpen, setIsToothModalOpen] = useState(false)
   const [isSavingTooth, setIsSavingTooth] = useState(false)
   const [showPrimaryTeeth, setShowPrimaryTeeth] = useState(false)
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
 
   // Fetch patient data
   useEffect(() => {
@@ -363,14 +366,37 @@ export default function PatientDetailPage() {
             </div>
           </div>
 
-          {/* Edit button */}
-          <Link
-            to={`/patients?edit=${patient.id}`}
-            className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <Edit2 className="h-4 w-4" />
-            Editar
-          </Link>
+          {/* Action buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={async () => {
+                setIsDownloadingPdf(true)
+                try {
+                  await downloadPatientHistoryPdf(patient.id)
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : 'Error al descargar el PDF')
+                } finally {
+                  setIsDownloadingPdf(false)
+                }
+              }}
+              disabled={isDownloadingPdf}
+              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              {isDownloadingPdf ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              Exportar PDF
+            </button>
+            <Link
+              to={`/patients?edit=${patient.id}`}
+              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Edit2 className="h-4 w-4" />
+              Editar
+            </Link>
+          </div>
         </div>
 
         {/* Contact info */}
