@@ -101,7 +101,7 @@ export function PricingPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-sky-50 to-white">
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50 to-white">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
               Planes y Precios
@@ -122,13 +122,13 @@ export function PricingPage() {
                   key={plan.name}
                   className={`p-8 rounded-2xl ${
                     plan.highlighted
-                      ? "bg-sky-600 text-white ring-4 ring-sky-600 ring-offset-4 scale-105"
+                      ? "bg-blue-600 text-white ring-4 ring-blue-600 ring-offset-4 scale-105"
                       : "bg-white border border-gray-200"
                   }`}
                 >
                   {plan.highlighted && (
                     <div className="text-center mb-4">
-                      <span className="bg-sky-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                      <span className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                         MÁS POPULAR
                       </span>
                     </div>
@@ -142,7 +142,7 @@ export function PricingPage() {
                   </h3>
                   <p
                     className={`text-sm mb-4 ${
-                      plan.highlighted ? "text-sky-100" : "text-gray-500"
+                      plan.highlighted ? "text-blue-100" : "text-gray-500"
                     }`}
                   >
                     {plan.description}
@@ -151,7 +151,7 @@ export function PricingPage() {
                     <span className="text-5xl font-bold">{plan.price}</span>
                     <span
                       className={
-                        plan.highlighted ? "text-sky-100" : "text-gray-500"
+                        plan.highlighted ? "text-blue-100" : "text-gray-500"
                       }
                     >
                       {plan.period}
@@ -161,8 +161,8 @@ export function PricingPage() {
                     href={`${appUrl}/register`}
                     className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-colors mb-8 ${
                       plan.highlighted
-                        ? "bg-white text-sky-600 hover:bg-sky-50"
-                        : "bg-sky-600 text-white hover:bg-sky-700"
+                        ? "bg-white text-blue-600 hover:bg-blue-50"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
                     {plan.cta}
@@ -174,7 +174,7 @@ export function PricingPage() {
                           className={
                             feature.included
                               ? plan.highlighted
-                                ? "text-sky-200"
+                                ? "text-blue-200"
                                 : "text-green-500"
                               : "text-gray-300"
                           }
@@ -224,17 +224,17 @@ export function PricingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-sky-500 py-16">
+        <section className="bg-blue-600 py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">
               ¿Listo para comenzar?
             </h2>
-            <p className="text-xl text-sky-100 mb-8">
+            <p className="text-xl text-blue-100 mb-8">
               Prueba Alveodent gratis por 14 días. Sin tarjeta de crédito.
             </p>
             <a
               href={`${appUrl}/register`}
-              className="inline-block bg-white text-sky-500 hover:bg-sky-50 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
             >
               Crear Cuenta Gratis
             </a>

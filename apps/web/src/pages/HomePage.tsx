@@ -10,12 +10,12 @@ export function HomePage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-sky-50 to-white py-20">
+        <section className="bg-gradient-to-br from-blue-50 to-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
                 Gestiona tu clínica dental de forma{" "}
-                <span className="text-sky-500">inteligente</span>
+                <span className="text-blue-600">inteligente</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8">
                 Simplifica la administración de pacientes, citas, tratamientos y
@@ -25,7 +25,7 @@ export function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href={`${appUrl}/register`}
-                  className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
                 >
                   Comenzar Prueba Gratis
                 </a>
@@ -59,9 +59,9 @@ export function HomePage() {
             <div className="grid md:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -85,9 +85,9 @@ export function HomePage() {
 
               {/* Feature 2 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -111,9 +111,9 @@ export function HomePage() {
 
               {/* Feature 3 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -137,9 +137,9 @@ export function HomePage() {
 
               {/* Feature 4 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -163,9 +163,9 @@ export function HomePage() {
 
               {/* Feature 5 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -189,9 +189,9 @@ export function HomePage() {
 
               {/* Feature 6 */}
               <div className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-sky-500"
+                    className="w-6 h-6 text-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -217,17 +217,17 @@ export function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-sky-500 py-16">
+        <section className="bg-blue-600 py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">
               ¿Listo para transformar tu clínica?
             </h2>
-            <p className="text-xl text-sky-100 mb-8">
+            <p className="text-xl text-blue-100 mb-8">
               Únete a cientos de profesionales que ya confían en Alveodent.
             </p>
             <a
               href={`${appUrl}/register`}
-              className="inline-block bg-white text-sky-500 hover:bg-sky-50 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
             >
               Comenzar Ahora - Es Gratis
             </a>
