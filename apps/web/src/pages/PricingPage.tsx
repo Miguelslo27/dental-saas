@@ -128,7 +128,7 @@ export function PricingPage() {
                 >
                   {plan.highlighted && (
                     <div className="text-center mb-4">
-                      <span className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                      <span className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                         MÁS POPULAR
                       </span>
                     </div>
