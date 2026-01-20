@@ -200,18 +200,16 @@ Retomar junto con Tarea 8.2
 
 Unificar paleta de colores con la app principal (sky → blue).
 
-- [x] 13.1.1: Actualizar `apps/web/src/index.css` - Variables CSS de color
+- [x] 13.1.1: Actualizar `apps/web/src/index.css` - Eliminar variables CSS no usadas
 - [x] 13.1.2: Actualizar `apps/web/src/components/Header.tsx` - Clases sky → blue
 - [x] 13.1.3: Actualizar `apps/web/src/components/Footer.tsx` - Clases sky → blue
 - [x] 13.1.4: Actualizar `apps/web/src/pages/HomePage.tsx` - Clases sky → blue
 - [x] 13.1.5: Actualizar `apps/web/src/pages/PricingPage.tsx` - Clases sky → blue
 
-**Colores a usar:**
-```
-Primary:      blue-600 (#2563eb)
-Primary Dark: blue-700 (#1d4ed8)
-Primary Light: blue-50, blue-100
-```
+**Colores:**
+- Primary: `blue-600` (#2563eb)
+- Primary Dark: `blue-700` (#1d4ed8)
+- Primary Light: `blue-50`, `blue-100`
 
 ---
 
