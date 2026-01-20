@@ -9,17 +9,19 @@ const statsRouter: IRouter = Router()
  */
 statsRouter.get('/', async (_req, res, next) => {
   try {
+    // Get first day of current month for thisMonth queries
+    const now = new Date()
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
     const [
       totalTenants,
       activeTenants,
       totalUsers,
       activeUsers,
+      usersByRole,
       totalPatients,
-      totalDoctors,
       totalAppointments,
-      recentTenants,
-      recentUsers,
-      appointmentsByStatus,
+      appointmentsThisMonth,
     ] = await Promise.all([
       // Tenant stats
       prisma.tenant.count(),
@@ -29,41 +31,29 @@ statsRouter.get('/', async (_req, res, next) => {
       prisma.user.count({ where: { role: { not: 'SUPER_ADMIN' } } }),
       prisma.user.count({ where: { isActive: true, role: { not: 'SUPER_ADMIN' } } }),
 
+      // Users by role
+      prisma.user.groupBy({
+        by: ['role'],
+        where: { role: { not: 'SUPER_ADMIN' } },
+        _count: { id: true },
+      }),
+
       // Entity counts
       prisma.patient.count(),
-      prisma.doctor.count(),
       prisma.appointment.count(),
 
-      // Recent tenants (last 7 days)
-      prisma.tenant.count({
+      // Appointments this month
+      prisma.appointment.count({
         where: {
-          createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          },
+          createdAt: { gte: firstDayOfMonth },
         },
-      }),
-
-      // Recent users (last 7 days)
-      prisma.user.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          },
-          role: { not: 'SUPER_ADMIN' },
-        },
-      }),
-
-      // Appointments by status
-      prisma.appointment.groupBy({
-        by: ['status'],
-        _count: { id: true },
       }),
     ])
 
-    // Transform appointments by status into an object
-    const appointmentStats = appointmentsByStatus.reduce(
+    // Transform users by role into an object
+    const byRole = usersByRole.reduce(
       (acc, item) => {
-        acc[item.status] = item._count.id
+        acc[item.role] = item._count.id
         return acc
       },
       {} as Record<string, number>
@@ -74,25 +64,22 @@ statsRouter.get('/', async (_req, res, next) => {
         total: totalTenants,
         active: activeTenants,
         inactive: totalTenants - activeTenants,
-        newLast7Days: recentTenants,
       },
       users: {
         total: totalUsers,
         active: activeUsers,
-        inactive: totalUsers - activeUsers,
-        newLast7Days: recentUsers,
+        byRole,
       },
       patients: {
         total: totalPatients,
       },
-      doctors: {
-        total: totalDoctors,
-      },
       appointments: {
         total: totalAppointments,
-        byStatus: appointmentStats,
+        thisMonth: appointmentsThisMonth,
       },
-      generatedAt: new Date().toISOString(),
+      revenue: {
+        thisMonth: 0, // Placeholder - billing integration deferred
+      },
     })
   } catch (error) {
     next(error)
@@ -100,29 +87,29 @@ statsRouter.get('/', async (_req, res, next) => {
 })
 
 /**
- * GET /api/admin/stats/tenants
- * Get detailed tenant statistics
+ * GET /api/admin/stats/top-tenants
+ * Get top tenants by activity (patients + appointments)
  */
-statsRouter.get('/tenants', async (_req, res, next) => {
+statsRouter.get('/top-tenants', async (_req, res, next) => {
   try {
     const tenants = await prisma.tenant.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
         slug: true,
-        isActive: true,
-        createdAt: true,
         _count: {
           select: {
-            users: true,
             patients: true,
-            doctors: true,
             appointments: true,
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
+      orderBy: [
+        { patients: { _count: 'desc' } },
+        { appointments: { _count: 'desc' } },
+      ],
+      take: 10,
     })
 
     res.json({ tenants })
@@ -132,58 +119,32 @@ statsRouter.get('/tenants', async (_req, res, next) => {
 })
 
 /**
- * GET /api/admin/stats/activity
- * Get recent platform activity
+ * GET /api/admin/stats/recent-activity
+ * Get recent platform activity (tenants and users created)
  */
-statsRouter.get('/activity', async (_req, res, next) => {
+statsRouter.get('/recent-activity', async (_req, res, next) => {
   try {
-    const [recentLogins, recentRegistrations, recentAppointments] = await Promise.all([
-      // Recent logins
-      prisma.user.findMany({
-        where: {
-          lastLoginAt: { not: null },
-          role: { not: 'SUPER_ADMIN' },
-        },
+    const [recentTenants, recentUsers] = await Promise.all([
+      // Recent tenants created
+      prisma.tenant.findMany({
         select: {
           id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
-          lastLoginAt: true,
-          tenant: {
-            select: { name: true, slug: true },
-          },
-        },
-        orderBy: { lastLoginAt: 'desc' },
-        take: 10,
-      }),
-
-      // Recent registrations
-      prisma.user.findMany({
-        where: { role: { not: 'SUPER_ADMIN' } },
-        select: {
-          id: true,
-          email: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           createdAt: true,
-          tenant: {
-            select: { name: true, slug: true },
-          },
         },
         orderBy: { createdAt: 'desc' },
         take: 10,
       }),
 
-      // Recent appointments
-      prisma.appointment.findMany({
+      // Recent users created
+      prisma.user.findMany({
+        where: { role: { not: 'SUPER_ADMIN' } },
         select: {
           id: true,
-          status: true,
-          startTime: true,
+          email: true,
           createdAt: true,
           tenant: {
-            select: { name: true, slug: true },
+            select: { name: true },
           },
         },
         orderBy: { createdAt: 'desc' },
@@ -191,12 +152,25 @@ statsRouter.get('/activity', async (_req, res, next) => {
       }),
     ])
 
-    res.json({
-      recentLogins,
-      recentRegistrations,
-      recentAppointments,
-      generatedAt: new Date().toISOString(),
-    })
+    // Combine and sort by createdAt
+    const activity = [
+      ...recentTenants.map((t) => ({
+        type: 'tenant_created' as const,
+        id: t.id,
+        name: t.name,
+        createdAt: t.createdAt.toISOString(),
+      })),
+      ...recentUsers.map((u) => ({
+        type: 'user_created' as const,
+        id: u.id,
+        email: u.email,
+        tenantName: u.tenant?.name,
+        createdAt: u.createdAt.toISOString(),
+      })),
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 15)
+
+    res.json({ activity })
   } catch (error) {
     next(error)
   }
