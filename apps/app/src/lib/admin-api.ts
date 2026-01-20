@@ -96,9 +96,7 @@ export interface PlatformStats {
     total: number
     thisMonth: number
   }
-  revenue: {
-    thisMonth: number
-  }
+  // revenue will be added when billing integration is implemented
 }
 
 export interface TopTenant {

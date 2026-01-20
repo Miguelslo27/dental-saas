@@ -31,7 +31,7 @@ dental-saas/
 |------|-------------|--------|-----|
 | 0 | Configuración del Proyecto | ✅ | #1-3 |
 | 1 | Core Multi-Tenant y Modelos | ✅ | #4-8 |
-| 2 | Registro de Tenants y Auth | ✅ | #9-14, #44-48 |
+| 2 | Registro de Tenants y Auth | ✅ | #9-14, #44-48, #72 |
 | 3 | Gestión de Doctores | ✅ | #55 |
 | 4 | Gestión de Pacientes + Dental Chart | ✅ | #56, #63, #64 |
 | 5 | Gestión de Citas | ✅ (CRUD) | #59 |
@@ -46,7 +46,7 @@ dental-saas/
 | 14 | Testing E2E | ⏳ | - |
 | 15 | Documentación y Deploy | ⏳ | - |
 
-**Tests:** 306 pasando | **Última actualización:** 15 de Enero, 2026
+**Tests:** 338 pasando | **Última actualización:** 20 de Enero, 2026
 
 ---
 
@@ -316,4 +316,4 @@ enum ToothCondition {
 
 ---
 
-*Última actualización: 16 de Enero, 2026*
+*Última actualización: 20 de Enero, 2026*
