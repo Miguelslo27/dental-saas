@@ -185,14 +185,139 @@ Retomar junto con Tarea 8.2
 ---
 
 ## 📦 FASE 13: Landing Page y Marketing ⏳
-**Rama:** `feature/landing-page`  
-**Duración estimada:** 2 días
 
-### Tarea 13.1: Landing Page
-- [ ] 13.1.1-13.1.7: Hero, features, pricing, testimonios, FAQ, footer, SEO
+> **Estado actual de `apps/web`:**
+> - React 19 + Vite + Tailwind CSS 4
+> - Páginas existentes: HomePage (hero + features), PricingPage (planes + FAQ básico)
+> - Rutas: `/`, `/precios`
+> - Links legales en Footer son placeholder (`href="#"`)
+> - Colores usan `sky-*` pero `apps/app` usa `blue-*`
 
-### Tarea 13.2: Páginas Legales
-- [ ] 13.2.1-13.2.3: Términos, Privacidad, Cookies
+---
+
+### ✅ Tarea 13.1: Estandarización de Colores (PR #73)
+**Rama:** `feat/landing-colors`
+
+Unificar paleta de colores con la app principal (sky → blue).
+
+- [x] 13.1.1: Actualizar `apps/web/src/index.css` - Variables CSS de color
+- [x] 13.1.2: Actualizar `apps/web/src/components/Header.tsx` - Clases sky → blue
+- [x] 13.1.3: Actualizar `apps/web/src/components/Footer.tsx` - Clases sky → blue
+- [x] 13.1.4: Actualizar `apps/web/src/pages/HomePage.tsx` - Clases sky → blue
+- [x] 13.1.5: Actualizar `apps/web/src/pages/PricingPage.tsx` - Clases sky → blue
+
+**Colores a usar:**
+```
+Primary:      blue-600 (#2563eb)
+Primary Dark: blue-700 (#1d4ed8)
+Primary Light: blue-50, blue-100
+```
+
+---
+
+### Tarea 13.2: Componente FAQ Reutilizable (PR #74)
+**Rama:** `feat/landing-faq`
+
+Extraer FAQ de PricingPage a componente independiente con accordion.
+
+- [ ] 13.2.1: Crear `apps/web/src/components/FAQ.tsx` - Componente accordion
+- [ ] 13.2.2: Implementar expand/collapse con estado React
+- [ ] 13.2.3: Agregar 5 preguntas adicionales (total 10)
+- [ ] 13.2.4: Actualizar `PricingPage.tsx` para usar componente FAQ
+- [ ] 13.2.5: Agregar icono ChevronDown/ChevronUp (lucide-react)
+
+**Nuevas preguntas a agregar:**
+- ¿Cómo funciona el período de prueba?
+- ¿Puedo importar datos de otro sistema?
+- ¿Qué tipo de soporte ofrecen?
+- ¿Funciona en dispositivos móviles?
+- ¿Cómo se manejan los datos de pacientes?
+
+---
+
+### Tarea 13.3: Sección de Testimonios (PR #75)
+**Rama:** `feat/landing-testimonials`
+
+Agregar testimonios de clínicas dentales a la landing page.
+
+- [ ] 13.3.1: Crear `apps/web/src/components/Testimonials.tsx`
+- [ ] 13.3.2: Diseñar card de testimonio (avatar, nombre, clínica, quote)
+- [ ] 13.3.3: Agregar 3-4 testimonios ficticios realistas
+- [ ] 13.3.4: Implementar grid responsivo (1 col móvil, 2-3 cols desktop)
+- [ ] 13.3.5: Integrar en `HomePage.tsx` después de Features
+
+**Estructura del testimonio:**
+```typescript
+interface Testimonial {
+  name: string      // "Dra. María García"
+  role: string      // "Directora"
+  clinic: string    // "Dental Care Plus"
+  quote: string     // "Alveodent ha transformado..."
+  avatar?: string   // Iniciales como fallback
+}
+```
+
+---
+
+### Tarea 13.4: Páginas Legales (PR #76)
+**Rama:** `feat/landing-legal`
+
+Crear páginas de términos, privacidad y cookies.
+
+- [ ] 13.4.1: Crear `apps/web/src/components/LegalLayout.tsx` - Layout compartido
+- [ ] 13.4.2: Crear `apps/web/src/pages/TermsPage.tsx` - Términos de Servicio
+- [ ] 13.4.3: Crear `apps/web/src/pages/PrivacyPage.tsx` - Política de Privacidad
+- [ ] 13.4.4: Crear `apps/web/src/pages/CookiesPage.tsx` - Política de Cookies
+- [ ] 13.4.5: Actualizar `apps/web/src/App.tsx` - Agregar rutas `/terminos`, `/privacidad`, `/cookies`
+- [ ] 13.4.6: Actualizar `Footer.tsx` - Cambiar `href="#"` por `<Link>` a páginas legales
+
+**Rutas finales:**
+```
+/terminos   → TermsPage
+/privacidad → PrivacyPage
+/cookies    → CookiesPage
+```
+
+---
+
+### Tarea 13.5: SEO y Meta Tags (PR #77)
+**Rama:** `feat/landing-seo`
+
+Mejorar SEO con Open Graph, Twitter Cards y datos estructurados.
+
+- [ ] 13.5.1: Actualizar `apps/web/index.html` - Open Graph meta tags
+- [ ] 13.5.2: Agregar Twitter Card meta tags
+- [ ] 13.5.3: Agregar Schema.org structured data (SoftwareApplication)
+- [ ] 13.5.4: Agregar canonical URL
+- [ ] 13.5.5: Crear `apps/web/public/og-image.png` (1200x630px) - Imagen para compartir
+
+**Meta tags a agregar:**
+```html
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Alveodent - Software de Gestión Dental" />
+<meta property="og:description" content="..." />
+<meta property="og:image" content="/og-image.png" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- Schema.org -->
+<script type="application/ld+json">{ "@type": "SoftwareApplication", ... }</script>
+```
+
+---
+
+### Tarea 13.6: Menú Móvil (PR #78)
+**Rama:** `feat/landing-mobile-menu`
+
+Agregar hamburger menu para navegación en móvil.
+
+- [ ] 13.6.1: Agregar estado `mobileMenuOpen` en Header.tsx
+- [ ] 13.6.2: Agregar botón hamburguesa (visible solo en móvil)
+- [ ] 13.6.3: Implementar dropdown menu con animación
+- [ ] 13.6.4: Incluir todos los links de navegación + CTAs
+- [ ] 13.6.5: Cerrar menú al hacer click en link o fuera del menú
 
 ---
 
