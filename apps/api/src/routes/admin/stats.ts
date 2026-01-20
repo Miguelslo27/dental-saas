@@ -42,10 +42,10 @@ statsRouter.get('/', async (_req, res, next) => {
       prisma.patient.count(),
       prisma.appointment.count(),
 
-      // Appointments this month
+      // Appointments scheduled this month (by startTime, not createdAt)
       prisma.appointment.count({
         where: {
-          createdAt: { gte: firstDayOfMonth },
+          startTime: { gte: firstDayOfMonth },
         },
       }),
     ])
@@ -76,9 +76,6 @@ statsRouter.get('/', async (_req, res, next) => {
       appointments: {
         total: totalAppointments,
         thisMonth: appointmentsThisMonth,
-      },
-      revenue: {
-        thisMonth: 0, // Placeholder - billing integration deferred
       },
     })
   } catch (error) {
