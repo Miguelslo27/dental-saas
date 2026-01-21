@@ -239,24 +239,7 @@ Resume together with Task 8.2
 
 #### Task 13.3: Testimonials Section (PR #75) - DONE
 
-#### Task 13.4: Legal Pages (PR #76)
-**Branch:** `feat/landing-legal`
-
-Create terms, privacy, and cookies pages.
-
-- [ ] 13.4.1: Create `apps/web/src/components/LegalLayout.tsx` - Shared layout
-- [ ] 13.4.2: Create `apps/web/src/pages/TermsPage.tsx` - Terms of Service
-- [ ] 13.4.3: Create `apps/web/src/pages/PrivacyPage.tsx` - Privacy Policy
-- [ ] 13.4.4: Create `apps/web/src/pages/CookiesPage.tsx` - Cookie Policy
-- [ ] 13.4.5: Update `apps/web/src/App.tsx` - Add routes `/terminos`, `/privacidad`, `/cookies`
-- [ ] 13.4.6: Update `Footer.tsx` - Change `href="#"` to `<Link>` to legal pages
-
-**Final routes:**
-```
-/terminos   -> TermsPage
-/privacidad -> PrivacyPage
-/cookies    -> CookiesPage
-```
+#### Task 13.4: Legal Pages (PR #76) - DONE
 
 #### Task 13.5: SEO and Meta Tags (PR #77)
 **Branch:** `feat/landing-seo`
