@@ -1,5 +1,6 @@
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { Testimonials } from "../components/Testimonials";
 
 export function HomePage() {
   const appUrl = __APP_URL__;
@@ -215,6 +216,9 @@ export function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <Testimonials />
 
         {/* CTA Section */}
         <section className="bg-blue-600 py-16">

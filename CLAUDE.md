@@ -237,27 +237,7 @@ Resume together with Task 8.2
 
 #### Task 13.2: Reusable FAQ Component (PR #74) - DONE
 
-#### Task 13.3: Testimonials Section (PR #75)
-**Branch:** `feat/landing-testimonials`
-
-Add dental clinic testimonials to landing page.
-
-- [ ] 13.3.1: Create `apps/web/src/components/Testimonials.tsx`
-- [ ] 13.3.2: Design testimonial card (avatar, name, clinic, quote)
-- [ ] 13.3.3: Add 3-4 realistic fictional testimonials
-- [ ] 13.3.4: Implement responsive grid (1 col mobile, 2-3 cols desktop)
-- [ ] 13.3.5: Integrate in `HomePage.tsx` after Features
-
-**Testimonial structure:**
-```typescript
-interface Testimonial {
-  name: string      // "Dra. Maria Garcia"
-  role: string      // "Directora"
-  clinic: string    // "Dental Care Plus"
-  quote: string     // "Alveodent has transformed..."
-  avatar?: string   // Initials as fallback
-}
-```
+#### Task 13.3: Testimonials Section (PR #75) - DONE
 
 #### Task 13.4: Legal Pages (PR #76)
 **Branch:** `feat/landing-legal`
