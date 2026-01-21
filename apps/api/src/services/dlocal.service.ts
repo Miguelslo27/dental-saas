@@ -42,7 +42,7 @@ export const DLocalService = {
    * Create a payment for subscription upgrade
    * @returns Payment URL for redirect or null if dLocal is not configured
    */
-  async createPayment(options: {
+  async createPayment(_options: {
     amount: number
     currency: string
     orderId: string
@@ -91,8 +91,8 @@ export const DLocalService = {
    * Verify IPN (Instant Payment Notification) signature
    */
   verifyWebhookSignature(
-    payload: string,
-    signature: string
+    _payload: string,
+    _signature: string
   ): boolean {
     if (!isDLocalConfigured()) {
       return false
@@ -114,7 +114,7 @@ export const DLocalService = {
   /**
    * Get payment status
    */
-  async getPaymentStatus(paymentId: string): Promise<{
+  async getPaymentStatus(_paymentId: string): Promise<{
     status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' | 'CANCELLED'
     amount: number
     currency: string
@@ -133,7 +133,7 @@ export const DLocalService = {
    * Tokenize a card for recurring payments
    * @returns Card token ID or null
    */
-  async tokenizeCard(options: {
+  async tokenizeCard(_options: {
     cardNumber: string
     expirationMonth: string
     expirationYear: string
@@ -155,7 +155,7 @@ export const DLocalService = {
   /**
    * Charge a saved card (for recurring subscriptions)
    */
-  async chargeCard(options: {
+  async chargeCard(_options: {
     cardToken: string
     amount: number
     currency: string
@@ -181,8 +181,8 @@ export const DLocalService = {
    * Refund a payment
    */
   async refundPayment(
-    paymentId: string,
-    amount?: number
+    _paymentId: string,
+    _amount?: number
   ): Promise<{ refundId: string; status: string } | null> {
     if (!isDLocalConfigured()) {
       return null

@@ -12,7 +12,6 @@ describe('Billing API', () => {
   let ownerToken: string
   let adminToken: string
   let staffToken: string
-  let planId: string
 
   // Helper to generate JWT token
   function generateToken(userId: string, tenantId: string, role: string) {
@@ -38,7 +37,6 @@ describe('Billing API', () => {
         features: ['Basic features'],
       },
     })
-    planId = plan.id
 
     // Also ensure basic plan exists
     await prisma.plan.upsert({

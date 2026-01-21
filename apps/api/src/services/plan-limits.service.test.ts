@@ -4,7 +4,6 @@ import { PlanLimitsService } from './plan-limits.service.js'
 
 describe('PlanLimitsService', () => {
   let tenantId: string
-  let planId: string
 
   beforeAll(async () => {
     // Get or create free plan
@@ -21,7 +20,6 @@ describe('PlanLimitsService', () => {
         features: ['Basic features'],
       },
     })
-    planId = plan.id
 
     // Create test tenant
     const tenant = await prisma.tenant.create({
@@ -151,11 +149,12 @@ describe('PlanLimitsService', () => {
     it('should return complete limit status', async () => {
       const status = await PlanLimitsService.getPlanLimitStatus(tenantId)
 
-      expect(status.plan.name).toBe('free')
-      expect(status.doctors.current).toBe(3)
-      expect(status.doctors.limit).toBe(3)
-      expect(status.doctors.remaining).toBe(0)
-      expect(status.patients.limit).toBe(15)
+      expect(status).not.toBeNull()
+      expect(status!.plan.name).toBe('free')
+      expect(status!.doctors.current).toBe(3)
+      expect(status!.doctors.limit).toBe(3)
+      expect(status!.doctors.remaining).toBe(0)
+      expect(status!.patients.limit).toBe(15)
     })
   })
 })

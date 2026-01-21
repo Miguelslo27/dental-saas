@@ -4,7 +4,7 @@ import { prisma } from '@dental/database'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { TenantSettingsService } from '../services/tenant-settings.service.js'
 
-const router = Router()
+const router: Router = Router()
 
 // Validation schema for settings update
 const updateSettingsSchema = z.object({

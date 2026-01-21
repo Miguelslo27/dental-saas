@@ -92,7 +92,8 @@ export async function requireActiveSubscription(
     }
 
     // Check if subscription period has expired
-    if (new Date() > subscription.currentPeriodEnd && subscription.status !== 'CANCELED') {
+    // Note: If status was 'CANCELED', we already returned above, so no need to check again
+    if (new Date() > subscription.currentPeriodEnd) {
       return res.status(403).json({
         error: 'Subscription Expired',
         message: 'Your subscription period has expired. Please renew to continue.',
