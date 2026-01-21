@@ -1,5 +1,6 @@
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { FAQ } from "../components/FAQ";
 
 const plans = [
   {
@@ -64,33 +65,6 @@ const plans = [
   },
 ];
 
-const faqs = [
-  {
-    question: "¿Puedo cambiar de plan en cualquier momento?",
-    answer:
-      "Sí, puedes actualizar o degradar tu plan en cualquier momento. Los cambios se aplican inmediatamente y se prorratean según el tiempo restante del período de facturación.",
-  },
-  {
-    question: "¿Qué pasa si supero los límites de mi plan?",
-    answer:
-      "Recibirás una notificación cuando estés cerca de los límites. No perderás acceso a tus datos, pero no podrás agregar más registros hasta que actualices tu plan o elimines algunos existentes.",
-  },
-  {
-    question: "¿Ofrecen descuentos para pagos anuales?",
-    answer:
-      "Sí, ofrecemos un 20% de descuento para suscripciones anuales. Contacta a ventas para más información.",
-  },
-  {
-    question: "¿Mis datos están seguros?",
-    answer:
-      "Absolutamente. Usamos encriptación de nivel bancario, servidores seguros y realizamos backups automáticos. Cumplimos con las normativas de protección de datos.",
-  },
-  {
-    question: "¿Puedo cancelar en cualquier momento?",
-    answer:
-      "Sí, puedes cancelar tu suscripción cuando quieras. Mantendrás acceso hasta el final del período de facturación actual.",
-  },
-];
 
 export function PricingPage() {
   const appUrl = __APP_URL__;
@@ -202,26 +176,7 @@ export function PricingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
-              Preguntas Frecuentes
-            </h2>
-            <div className="space-y-6">
-              {faqs.map((faq) => (
-                <div
-                  key={faq.question}
-                  className="bg-white p-6 rounded-xl shadow-sm"
-                >
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {faq.question}
-                  </h3>
-                  <p className="text-gray-600">{faq.answer}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <FAQ />
 
         {/* CTA Section */}
         <section className="bg-blue-600 py-16">
