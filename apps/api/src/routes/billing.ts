@@ -5,13 +5,13 @@ import { requireAuth, requireRole } from '../middleware/auth.js'
 import { PlanService } from '../services/plan.service.js'
 import { PlanLimitsService } from '../services/plan-limits.service.js'
 
-const router = Router()
+const router: Router = Router()
 
 /**
  * GET /api/plans
  * Get all available plans (public endpoint)
  */
-router.get('/plans', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/plans', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const plans = await PlanService.getAllPlans()
 

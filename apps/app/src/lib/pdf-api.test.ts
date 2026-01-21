@@ -17,8 +17,10 @@ global.URL.revokeObjectURL = mockRevokeObjectURL
 
 describe('pdf-api', () => {
   let mockLink: { href: string; download: string; click: ReturnType<typeof vi.fn> }
-  let appendChildSpy: ReturnType<typeof vi.spyOn>
-  let removeChildSpy: ReturnType<typeof vi.spyOn>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let appendChildSpy: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let removeChildSpy: any
 
   beforeEach(() => {
     vi.clearAllMocks()

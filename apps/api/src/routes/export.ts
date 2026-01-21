@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { ExportService } from '../services/export.service.js'
 
-const router = Router()
+const router: Router = Router()
 
 /**
  * GET /api/export

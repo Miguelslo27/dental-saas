@@ -13,9 +13,6 @@ describe('Export Routes', () => {
   let staffToken: string
   let doctorId: string
   let patientId: string
-  let appointmentId: string
-  let labworkId: string
-  let expenseId: string
 
   function generateToken(payload: {
     userId: string
@@ -141,7 +138,7 @@ describe('Export Routes', () => {
     })
     patientId = patient.id
 
-    const appointment = await prisma.appointment.create({
+    await prisma.appointment.create({
       data: {
         tenantId,
         patientId,
@@ -154,9 +151,8 @@ describe('Export Routes', () => {
         cost: 100,
       },
     })
-    appointmentId = appointment.id
 
-    const labwork = await prisma.labwork.create({
+    await prisma.labwork.create({
       data: {
         tenantId,
         patientId,
@@ -166,9 +162,8 @@ describe('Export Routes', () => {
         note: 'Crown for tooth 11',
       },
     })
-    labworkId = labwork.id
 
-    const expense = await prisma.expense.create({
+    await prisma.expense.create({
       data: {
         tenantId,
         date: new Date('2026-01-10'),
@@ -177,7 +172,6 @@ describe('Export Routes', () => {
         note: 'Monthly supplies',
       },
     })
-    expenseId = expense.id
   })
 
   afterAll(async () => {

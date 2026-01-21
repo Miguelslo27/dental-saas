@@ -1073,7 +1073,6 @@ describe('Appointments API', () => {
   describe('Tenant Isolation', () => {
     let otherTenantId: string
     let otherAppointmentId: string
-    let otherToken: string
 
     beforeAll(async () => {
       // Create another tenant
@@ -1087,7 +1086,7 @@ describe('Appointments API', () => {
 
       // Create user for other tenant
       const passwordHash = await hashPassword('OtherPass123!')
-      const otherUser = await prisma.user.create({
+      await prisma.user.create({
         data: {
           email: 'other-admin@test.com',
           passwordHash,
@@ -1097,7 +1096,6 @@ describe('Appointments API', () => {
           tenantId: otherTenant.id,
         },
       })
-      otherToken = generateToken(otherUser.id, otherTenant.id, 'ADMIN')
 
       // Create patient and doctor for other tenant
       const otherPatient = await prisma.patient.create({

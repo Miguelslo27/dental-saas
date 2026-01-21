@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import { HomePage } from "./pages/HomePage";
 import { PricingPage } from "./pages/PricingPage";
+import { TermsPage } from "./pages/TermsPage";
+import { PrivacyPage } from "./pages/PrivacyPage";
+import { CookiesPage } from "./pages/CookiesPage";
 
 export default function App() {
   return (
@@ -8,6 +11,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/precios" element={<PricingPage />} />
+        <Route path="/terminos" element={<TermsPage />} />
+        <Route path="/privacidad" element={<PrivacyPage />} />
+        <Route path="/cookies" element={<CookiesPage />} />
       </Routes>
     </BrowserRouter>
   );

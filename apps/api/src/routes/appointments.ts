@@ -46,7 +46,6 @@ const costSchema = z
   .number()
   .min(0, { message: 'Cost cannot be negative' })
   .optional()
-  .nullable()
 
 const createAppointmentSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
