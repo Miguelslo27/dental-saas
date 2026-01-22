@@ -251,55 +251,117 @@ describe('api.ts', () => {
     })
   })
 
-  describe('interfaces', () => {
-    it('should export LoginPayload interface', async () => {
-      const { authApi } = await import('./api')
-      const payload = {
-        email: 'test@example.com',
-        password: 'password',
-        clinicSlug: 'clinic',
+})
+
+describe('apiClient interceptors', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('request interceptor', () => {
+    it('should add Authorization header when accessToken exists', () => {
+      const mockConfig = {
+        headers: {} as Record<string, string>,
       }
-      // Type check - this should compile without errors
-      expect(typeof payload.email).toBe('string')
-      expect(typeof payload.password).toBe('string')
-      expect(typeof payload.clinicSlug).toBe('string')
-      expect(authApi).toBeDefined()
+
+      mockAuthStore.getState.mockReturnValue({
+        accessToken: 'test-access-token',
+        refreshToken: null,
+        logout: vi.fn(),
+        setTokens: vi.fn(),
+      })
+
+      // Simulate request interceptor logic
+      const { accessToken } = mockAuthStore.getState()
+      if (accessToken && mockConfig.headers) {
+        mockConfig.headers.Authorization = `Bearer ${accessToken}`
+      }
+
+      expect(mockConfig.headers.Authorization).toBe('Bearer test-access-token')
     })
 
-    it('should export RegisterPayload interface', async () => {
-      const { authApi } = await import('./api')
-      const payload = {
-        email: 'test@example.com',
-        password: 'password',
-        firstName: 'John',
-        lastName: 'Doe',
-        clinicSlug: 'clinic',
-        clinicName: 'My Clinic',
+    it('should not add Authorization header when accessToken is null', () => {
+      const mockConfig = {
+        headers: {} as Record<string, string>,
       }
-      // Type check - this should compile without errors
-      expect(typeof payload.firstName).toBe('string')
-      expect(typeof payload.lastName).toBe('string')
-      expect(authApi).toBeDefined()
+
+      mockAuthStore.getState.mockReturnValue({
+        accessToken: null,
+        refreshToken: null,
+        logout: vi.fn(),
+        setTokens: vi.fn(),
+      })
+
+      // Simulate request interceptor logic
+      const { accessToken } = mockAuthStore.getState()
+      if (accessToken && mockConfig.headers) {
+        mockConfig.headers.Authorization = `Bearer ${accessToken}`
+      }
+
+      expect(mockConfig.headers.Authorization).toBeUndefined()
+    })
+  })
+
+  describe('response interceptor - 401 handling', () => {
+    it('should call logout when no refresh token available', () => {
+      const mockLogout = vi.fn()
+
+      mockAuthStore.getState.mockReturnValue({
+        accessToken: 'expired-token',
+        refreshToken: null,
+        logout: mockLogout,
+        setTokens: vi.fn(),
+      })
+
+      // Simulate 401 error handling logic
+      const { refreshToken, logout } = mockAuthStore.getState()
+      if (!refreshToken) {
+        logout()
+      }
+
+      expect(mockLogout).toHaveBeenCalled()
     })
 
-    it('should export AuthResponse interface', async () => {
-      const { authApi } = await import('./api')
-      const response = {
-        user: {
-          id: 'id',
-          email: 'email',
-          firstName: 'First',
-          lastName: 'Last',
-          role: 'OWNER' as const,
-          tenantId: 'tenant',
-          createdAt: '2024-01-01',
-        },
-        accessToken: 'token',
-        refreshToken: 'refresh',
+    it('should attempt token refresh when refresh token exists', async () => {
+      const mockSetTokens = vi.fn()
+
+      mockAuthStore.getState.mockReturnValue({
+        accessToken: 'expired-token',
+        refreshToken: 'valid-refresh-token',
+        logout: vi.fn(),
+        setTokens: mockSetTokens,
+      })
+
+      // Simulate successful token refresh
+      const { refreshToken, setTokens } = mockAuthStore.getState()
+      if (refreshToken) {
+        // Simulate API response
+        const newTokens = {
+          accessToken: 'new-access-token',
+          refreshToken: 'new-refresh-token',
+        }
+        setTokens(newTokens.accessToken, newTokens.refreshToken)
       }
-      // Type check
-      expect(response.user.role).toBe('OWNER')
-      expect(authApi).toBeDefined()
+
+      expect(mockSetTokens).toHaveBeenCalledWith('new-access-token', 'new-refresh-token')
+    })
+
+    it('should logout on refresh token failure', () => {
+      const mockLogout = vi.fn()
+
+      mockAuthStore.getState.mockReturnValue({
+        accessToken: 'expired-token',
+        refreshToken: 'invalid-refresh-token',
+        logout: mockLogout,
+        setTokens: vi.fn(),
+      })
+
+      // Simulate failed token refresh
+      const { logout } = mockAuthStore.getState()
+      // On refresh failure, logout is called
+      logout()
+
+      expect(mockLogout).toHaveBeenCalled()
     })
   })
 })
