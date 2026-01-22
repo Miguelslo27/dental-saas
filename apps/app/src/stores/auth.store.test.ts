@@ -282,17 +282,16 @@ describe('auth.store', () => {
   })
 
   describe('User type', () => {
-    it('should support all user roles', () => {
-      const roles: User['role'][] = ['OWNER', 'ADMIN', 'DOCTOR', 'STAFF']
-
-      roles.forEach((role) => {
+    it.each<User['role']>(['OWNER', 'ADMIN', 'DOCTOR', 'STAFF'])(
+      'should support %s role',
+      (role) => {
         const userWithRole: User = { ...mockUser, role }
         useAuthStore.getState().setAuth(userWithRole, mockAccessToken, mockRefreshToken)
 
         const state = useAuthStore.getState()
         expect(state.user?.role).toBe(role)
-      })
-    })
+      }
+    )
 
     it('should support user without optional fields', () => {
       const minimalUser: User = {
