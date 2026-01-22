@@ -175,7 +175,7 @@ Copy `.env.example` to `.env` and configure:
 | 10 | Export Data | DONE | #68 |
 | 11 | Generacion de PDFs | DONE | #69, #70 |
 | 12 | Internacionalizacion (i18n) | DONE | #71 |
-| 13 | Landing Page completa | PENDING | - |
+| 13 | Landing Page completa | DONE | #73-78 |
 | 14 | Testing E2E | PENDING | - |
 | 15 | Documentacion y Deploy | PENDING | - |
 
@@ -226,7 +226,7 @@ Resume together with Task 8.2
 
 ---
 
-### Phase 13: Landing Page and Marketing - PENDING
+### Phase 13: Landing Page and Marketing - DONE
 
 > **Current state of `apps/web`:**
 > - React 19 + Vite + Tailwind CSS 4 + @tailwindcss/typography
@@ -369,4 +369,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 20 January, 2026*
+*Last update: 22 January, 2026*
