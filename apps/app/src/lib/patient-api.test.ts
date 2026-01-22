@@ -371,14 +371,14 @@ describe('patient-api', () => {
       it('should handle birthday not yet occurred this year', () => {
         const today = new Date()
         const birthYear = today.getFullYear() - 25
-        // Set birthday to next month
-        const nextMonth = (today.getMonth() + 2) % 12
-        const dob = `${birthYear}-${String(nextMonth + 1).padStart(2, '0')}-15`
+        // Use December 31 as birthday - will almost always be in the future
+        const dob = `${birthYear}-12-31`
 
         const age = calculateAge(dob)
 
-        // Should be 24 if birthday hasn't occurred yet
-        expect(age).toBe(24)
+        // If today is Dec 31, age is 25; otherwise 24 (birthday hasn't occurred)
+        const isDecember31 = today.getMonth() === 11 && today.getDate() === 31
+        expect(age).toBe(isDecember31 ? 25 : 24)
       })
     })
 
