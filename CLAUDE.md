@@ -175,7 +175,7 @@ Copy `.env.example` to `.env` and configure:
 | 10 | Export Data | DONE | #68 |
 | 11 | Generacion de PDFs | DONE | #69, #70 |
 | 12 | Internacionalizacion (i18n) | DONE | #71 |
-| 13 | Landing Page completa | PENDING | - |
+| 13 | Landing Page completa | DONE | #73-78 |
 | 14 | Testing E2E | PENDING | - |
 | 15 | Documentacion y Deploy | PENDING | - |
 
@@ -226,7 +226,7 @@ Resume together with Task 8.2
 
 ---
 
-### Phase 13: Landing Page and Marketing - PENDING
+### Phase 13: Landing Page and Marketing - DONE
 
 > **Current state of `apps/web`:**
 > - React 19 + Vite + Tailwind CSS 4 + @tailwindcss/typography
@@ -242,31 +242,11 @@ Resume together with Task 8.2
 
 ## ✅ Task 13.4: Legal Pages (PR #76)
 
-#### Task 13.5: SEO and Meta Tags (PR #77)
-**Branch:** `feat/landing-seo`
+## ✅ Task 13.5: SEO and Meta Tags (PR #77)
 
-Improve SEO with Open Graph, Twitter Cards, and structured data.
+Added Open Graph, Twitter Cards, Schema.org JSON-LD, and canonical URL.
 
-- [ ] 13.5.1: Update `apps/web/index.html` - Open Graph meta tags
-- [ ] 13.5.2: Add Twitter Card meta tags
-- [ ] 13.5.3: Add Schema.org structured data (SoftwareApplication)
-- [ ] 13.5.4: Add canonical URL
-- [ ] 13.5.5: Create `apps/web/public/og-image.png` (1200x630px) - Share image
-
-**Meta tags to add:**
-```html
-<!-- Open Graph -->
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Alveodent - Software de Gestion Dental" />
-<meta property="og:description" content="..." />
-<meta property="og:image" content="/og-image.png" />
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image" />
-
-<!-- Schema.org -->
-<script type="application/ld+json">{ "@type": "SoftwareApplication", ... }</script>
-```
+**Note:** `og-image.png` (1200x630px) needs to be created by a designer and added to `apps/web/public/`.
 
 #### Task 13.6: Mobile Menu (PR #78)
 **Branch:** `feat/landing-mobile-menu`
@@ -389,4 +369,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 20 January, 2026*
+*Last update: 22 January, 2026*
