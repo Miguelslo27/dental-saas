@@ -118,7 +118,7 @@ dental-saas/
 - **Framework:** Vitest
 - **Backend:** Unit tests for services, integration tests for routes
 - **Frontend:** React Testing Library + jsdom
-- **Current count:** 338+ tests passing
+- **Current count:** 587+ tests passing
 
 ```bash
 # Run specific test file
@@ -176,7 +176,7 @@ Copy `.env.example` to `.env` and configure:
 | 11 | Generacion de PDFs | DONE | #69, #70 |
 | 12 | Internacionalizacion (i18n) | DONE | #71 |
 | 13 | Landing Page completa | DONE | #73-78 |
-| 14 | Testing E2E | PENDING | - |
+| 14 | Testing | IN PROGRESS | #79-85 |
 | 15 | Documentacion y Deploy | PENDING | - |
 
 ---
@@ -257,82 +257,59 @@ Added responsive hamburger menu for mobile navigation with slide-down animation 
 ### Phase 14: Testing - IN PROGRESS
 
 > **Current state:**
-> - Backend: 338 tests, 20 files (high coverage)
-> - Frontend: 42 tests, 5 files (7% module coverage)
-> - E2E: 1 basic file with Playwright
->
-> **Objective:** Increase frontend coverage to 60%+ and add comprehensive E2E tests.
+> - Backend: 338 tests in 20 files (high coverage)
+> - Frontend: 291 tests in 14 files (stores fully covered)
+> - E2E: Playwright configured
 
-#### Epic 14.1: Frontend Unit Tests - Stores & Core (High Priority)
+## ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85)
 
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.1.1 | Tests for auth.store.ts | PENDING | - |
-| 14.1.2 | Tests for patients.store.ts | PENDING | - |
-| 14.1.3 | Tests for doctors.store.ts | PENDING | - |
-| 14.1.4 | Tests for appointments.store.ts | PENDING | - |
-| 14.1.5 | Tests for expenses.store.ts and labworks.store.ts | PENDING | - |
-| 14.1.6 | Tests for settings.store.ts and stats.store.ts | PENDING | - |
-| 14.1.7 | Tests for admin.store.ts | PENDING | - |
+| Task | Store | Tests | PR |
+|------|-------|-------|-----|
+| 14.1.1 | auth.store | 30 | #79 |
+| 14.1.2 | patients.store | 40 | #80 |
+| 14.1.3 | doctors.store | 40 | #81 |
+| 14.1.4 | appointments.store | 37 | #82 |
+| 14.1.5 | expenses.store + labworks.store | 45 | #83 |
+| 14.1.6 | settings.store + stats.store | 36 | #84 |
+| 14.1.7 | admin.store | 24 | #85 |
+
+**Total: 252 new store tests**
 
 #### Epic 14.2: Frontend Unit Tests - API Clients
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.2.1 | Tests for api.ts (base client) | PENDING | - |
-| 14.2.2 | Tests for patient-api.ts and doctor-api.ts | PENDING | - |
-| 14.2.3 | Tests for appointment-api.ts | PENDING | - |
-| 14.2.4 | Tests for expense-api.ts and labwork-api.ts | PENDING | - |
-| 14.2.5 | Tests for settings-api.ts, stats-api.ts, export-api.ts | PENDING | - |
-| 14.2.6 | Tests for admin-api.ts | PENDING | - |
+- [ ] 14.2.1: auth-api.ts tests
+- [ ] 14.2.2: patient-api.ts tests
+- [ ] 14.2.3: doctor-api.ts tests
+- [ ] 14.2.4: appointment-api.ts tests
+- [ ] 14.2.5: expense-api.ts + labwork-api.ts tests
+- [ ] 14.2.6: settings-api.ts + stats-api.ts tests
 
 #### Epic 14.3: Frontend Unit Tests - Hooks & Utils
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.3.1 | Tests for useAuth hook | PENDING | - |
-| 14.3.2 | Tests for utils.ts and constants.ts | PENDING | - |
+- [ ] 14.3.1: Custom hooks tests (useAuth, useDebounce, etc.)
+- [ ] 14.3.2: Utility functions tests
 
 #### Epic 14.4: Frontend Component Tests - Auth
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.4.1 | Tests for LoginPage | PENDING | - |
-| 14.4.2 | Tests for RegisterPage | PENDING | - |
-| 14.4.3 | Tests for ForgotPasswordPage and ResetPasswordPage | PENDING | - |
-| 14.4.4 | Tests for ProtectedRoute | PENDING | - |
+- [ ] 14.4.1: LoginPage tests
+- [ ] 14.4.2: RegisterPage tests
+- [ ] 14.4.3: ForgotPasswordPage tests
+- [ ] 14.4.4: ResetPasswordPage tests
 
 #### Epic 14.5: Frontend Component Tests - CRUD Pages
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.5.1 | Tests for PatientsPage | PENDING | - |
-| 14.5.2 | Tests for DoctorsPage | PENDING | - |
-| 14.5.3 | Tests for AppointmentsPage | PENDING | - |
-| 14.5.4 | Tests for ExpensesPage and LabworksPage | PENDING | - |
+- [ ] 14.5.1: PatientsPage tests
+- [ ] 14.5.2: DoctorsPage tests
+- [ ] 14.5.3: AppointmentsPage tests
+- [ ] 14.5.4: ExpensesPage + LabworksPage tests
 
 #### Epic 14.6: Frontend Component Tests - Forms & UI
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.6.1 | Tests for PatientFormModal and PatientCard | PENDING | - |
-| 14.6.2 | Tests for DoctorFormModal and DoctorCard | PENDING | - |
-| 14.6.3 | Tests for AppointmentFormModal and AppointmentCard | PENDING | - |
-| 14.6.4 | Tests for ConfirmDialog and LanguageSelector | PENDING | - |
+- [ ] 14.6.1: PatientForm tests
+- [ ] 14.6.2: AppointmentForm tests
+- [ ] 14.6.3: DentalChart tests
+- [ ] 14.6.4: Shared UI components tests
 
 #### Epic 14.7: E2E Tests with Playwright
-
-| Task | Description | Status | PR |
-|------|-------------|--------|-----|
-| 14.7.1 | E2E Auth flow (login, logout, forgot password) | PENDING | - |
-| 14.7.2 | E2E Patients CRUD | PENDING | - |
-| 14.7.3 | E2E Appointments CRUD | PENDING | - |
-| 14.7.4 | E2E Settings flow | PENDING | - |
-
-**Estimation:**
-- Total subtasks (PRs): 31
-- New tests estimated: ~250-300
-- Target coverage: Frontend 60%+
+- [ ] 14.7.1: Auth flows (login, register, logout)
+- [ ] 14.7.2: Patient CRUD flow
+- [ ] 14.7.3: Appointment booking flow
+- [ ] 14.7.4: Settings and profile flow
 
 ---
 
