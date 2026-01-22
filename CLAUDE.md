@@ -213,7 +213,8 @@ Copy `.env.example` to `.env` and configure:
 > All tenants will have access to the "enterprise" plan without limit restrictions.
 > dLocal integration will resume when the product is ready for monetization.
 
-#### Task 8.1: Backend - Plans and Limits Service (PR #65) - DONE
+## ✅ Task 8.1: Backend - Plans and Limits Service (PR #65)
+
 #### Task 8.2: Backend - dLocal Integration - DEFERRED
 Resume when:
 - Product is at stable version (v1.0)
@@ -233,13 +234,13 @@ Resume together with Task 8.2
 > - Routes: `/`, `/precios`
 > - Legal links in Footer are placeholder (`href="#"`)
 
-#### Task 13.1: Color Standardization (PR #73) - DONE
+## ✅ Task 13.1: Color Standardization (PR #73)
 
-#### Task 13.2: Reusable FAQ Component (PR #74) - DONE
+## ✅ Task 13.2: Reusable FAQ Component (PR #74)
 
-#### Task 13.3: Testimonials Section (PR #75) - DONE
+## ✅ Task 13.3: Testimonials Section (PR #75)
 
-#### Task 13.4: Legal Pages (PR #76) - DONE
+## ✅ Task 13.4: Legal Pages (PR #76)
 
 #### Task 13.5: SEO and Meta Tags (PR #77)
 **Branch:** `feat/landing-seo`
