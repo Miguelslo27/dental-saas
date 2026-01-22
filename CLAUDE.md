@@ -248,16 +248,9 @@ Added Open Graph, Twitter Cards, Schema.org JSON-LD, and canonical URL.
 
 **Note:** `og-image.png` (1200x630px) needs to be created by a designer and added to `apps/web/public/`.
 
-#### Task 13.6: Mobile Menu (PR #78)
-**Branch:** `feat/landing-mobile-menu`
+## ✅ Task 13.6: Mobile Menu (PR #78)
 
-Add hamburger menu for mobile navigation.
-
-- [ ] 13.6.1: Add `mobileMenuOpen` state in Header.tsx
-- [ ] 13.6.2: Add hamburger button (visible only on mobile)
-- [ ] 13.6.3: Implement dropdown menu with animation
-- [ ] 13.6.4: Include all navigation links + CTAs
-- [ ] 13.6.5: Close menu on link click or outside click
+Added responsive hamburger menu for mobile navigation with slide-down animation and auto-close behavior.
 
 ---
 
