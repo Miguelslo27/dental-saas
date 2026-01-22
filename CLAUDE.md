@@ -203,54 +203,7 @@ Copy `.env.example` to `.env` and configure:
 - [ ] 5.3.1: FullCalendar (usando vista custom por ahora)
 - [ ] 5.3.4: Vista semanal de calendario
 - [ ] 5.4.8: Componente de prescripciones
-
----
-
-### Phase 8: Subscriptions and Payments (dLocal) - DEFERRED
-
-> **BUSINESS DECISION (13 January 2026):**
-> Subscriptions will be **free indefinitely** until the project reaches a stable version.
-> All tenants will have access to the "enterprise" plan without limit restrictions.
-> dLocal integration will resume when the product is ready for monetization.
-
-## ✅ Task 8.1: Backend - Plans and Limits Service (PR #65)
-
-#### Task 8.2: Backend - dLocal Integration - DEFERRED
-Resume when:
-- Product is at stable version (v1.0)
-- dLocal credentials are available
-- Pricing strategy is defined
-
-#### Task 8.3: Frontend - Billing UI - DEFERRED
-Resume together with Task 8.2
-
----
-
-### Phase 13: Landing Page and Marketing - DONE
-
-> **Current state of `apps/web`:**
-> - React 19 + Vite + Tailwind CSS 4 + @tailwindcss/typography
-> - Pages: HomePage, PricingPage, TermsPage, PrivacyPage, CookiesPage
-> - Routes: `/`, `/precios`, `/terminos`, `/privacidad`, `/cookies`
-> - Components: Header, Footer, FAQ, Testimonials, LegalLayout
-
-## ✅ Task 13.1: Color Standardization (PR #73)
-
-## ✅ Task 13.2: Reusable FAQ Component (PR #74)
-
-## ✅ Task 13.3: Testimonials Section (PR #75)
-
-## ✅ Task 13.4: Legal Pages (PR #76)
-
-## ✅ Task 13.5: SEO and Meta Tags (PR #77)
-
-Added Open Graph, Twitter Cards, Schema.org JSON-LD, and canonical URL.
-
-**Note:** `og-image.png` (1200x630px) needs to be created by a designer and added to `apps/web/public/`.
-
-## ✅ Task 13.6: Mobile Menu (PR #78)
-
-Added responsive hamburger menu for mobile navigation with slide-down animation and auto-close behavior.
+- [ ] 13.5.A: og-image.png (1200x630px) para apps/web/public/
 
 ---
 
@@ -261,19 +214,7 @@ Added responsive hamburger menu for mobile navigation with slide-down animation 
 > - Frontend: 291 tests in 14 files (stores fully covered)
 > - E2E: Playwright configured
 
-## ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85)
-
-| Task | Store | Tests | PR |
-|------|-------|-------|-----|
-| 14.1.1 | auth.store | 30 | #79 |
-| 14.1.2 | patients.store | 40 | #80 |
-| 14.1.3 | doctors.store | 40 | #81 |
-| 14.1.4 | appointments.store | 37 | #82 |
-| 14.1.5 | expenses.store + labworks.store | 45 | #83 |
-| 14.1.6 | settings.store + stats.store | 36 | #84 |
-| 14.1.7 | admin.store | 24 | #85 |
-
-**Total: 252 new store tests**
+#### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
 
 #### Epic 14.2: Frontend Unit Tests - API Clients
 - [ ] 14.2.1: auth-api.ts tests
@@ -410,4 +351,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 22 January, 2026 - Phase 14 plan documented*
+*Last update: 22 January, 2026 - Epic 14.1 completed (252 store tests)*
