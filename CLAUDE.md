@@ -229,10 +229,10 @@ Resume together with Task 8.2
 ### Phase 13: Landing Page and Marketing - PENDING
 
 > **Current state of `apps/web`:**
-> - React 19 + Vite + Tailwind CSS 4
-> - Existing pages: HomePage (hero + features), PricingPage (plans + basic FAQ)
-> - Routes: `/`, `/precios`
-> - Legal links in Footer are placeholder (`href="#"`)
+> - React 19 + Vite + Tailwind CSS 4 + @tailwindcss/typography
+> - Pages: HomePage, PricingPage, TermsPage, PrivacyPage, CookiesPage
+> - Routes: `/`, `/precios`, `/terminos`, `/privacidad`, `/cookies`
+> - Components: Header, Footer, FAQ, Testimonials, LegalLayout
 
 ## ✅ Task 13.1: Color Standardization (PR #73)
 
