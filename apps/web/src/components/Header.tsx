@@ -90,6 +90,7 @@ export function Header() {
             onClick={toggleMenu}
             className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
             aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {mobileMenuOpen ? (
@@ -126,6 +127,7 @@ export function Header() {
 
         {/* Mobile Menu */}
         <div
+          id="mobile-menu"
           ref={menuRef}
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             mobileMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
