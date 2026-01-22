@@ -207,6 +207,25 @@ Copy `.env.example` to `.env` and configure:
 
 ---
 
+### Phase 8: Subscriptions and Payments (dLocal) - DEFERRED
+
+#### ✅ Task 8.1: Backend - Plans and Limits Service (PR #65)
+#### Task 8.2: Backend - dLocal Integration - DEFERRED
+#### Task 8.3: Frontend - Billing UI - DEFERRED
+
+---
+
+### Phase 13: Landing Page and Marketing - DONE
+
+#### ✅ Task 13.1: Color Standardization (PR #73)
+#### ✅ Task 13.2: Reusable FAQ Component (PR #74)
+#### ✅ Task 13.3: Testimonials Section (PR #75)
+#### ✅ Task 13.4: Legal Pages (PR #76)
+#### ✅ Task 13.5: SEO and Meta Tags (PR #77)
+#### ✅ Task 13.6: Mobile Menu (PR #78)
+
+---
+
 ### Phase 14: Testing - IN PROGRESS
 
 > **Current state:**
