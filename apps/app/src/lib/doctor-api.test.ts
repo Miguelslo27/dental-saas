@@ -118,6 +118,12 @@ describe('doctor-api', () => {
 
       expect(result).toEqual([])
     })
+
+    it('should throw error on fetch failure', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error('Network error'))
+
+      await expect(getDoctors()).rejects.toThrow('Network error')
+    })
   })
 
   describe('getDoctorById', () => {
@@ -322,7 +328,8 @@ describe('doctor-api', () => {
 
       expect(result.allowed).toBe(false)
       expect(result.message).toBe('Doctor limit reached for your plan')
-      expect(result.currentCount).toBe(result.limit)
+      expect(result.currentCount).toBe(10)
+      expect(result.limit).toBe(10)
     })
 
     it('should throw error on check limit failure', async () => {
