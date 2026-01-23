@@ -230,7 +230,7 @@ Copy `.env.example` to `.env` and configure:
 
 > **Current state:**
 > - Backend: 338 tests in 20 files (high coverage)
-> - Frontend: 569 tests in 26 files
+> - Frontend: 631 tests in 29 files
 > - E2E: Playwright configured
 
 #### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
@@ -248,11 +248,11 @@ Copy `.env.example` to `.env` and configure:
 - [x] 14.3.2: utils.ts (cn function) tests - 10 tests
 - [x] 14.3.3: constants.ts tests - 11 tests
 
-#### Epic 14.4: Frontend Component Tests - Auth
-- [ ] 14.4.1: LoginPage tests
-- [ ] 14.4.2: RegisterPage tests
-- [ ] 14.4.3: ForgotPasswordPage tests
-- [ ] 14.4.4: ResetPasswordPage tests
+#### ✅ Epic 14.4: Frontend Component Tests - Auth (PR #94) - 62 tests
+- [x] 14.4.1: LoginPage tests - 13 tests
+- [x] 14.4.2: RegisterPage tests - 12 tests
+- [x] 14.4.3: ForgotPasswordPage tests - 15 tests
+- [x] 14.4.4: ResetPasswordPage tests - 22 tests
 
 #### Epic 14.5: Frontend Component Tests - CRUD Pages
 - [ ] 14.5.1: PatientsPage tests
@@ -371,4 +371,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 22 January, 2026 - Epic 14.3 completed (Hooks & Utils tests - 38 tests)*
+*Last update: 23 January, 2026 - Epic 14.4 completed (Auth Pages tests - 62 tests)*
