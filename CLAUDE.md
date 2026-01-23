@@ -230,18 +230,18 @@ Copy `.env.example` to `.env` and configure:
 
 > **Current state:**
 > - Backend: 338 tests in 20 files (high coverage)
-> - Frontend: 444 tests in 19 files
+> - Frontend: 531 tests in 23 files
 > - E2E: Playwright configured
 
 #### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
 
-#### Epic 14.2: Frontend Unit Tests - API Clients
+#### ✅ Epic 14.2: Frontend Unit Tests - API Clients
 - [x] 14.2.1: api.ts tests (PR #86) - 16 tests
 - [x] 14.2.2: patient-api.ts tests (PR #87) - 37 tests
-- [x] 14.2.3: doctor-api.ts tests (PR #88) - 35 tests
+- [x] 14.2.3: doctor-api.ts tests (PR #88) - 36 tests
 - [x] 14.2.4: appointment-api.ts tests (PR #89) - 62 tests
-- [ ] 14.2.5: expense-api.ts + labwork-api.ts tests
-- [ ] 14.2.6: settings-api.ts + stats-api.ts tests
+- [x] 14.2.5: expense-api.ts + labwork-api.ts tests (PR #91) - 52 tests
+- [x] 14.2.6: settings-api.ts + stats-api.ts tests (PR #92) - 34 tests
 
 #### Epic 14.3: Frontend Unit Tests - Hooks & Utils
 - [ ] 14.3.1: Custom hooks tests (useAuth, useDebounce, etc.)
@@ -370,4 +370,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 22 January, 2026 - Task 14.2.4 completed (appointment-api.ts tests)*
+*Last update: 22 January, 2026 - Epic 14.2 completed (API Clients tests - 237 tests)*
