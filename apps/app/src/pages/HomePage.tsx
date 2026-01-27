@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAuth } from '@/hooks/useAuth'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 interface HealthResponse {
   status: string

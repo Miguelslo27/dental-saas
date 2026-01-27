@@ -57,4 +57,4 @@ src/
 
 ## Proxy API
 
-En desarrollo, las requests a `/api/*` se proxean a `http://localhost:3000`.
+En desarrollo, las requests a `/api/*` se proxean a `http://localhost:5001` (configurable via `VITE_API_URL`).

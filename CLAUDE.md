@@ -62,7 +62,7 @@ docker compose -f docker-compose.dev.yml up -d
 ```
 dental-saas/
 ├── apps/
-│   ├── api/              # Express backend (port 3000)
+│   ├── api/              # Express backend (port 5001)
 │   │   ├── src/
 │   │   │   ├── routes/   # API route handlers
 │   │   │   ├── services/ # Business logic
@@ -71,7 +71,7 @@ dental-saas/
 │   │   │   ├── pdfs/     # PDF templates (@react-pdf/renderer)
 │   │   │   └── utils/
 │   │   └── package.json
-│   ├── app/              # React frontend (port 5173)
+│   ├── app/              # React frontend (port 5002)
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   ├── pages/
@@ -79,7 +79,7 @@ dental-saas/
 │   │   │   ├── lib/      # API clients, utilities
 │   │   │   └── i18n/     # Internationalization (ES, EN, AR)
 │   │   └── package.json
-│   └── web/              # Landing page (port 5174)
+│   └── web/              # Landing page (port 5003)
 ├── packages/
 │   ├── database/         # Prisma schema and client
 │   │   └── prisma/
@@ -129,9 +129,32 @@ pnpm --filter @dental/app test src/lib/pdf-api.test.ts
 ## Environment Variables
 
 Copy `.env.example` to `.env` and configure:
+
+### Application Ports
+- `PORT` - API server port (default: 5001)
+- `VITE_APP_PORT` - App frontend port (default: 5002)
+- `VITE_WEB_PORT` - Landing page port (default: 5003)
+
+### Database & Services
 - `DATABASE_URL` - PostgreSQL connection string
-- `JWT_SECRET` - JWT signing secret
+- `REDIS_URL` - Redis connection string
+- `POSTGRES_PORT` - PostgreSQL port (default: 5432)
+- `REDIS_PORT` - Redis port (default: 6379)
+
+### Authentication & Security
+- `JWT_SECRET` - JWT signing secret (min 32 characters)
+- `JWT_ACCESS_EXPIRES_IN` - Access token expiration (default: 15m)
+- `JWT_REFRESH_EXPIRES_IN` - Refresh token expiration (default: 7d)
+- `SETUP_KEY` - Super admin setup key (min 16 characters)
+
+### External Services
 - `RESEND_API_KEY` - Email service (Resend)
+- `EMAIL_FROM` - Email sender address
+
+### Other
+- `NODE_ENV` - Environment (development/production/test)
+- `CORS_ORIGIN` - Allowed CORS origin (cannot be "*" in production)
+- `VITE_API_URL` - API URL for frontend apps
 
 ## Git Workflow
 
@@ -150,11 +173,13 @@ Copy `.env.example` to `.env` and configure:
 
 ## Quick Reference
 
-| App | Port | Package Name |
-|-----|------|--------------|
-| API | 3000 | @dental/api |
-| App | 5173 | @dental/app |
-| Web | 5174 | @dental/web |
+| App | Port | Env Variable | Package Name |
+|-----|------|--------------|--------------|
+| API | 5001 | `PORT` | @dental/api |
+| App | 5002 | `VITE_APP_PORT` | @dental/app |
+| Web | 5003 | `VITE_WEB_PORT` | @dental/web |
+
+**Note:** All ports are configurable via `.env` file.
 
 ---
 
@@ -371,4 +396,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 23 January, 2026 - Epic 14.4 completed (Auth Pages tests - 62 tests)*
+*Last update: 27 January, 2026 - Centralized all ports in .env (API:5001, App:5002, Web:5003)*
