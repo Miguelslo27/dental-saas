@@ -25,7 +25,7 @@ export function getTokenExpiryDate(): Date {
  * Build the password reset URL for admin users
  */
 export function buildAdminResetUrl(token: string): string {
-  const frontendUrl = env.CORS_ORIGIN || 'http://localhost:5173'
+  const frontendUrl = env.CORS_ORIGIN || 'http://localhost:5002'
   const baseUrl = frontendUrl.replace(/\/$/, '')
   return `${baseUrl}/admin/reset-password?token=${token}`
 }
@@ -34,7 +34,7 @@ export function buildAdminResetUrl(token: string): string {
  * Build the password reset URL for tenant users
  */
 export function buildTenantResetUrl(token: string, clinicSlug: string): string {
-  const frontendUrl = env.CORS_ORIGIN || 'http://localhost:5173'
+  const frontendUrl = env.CORS_ORIGIN || 'http://localhost:5002'
   const baseUrl = frontendUrl.replace(/\/$/, '')
   return `${baseUrl}/${clinicSlug}/reset-password?token=${token}`
 }

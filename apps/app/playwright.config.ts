@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: process.env.VITE_APP_PORT ? `http://localhost:${process.env.VITE_APP_PORT}` : 'http://localhost:5002',
     trace: 'on-first-retry',
   },
   projects: [
@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'pnpm dev',
-    url: 'http://localhost:5173',
+    url: process.env.VITE_APP_PORT ? `http://localhost:${process.env.VITE_APP_PORT}` : 'http://localhost:5002',
     reuseExistingServer: !process.env.CI,
   },
 })

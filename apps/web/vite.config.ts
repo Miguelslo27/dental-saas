@@ -14,14 +14,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      port: 5174,
+      port: parseInt(env.VITE_WEB_PORT || "5003"),
       host: true,
     },
     preview: {
-      port: 5174,
+      port: parseInt(env.VITE_WEB_PORT || "5003"),
     },
     define: {
-      __APP_URL__: JSON.stringify(env.VITE_APP_URL || "http://localhost:5173"),
+      __APP_URL__: JSON.stringify(env.VITE_APP_URL || "http://localhost:5002"),
     },
   };
 });

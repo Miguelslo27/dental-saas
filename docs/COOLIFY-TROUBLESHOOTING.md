@@ -163,7 +163,7 @@ Esto reiniciará automáticamente el proxy después de cada deploy, asegurando q
 # docker-compose.yml - api service
 stop_grace_period: 30s
 healthcheck:
-  test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+  test: ["CMD", "wget", "-q", "--spider", "http://localhost:${PORT:-5001}/api/health"]
   interval: 10s
   timeout: 5s
   retries: 5
@@ -243,7 +243,7 @@ ssh -i $COOLIFY_SSH_KEY_PATH $COOLIFY_SSH_USER@$COOLIFY_SSH_HOST \
 
 # Probar health desde dentro del contenedor
 ssh -i $COOLIFY_SSH_KEY_PATH $COOLIFY_SSH_USER@$COOLIFY_SSH_HOST \
-  "docker exec <api-container-name> wget -qO- http://localhost:3000/api/health"
+  "docker exec <api-container-name> wget -qO- http://localhost:${PORT:-5001}/api/health"
 
 # Reiniciar Traefik (fix gateway timeout)
 ssh -i $COOLIFY_SSH_KEY_PATH $COOLIFY_SSH_USER@$COOLIFY_SSH_HOST \
@@ -281,7 +281,7 @@ docker system prune -f
 | ------------------ | ----------------------------- | ----------------------------------------------- |
 | API running        | `docker ps --filter name=api` | Status: Up (no restarting)                      |
 | Health endpoint    | `curl <API_URL>/api/health`   | `{"status":"ok"}`                               |
-| DB connected       | Ver logs del API              | "🚀 API server running on http://localhost:3000" |
+| DB connected       | Ver logs del API              | "🚀 API server running on http://localhost:5001" |
 | Frontend loads     | Abrir `<WEB_URL>` en browser  | Página carga sin errores                        |
 | Health check works | Ver console del browser       | Sin errores de CSP o fetch                      |
 

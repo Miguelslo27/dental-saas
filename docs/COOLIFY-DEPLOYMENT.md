@@ -24,7 +24,7 @@ This guide covers deploying the Alveo System monorepo to Coolify using Docker Co
 │                    COOLIFY (Traefik Proxy)                       │
 │                                                                  │
 │   your-domain.com ───────────▶ web:8080 (nginx)                 │
-│   api.your-domain.com ───────▶ api:3000 (node)                  │
+│   api.your-domain.com ───────▶ api:5001 (node)                  │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                     Docker Compose Stack                         │
@@ -32,7 +32,7 @@ This guide covers deploying the Alveo System monorepo to Coolify using Docker Co
 │  ┌─────────────┐     ┌─────────────┐                            │
 │  │     web     │────▶│     api     │                            │
 │  │   (nginx)   │     │   (node)    │                            │
-│  │   :8080     │     │   :3000     │                            │
+│  │   :8080     │     │   :5001     │                            │
 │  └─────────────┘     └──────┬──────┘                            │
 │                             │                                    │
 │              ┌──────────────┴──────────────┐                    │
@@ -49,7 +49,7 @@ This guide covers deploying the Alveo System monorepo to Coolify using Docker Co
 | Service      | Technology        | Internal Port | Exposed     |
 | ------------ | ----------------- | ------------- | ----------- |
 | **web**      | nginx + React     | 8080          | Via Traefik |
-| **api**      | Node.js + Express | 3000          | Via Traefik |
+| **api**      | Node.js + Express | 5001          | Via Traefik |
 | **postgres** | PostgreSQL 16     | 5432          | No          |
 | **redis**    | Redis 7           | 6379          | No          |
 
@@ -295,7 +295,7 @@ After deployment, configure domains for each service:
 | Service | Domain                | Port   |
 | ------- | --------------------- | ------ |
 | **web** | `your-domain.com`     | `8080` |
-| **api** | `api.your-domain.com` | `3000` |
+| **api** | `api.your-domain.com` | `5001` |
 
 ### Steps in Coolify UI:
 
@@ -359,7 +359,7 @@ api.your-domain.com    A    <COOLIFY-SERVER-IP>
    - Enable SSL
 3. Configure `api` service:
    - Domain: `api.your-domain.com`
-   - Port: `3000`
+   - Port: `5001`
    - Enable SSL
 
 ### 6. Redeploy
@@ -463,7 +463,7 @@ This ensures the proxy reloads its routing configuration after every deployment,
 2. Check container is actually running
 3. Verify ports:
    - `web` → port `8080` (NOT 80)
-   - `api` → port `3000`
+   - `api` → port `5001`
 
 ### 404 Not Found
 
