@@ -255,7 +255,7 @@ Copy `.env.example` to `.env` and configure:
 
 > **Current state:**
 > - Backend: 338 tests in 20 files (high coverage)
-> - Frontend: 689 tests in 31 files
+> - Frontend: 722 tests in 32 files
 > - E2E: Playwright configured
 
 #### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
@@ -282,7 +282,7 @@ Copy `.env.example` to `.env` and configure:
 #### Epic 14.5: Frontend Component Tests - CRUD Pages - IN PROGRESS
 - [x] 14.5.1: PatientsPage tests (PR #95) - 29 tests
 - [x] 14.5.2: DoctorsPage tests (PR #96) - 29 tests
-- [ ] 14.5.3: AppointmentsPage tests
+- [x] 14.5.3: AppointmentsPage tests (PR #97) - 33 tests
 - [ ] 14.5.4: ExpensesPage + LabworksPage tests
 
 #### Epic 14.6: Frontend Component Tests - Forms & UI
@@ -396,4 +396,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 27 January, 2026 - Epic 14.5.2: DoctorsPage tests (29 tests)*
+*Last update: 27 January, 2026 - Epic 14.5.3: AppointmentsPage tests (33 tests)*
