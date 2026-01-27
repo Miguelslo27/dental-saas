@@ -5,7 +5,6 @@
 services:
   postgres:
     image: postgres:16-alpine
-    hostname: dental-postgres
     restart: unless-stopped
     environment:
       # Defaults for preview deployments (override in Coolify for production)
@@ -67,14 +66,15 @@ services:
       NODE_ENV: production
       PORT: ${PORT:-5001}
       # Defaults for preview deployments (override in Coolify for production)
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@dental-postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD:-preview_redis_password}@redis:6379
       # CORS_ORIGIN must match the public URL of the frontend in production.
       # Expected format: "https://example.com" (no trailing slash).
       # Do NOT use localhost values (e.g. http://localhost:5001) in production.
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       JWT_SECRET: ${JWT_SECRET:-preview_jwt_secret_not_for_production_use}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-preview_refresh_secret_not_for_production}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
       SETUP_KEY: ${SETUP_KEY:-preview_setup_key}
       # Email (Resend) - optional, emails will be skipped if not configured
       RESEND_API_KEY: ${RESEND_API_KEY:-}

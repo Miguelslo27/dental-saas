@@ -228,7 +228,8 @@ REDIS_PASSWORD=<generate-secure-password>
 # =============================================
 # JWT secrets - CRITICAL: Generate unique values
 JWT_SECRET=<generate-64-char-secret>
-JWT_REFRESH_SECRET=<generate-64-char-secret>
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
 
 # Initial admin setup key
 SETUP_KEY=<generate-32-char-secret>
@@ -271,15 +272,27 @@ openssl rand -hex 16
 ### Example Complete Configuration
 
 ```bash
+# Database
 POSTGRES_DB=dental_saas
 POSTGRES_USER=dental
 POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD_HERE
+
+# Redis
 REDIS_PASSWORD=YOUR_REDIS_PASSWORD_HERE
+
+# JWT
 JWT_SECRET=<REPLACE_WITH_STRONG_JWT_SECRET>
-JWT_REFRESH_SECRET=<REPLACE_WITH_STRONG_JWT_REFRESH_SECRET>
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Admin Setup
 SETUP_KEY=<REPLACE_WITH_SETUP_KEY>
+
+# CORS & API
 CORS_ORIGIN=https://dental.example.com
 VITE_API_URL=https://api.dental.example.com
+
+# Email (Optional)
 RESEND_API_KEY=<OPTIONAL_RESEND_API_KEY>
 EMAIL_FROM=Alveo System <noreply@dental.example.com>
 ```
