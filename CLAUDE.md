@@ -255,7 +255,7 @@ Copy `.env.example` to `.env` and configure:
 
 > **Current state:**
 > - Backend: 338 tests in 20 files (high coverage)
-> - Frontend: 768 tests in 34 files
+> - Frontend: 814 tests in 36 files
 > - E2E: Playwright configured
 
 #### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
@@ -285,11 +285,10 @@ Copy `.env.example` to `.env` and configure:
 - [x] 14.5.3: AppointmentsPage tests (PR #97) - 33 tests
 - [x] 14.5.4: ExpensesPage + LabworksPage tests (PR #98) - 46 tests
 
-#### Epic 14.6: Frontend Component Tests - Forms & UI
-- [ ] 14.6.1: PatientForm tests
-- [ ] 14.6.2: AppointmentForm tests
-- [ ] 14.6.3: DentalChart tests
-- [ ] 14.6.4: Shared UI components tests
+#### Epic 14.6: Frontend Component Tests - Forms & UI - IN PROGRESS
+- [x] 14.6.1: PatientFormModal + DoctorFormModal tests (PR #99) - 46 tests
+- [ ] 14.6.2: AppointmentFormModal + ExpenseFormModal + LabworkFormModal tests
+- [ ] 14.6.3: Shared UI components tests
 
 #### Epic 14.7: E2E Tests with Playwright
 - [ ] 14.7.1: Auth flows (login, register, logout)
@@ -396,4 +395,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 27 January, 2026 - Epic 14.5.4: ExpensesPage + LabworksPage tests (46 tests, 768 total)*
+*Last update: 27 January, 2026 - Epic 14.6.1: PatientFormModal + DoctorFormModal tests (46 tests, 814 total)*
