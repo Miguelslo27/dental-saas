@@ -241,81 +241,32 @@ Copy `.env.example` to `.env` and configure:
 ---
 
 ### Phase 13: Landing Page and Marketing - DONE
-
-#### ✅ Task 13.1: Color Standardization (PR #73)
-#### ✅ Task 13.2: Reusable FAQ Component (PR #74)
-#### ✅ Task 13.3: Testimonials Section (PR #75)
-#### ✅ Task 13.4: Legal Pages (PR #76)
-#### ✅ Task 13.5: SEO and Meta Tags (PR #77)
-#### ✅ Task 13.6: Mobile Menu (PR #78)
+**PRs:** #73-78
 
 ---
 
 ### Phase 14: Testing - DONE
+**PRs:** #79-101
+**Final state:** 338 backend tests + 851 frontend tests + 4 E2E suites with Playwright
 
-> **Final state:**
-> - Backend: 338 tests in 20 files (high coverage)
-> - Frontend: 851 tests in 38 files
-> - E2E: 4 test suites with Playwright (auth, patients, appointments, settings)
-
-#### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85) - 252 tests
-
-#### ✅ Epic 14.2: Frontend Unit Tests - API Clients
-- [x] 14.2.1: api.ts tests (PR #86) - 16 tests
-- [x] 14.2.2: patient-api.ts tests (PR #87) - 37 tests
-- [x] 14.2.3: doctor-api.ts tests (PR #88) - 36 tests
-- [x] 14.2.4: appointment-api.ts tests (PR #89) - 62 tests
-- [x] 14.2.5: expense-api.ts + labwork-api.ts tests (PR #91) - 52 tests
-- [x] 14.2.6: settings-api.ts + stats-api.ts tests (PR #92) - 34 tests
-
-#### ✅ Epic 14.3: Frontend Unit Tests - Hooks & Utils (PR #93) - 38 tests
-- [x] 14.3.1: useAuth hook tests - 17 tests
-- [x] 14.3.2: utils.ts (cn function) tests - 10 tests
-- [x] 14.3.3: constants.ts tests - 11 tests
-
-#### ✅ Epic 14.4: Frontend Component Tests - Auth (PR #94) - 62 tests
-- [x] 14.4.1: LoginPage tests - 13 tests
-- [x] 14.4.2: RegisterPage tests - 12 tests
-- [x] 14.4.3: ForgotPasswordPage tests - 15 tests
-- [x] 14.4.4: ResetPasswordPage tests - 22 tests
-
-#### ✅ Epic 14.5: Frontend Component Tests - CRUD Pages
-- [x] 14.5.1: PatientsPage tests (PR #95) - 29 tests
-- [x] 14.5.2: DoctorsPage tests (PR #96) - 29 tests
-- [x] 14.5.3: AppointmentsPage tests (PR #97) - 33 tests
-- [x] 14.5.4: ExpensesPage + LabworksPage tests (PR #98) - 46 tests
-
-#### Epic 14.6: Frontend Component Tests - Forms & UI - IN PROGRESS
-- [x] 14.6.1: PatientFormModal + DoctorFormModal tests (PR #99) - 46 tests
-- [ ] 14.6.2: AppointmentFormModal + ExpenseFormModal + LabworkFormModal tests (DEFERRED)
-- [x] 14.6.3: Shared UI components tests (PR #100) - 37 tests
-
+#### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85)
+#### ✅ Epic 14.2: Frontend Unit Tests - API Clients (PRs #86-92)
+#### ✅ Epic 14.3: Frontend Unit Tests - Hooks & Utils (PR #93)
+#### ✅ Epic 14.4: Frontend Component Tests - Auth (PR #94)
+#### ✅ Epic 14.5: Frontend Component Tests - CRUD Pages (PRs #95-98)
+#### ✅ Epic 14.6: Frontend Component Tests - Forms & UI (PRs #99-100) - Epic 14.6.2 DEFERRED
 #### ✅ Epic 14.7: E2E Tests with Playwright (PR #101)
-- [x] 14.7.1: Auth flows (login, register, forgot password)
-- [x] 14.7.2: Patient CRUD flow
-- [x] 14.7.3: Appointment booking flow
-- [x] 14.7.4: Settings and profile flow
 
 ---
 
 ### Phase 15: Documentation and Deploy - DONE
+**PRs:** #102-103
 
 #### ✅ Task 15.1: Documentation (PR #102)
-- [x] 15.1.1: Installation guide (INSTALLATION.md)
-- [x] 15.1.2: Environment variables documentation (ENVIRONMENT.md)
-- [x] 15.1.3: Development guide (DEVELOPMENT.md)
-- [x] 15.1.4: API documentation (API.md)
-- [x] 15.1.5: Updated README.md with comprehensive project overview
+Complete documentation suite: INSTALLATION.md, ENVIRONMENT.md, DEVELOPMENT.md, API.md, README.md
 
 #### ✅ Task 15.2: Production Preparation (PR #103)
-- [x] 15.2.1: Production Dockerfiles (already existed, verified)
-- [x] 15.2.2: Production docker-compose.yml (already existed, verified)
-- [x] 15.2.3: CI/CD pipeline setup (GitHub Actions - .github/workflows/ci.yml)
-- [x] 15.2.4: SSL/HTTPS configuration guide (PRODUCTION.md)
-- [x] 15.2.5: Environment variables for production (.env.production.example)
-- [x] 15.2.6: Database backup and restore procedures (scripts/backup-database.sh, scripts/restore-database.sh)
-- [x] 15.2.7: Monitoring setup guide (health checks, logs in PRODUCTION.md)
-- [x] 15.2.8: Error tracking integration guide (Sentry in PRODUCTION.md)
+CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.example, SSL setup
 
 ---
 
