@@ -282,7 +282,7 @@ Copy `.env.example` to `.env` and configure:
 #### Epic 14.5: Frontend Component Tests - CRUD Pages - IN PROGRESS
 - [x] 14.5.1: PatientsPage tests (PR #95) - 29 tests
 - [x] 14.5.2: DoctorsPage tests (PR #96) - 29 tests
-- [x] 14.5.3: AppointmentsPage tests - 33 tests
+- [x] 14.5.3: AppointmentsPage tests (PR #97) - 33 tests
 - [ ] 14.5.4: ExpensesPage + LabworksPage tests
 
 #### Epic 14.6: Frontend Component Tests - Forms & UI
