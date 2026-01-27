@@ -201,8 +201,8 @@ Copy `.env.example` to `.env` and configure:
 | 11 | Generacion de PDFs | DONE | #69, #70 |
 | 12 | Internacionalizacion (i18n) | DONE | #71 |
 | 13 | Landing Page completa | DONE | #73-78 |
-| 14 | Testing | IN PROGRESS | #79-85 |
-| 15 | Documentacion y Deploy | PENDING | - |
+| 14 | Testing | DONE | #79-101 |
+| 15 | Documentacion y Deploy | IN PROGRESS | #102 |
 
 ---
 
@@ -251,9 +251,9 @@ Copy `.env.example` to `.env` and configure:
 
 ---
 
-### Phase 14: Testing - IN PROGRESS
+### Phase 14: Testing - DONE
 
-> **Current state:**
+> **Final state:**
 > - Backend: 338 tests in 20 files (high coverage)
 > - Frontend: 851 tests in 38 files
 > - E2E: 4 test suites with Playwright (auth, patients, appointments, settings)
@@ -298,14 +298,25 @@ Copy `.env.example` to `.env` and configure:
 
 ---
 
-### Phase 15: Documentation and Deploy - PENDING
+### Phase 15: Documentation and Deploy - IN PROGRESS
 **Branch:** `feature/docs-deploy`
 
-#### Task 15.1: Documentation
-- [ ] 15.1.1-15.1.4: Swagger/OpenAPI, installation and configuration guides
+#### ✅ Task 15.1: Documentation (PR #102)
+- [x] 15.1.1: Installation guide (INSTALLATION.md)
+- [x] 15.1.2: Environment variables documentation (ENVIRONMENT.md)
+- [x] 15.1.3: Development guide (DEVELOPMENT.md)
+- [x] 15.1.4: API documentation (API.md)
+- [x] 15.1.5: Updated README.md with comprehensive project overview
 
 #### Task 15.2: Production Preparation
-- [ ] 15.2.1-15.2.8: Dockerfiles prod, docker-compose, CI/CD, Stripe prod, SSL, Sentry
+- [ ] 15.2.1: Create production Dockerfiles
+- [ ] 15.2.2: Production docker-compose.yml configuration
+- [ ] 15.2.3: CI/CD pipeline setup (GitHub Actions)
+- [ ] 15.2.4: SSL/HTTPS configuration guide
+- [ ] 15.2.5: Environment variables for production
+- [ ] 15.2.6: Database backup and restore procedures
+- [ ] 15.2.7: Monitoring setup (health checks, logs)
+- [ ] 15.2.8: Error tracking integration (Sentry)
 
 ---
 
@@ -395,4 +406,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 27 January, 2026 - Epic 14.7: E2E tests with Playwright (4 test suites: auth, patients, appointments, settings)*
+*Last update: 27 January, 2026 - Phase 15.1: Comprehensive documentation suite (INSTALLATION, ENVIRONMENT, DEVELOPMENT, API guides + README update)*
