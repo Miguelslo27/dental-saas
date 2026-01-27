@@ -169,6 +169,7 @@ Comprehensive documentation is available in the `/docs` directory:
 - [🔌 API Documentation](./docs/API.md) - Complete REST API reference
 
 ☁️ **Deployment:**
+- [🚀 Production Deployment](./docs/PRODUCTION.md) - SSL, monitoring, backups, and security
 - [🚀 Coolify Deployment](./docs/COOLIFY-DEPLOYMENT.md) - Deploy with Coolify
 - [🔧 Coolify Troubleshooting](./docs/COOLIFY-TROUBLESHOOTING.md) - Common issues and solutions
 
@@ -304,6 +305,10 @@ docker compose -f docker-compose.dev.yml up -d    # Start dev services
 docker compose -f docker-compose.dev.yml down     # Stop dev services
 docker compose build                               # Build prod images
 docker compose up -d                               # Start prod stack
+
+# Backup & Restore
+DATABASE_URL=<url> ./scripts/backup-database.sh   # Backup database
+DATABASE_URL=<url> ./scripts/restore-database.sh <file>  # Restore from backup
 ```
 
 ---
