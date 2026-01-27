@@ -24,9 +24,10 @@ COPY --from=1 /app/packages/database/node_modules ./packages/database/node_modul
 COPY --from=1 /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY . .
 
-# Generate Prisma client (DATABASE_URL is required by prisma.config.ts but not used for generate)
+# Generate Prisma client
+# DATABASE_URL is required by Prisma but not actually used during generation
 WORKDIR /app/packages/database
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN pnpm db:generate
 
 # Build database package
