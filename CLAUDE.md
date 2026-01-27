@@ -280,7 +280,7 @@ Copy `.env.example` to `.env` and configure:
 - [x] 14.4.4: ResetPasswordPage tests - 22 tests
 
 #### Epic 14.5: Frontend Component Tests - CRUD Pages - IN PROGRESS
-- [x] 14.5.1: PatientsPage tests - 29 tests
+- [x] 14.5.1: PatientsPage tests (PR #95) - 29 tests
 - [ ] 14.5.2: DoctorsPage tests
 - [ ] 14.5.3: AppointmentsPage tests
 - [ ] 14.5.4: ExpensesPage + LabworksPage tests
