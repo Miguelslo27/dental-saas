@@ -60,9 +60,10 @@ export function formatStatus(status: AppointmentStatus): string {
 export function sanitizeFilename(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '') // Remove invalid chars
+    // eslint-disable-next-line no-control-regex
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '') // Remove invalid chars including control characters
     .replace(/\s+/g, '-') // Replace spaces with dashes
-    .replace(/[^\w\-]/g, '') // Remove any remaining non-word chars except dashes
+    .replace(/[^\w-]/g, '') // Remove any remaining non-word chars except dashes
     .replace(/-+/g, '-') // Replace multiple dashes with single
     .replace(/^-|-$/g, '') // Remove leading/trailing dashes
     .substring(0, 100) // Limit length
