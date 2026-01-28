@@ -108,6 +108,8 @@ jobs:
 
       - name: Generate Prisma client
         run: pnpm --filter @dental/database db:generate
+        env:
+          DATABASE_URL: postgresql://dental_test:test_password@localhost:5432/dental_test?schema=public
 
       - name: Run database migrations
         run: pnpm --filter @dental/database db:migrate
