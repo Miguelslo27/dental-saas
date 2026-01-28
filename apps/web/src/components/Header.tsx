@@ -1,17 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 export function Header() {
   const appUrl = __APP_URL__;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const location = useLocation();
-
-  // Close menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -136,12 +130,14 @@ export function Header() {
           <div className="py-4 space-y-2 border-t border-gray-100">
             <Link
               to="/"
+              onClick={() => setMobileMenuOpen(false)}
               className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               Inicio
             </Link>
             <Link
               to="/precios"
+              onClick={() => setMobileMenuOpen(false)}
               className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               Precios

@@ -21,8 +21,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -82,8 +80,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -112,6 +108,11 @@ jobs:
 
       - name: Generate Prisma client
         run: pnpm --filter @dental/database db:generate
+        env:
+          DATABASE_URL: postgresql://dental_test:test_password@localhost:5432/dental_test?schema=public
+
+      - name: Build database package
+        run: pnpm --filter @dental/database build
 
       - name: Run database migrations
         run: pnpm --filter @dental/database db:migrate
@@ -141,8 +142,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -178,8 +177,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         id: pnpm-cache
