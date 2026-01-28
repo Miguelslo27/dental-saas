@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 export function Header() {
   const appUrl = __APP_URL__;
