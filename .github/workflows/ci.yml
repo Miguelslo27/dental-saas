@@ -111,6 +111,9 @@ jobs:
         env:
           DATABASE_URL: postgresql://dental_test:test_password@localhost:5432/dental_test?schema=public
 
+      - name: Build database package
+        run: pnpm --filter @dental/database build
+
       - name: Run database migrations
         run: pnpm --filter @dental/database db:migrate
         env:
