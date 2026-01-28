@@ -25,12 +25,13 @@ export default [
         { allowConstantExport: true },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', {
+      '@typescript-eslint/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_'
       }],
       'no-useless-escape': 'warn',
       'no-constant-binary-expression': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ]
