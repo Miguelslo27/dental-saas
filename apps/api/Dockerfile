@@ -82,6 +82,7 @@ USER api
 WORKDIR /app/apps/api
 EXPOSE 3000
 
-# Run migrations and start with retry logic for database connection
-# Waits up to 30 seconds for PostgreSQL to be ready before running migrations
-CMD ["sh", "/app/scripts/wait-for-db.sh"]
+# Start the API directly
+# Migrations should be run manually with: pnpm --filter @dental/database db:migrate
+# Or via Coolify post-deployment hook
+CMD ["node", "dist/index.js"]
