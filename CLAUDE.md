@@ -260,13 +260,34 @@ Copy `.env.example` to `.env` and configure:
 ---
 
 ### Phase 15: Documentation and Deploy - DONE
-**PRs:** #102-103
+**PRs:** #102-103, #105-107
 
 #### ✅ Task 15.1: Documentation (PR #102)
 Complete documentation suite: INSTALLATION.md, ENVIRONMENT.md, DEVELOPMENT.md, API.md, README.md
 
 #### ✅ Task 15.2: Production Preparation (PR #103)
 CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.example, SSL setup
+
+#### ✅ Task 15.3: Production Deployment Fixes (PRs #105-107)
+**PR #105:** Fixed CI pipeline issues
+- Excluded test files from production build (tsconfig.app.json)
+- Fixed pnpm version conflict in GitHub Actions
+- Added ESLint config for apps/web
+- Fixed DATABASE_URL for Prisma generation in CI
+- Relaxed linting rules (no-explicit-any, no-unused-vars as warnings)
+- All CI checks passing: Lint ✅, Test Backend (338) ✅, Test Frontend (851) ✅, Build ✅
+
+**PR #106:** URL-encoded database passwords in connection strings
+- Added POSTGRES_PASSWORD_ENCODED and REDIS_PASSWORD_ENCODED variables
+- Fixed DATABASE_URL and REDIS_URL to use URL-encoded passwords
+- Plain passwords (/, +, =) were breaking URL parsing
+- docs/PRODUCTION-PASSWORD-FIX.md with migration guide
+
+**PR #107:** Hotfix for API startup crash loop
+- Removed automatic migrations from container startup
+- API now starts directly without wait-for-db.sh script
+- Migrations applied manually in production (14 tables)
+- Future migrations run via Coolify post-deployment hook or manually
 
 ---
 
