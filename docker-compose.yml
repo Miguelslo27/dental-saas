@@ -66,10 +66,9 @@ services:
       NODE_ENV: production
       PORT: ${PORT:-5001}
       # Defaults for preview deployments (override in Coolify for production)
-      # NOTE: Use *_ENCODED variables for passwords in URLs (they contain URL-encoded special chars)
-      # Use plain POSTGRES_PASSWORD and REDIS_PASSWORD for the containers themselves
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD_ENCODED:-preview_password_not_for_production}@postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
-      REDIS_URL: redis://:${REDIS_PASSWORD_ENCODED:-preview_redis_password}@redis:6379
+      # NOTE: Passwords with special characters should be quoted in Coolify environment variables
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:-preview_redis_password}@redis:6379
       # CORS_ORIGIN must match the public URL of the frontend in production.
       # Expected format: "https://example.com" (no trailing slash).
       # Do NOT use localhost values (e.g. http://localhost:5001) in production.
