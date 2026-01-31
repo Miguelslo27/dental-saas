@@ -183,141 +183,85 @@ Copy `.env.example` to `.env` and configure:
 
 ---
 
-## Development Progress
+## Development Status
 
-| Fase | Descripcion | Estado | PRs |
-|------|-------------|--------|-----|
-| 0 | Configuracion del Proyecto | DONE | #1-3 |
-| 1 | Core Multi-Tenant y Modelos | DONE | #4-8 |
-| 2 | Registro de Tenants y Auth | DONE | #9-14, #44-48, #72 |
-| 3 | Gestion de Doctores | DONE | #55 |
-| 4 | Gestion de Pacientes + Dental Chart | DONE | #56, #63, #64 |
-| 5 | Gestion de Citas | DONE (CRUD) | #59 |
-| 6 | Labworks y Expenses | DONE | #60 |
-| 7 | Estadisticas y Dashboard | DONE | #61, #62 |
-| 8 | Suscripciones y Pagos (dLocal) | DEFERRED | #65 |
-| 9 | Configuracion del Tenant | DONE | #66, #67 |
-| 10 | Export Data | DONE | #68 |
-| 11 | Generacion de PDFs | DONE | #69, #70 |
-| 12 | Internacionalizacion (i18n) | DONE | #71 |
-| 13 | Landing Page completa | DONE | #73-78 |
-| 14 | Testing | DONE | #79-101 |
-| 15 | Documentacion y Deploy | DONE | #102-103 |
+**Current State:** Production-ready SaaS application deployed on Coolify
+
+All core features completed (15 phases):
+- Multi-tenant architecture with row-level security
+- Authentication & authorization (JWT, roles)
+- Patient management with dental charts
+- Appointments, doctors, labworks, expenses
+- Dashboard with statistics
+- PDF generation & data export
+- Internationalization (ES, EN, AR with RTL)
+- Landing page & marketing site
+- Complete test coverage (338 backend + 851 frontend + E2E)
+- CI/CD pipeline & production deployment
+
+**Test Coverage:** 1,189 passing tests across backend, frontend, and E2E suites
 
 ---
 
 ## Pending Tasks
 
-### Global Pending Items
+### High Priority
 
-#### Rate Limiting (Phase 2)
-- [ ] 2.2.11: Implementar rate limiting con Redis
-- [ ] 2.2.A.6: Rate limiting para password recovery (3 intentos por IP en 15 min)
+#### Bugs & Fixes
+- [ ] Fix appointment edit form: patient and doctor not pre-selected with current values
+- [ ] Fix superadmin panel: cannot view clinic and user details
 
-#### Appointment Images (Phase 5)
-- [ ] 5.2.1: Configurar Multer para uploads
-- [ ] 5.2.2: Crear servicio de almacenamiento (S3)
-- [ ] 5.2.3: Crear servicio de tracking de storage por tenant
-- [ ] 5.2.4: Crear middleware de verificacion de limite de storage
-- [ ] 5.2.5-5.2.8: Endpoints de imagenes
+#### Roles & Permissions
+- [ ] Add clinic administrators (can manage appointments, patients, labworks, expenses, doctors)
+- [ ] Implement role-based permissions system (only OWNER has full access)
 
-#### Deferred Items
-- [ ] 2.4.5: Flujo de onboarding inicial
-- [ ] 2.5.9: Pagina de perfil de usuario
-- [ ] 3.2.8: DoctorPicker (Combobox con busqueda)
-- [ ] 5.3.1: FullCalendar (usando vista custom por ahora)
-- [ ] 5.3.4: Vista semanal de calendario
-- [ ] 5.4.8: Componente de prescripciones
-- [ ] 13.5.A: og-image.png (1200x630px) para apps/web/public/
+#### Internationalization & Localization
+- [ ] Fix PDF patient file to use configured language (currently in English)
+- [ ] Send emails based on user's selected/default language
+- [ ] Currency alignment: ensure all values respect configured currency
+- [ ] Show warning when changing currency (no automatic conversion between currencies)
 
----
+#### Security & Performance
+- [ ] Rate limiting with Redis (persistence and scalability)
+- [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
 
-### Phase 8: Subscriptions and Payments (dLocal) - DEFERRED
+### Medium Priority
 
-#### ✅ Task 8.1: Backend - Plans and Limits Service (PR #65)
-#### Task 8.2: Backend - dLocal Integration - DEFERRED
-#### Task 8.3: Frontend - Billing UI - DEFERRED
+#### Language & Regional Settings
+- [ ] Language selector in web landing page and registration form
+- [ ] Save language preference on registration
+- [ ] Allow language change in settings (post-registration)
+- [ ] Detect and use browser's default language
+- [ ] Default timezone based on user's location
+- [ ] Country dropdown for phone number area code
 
----
+#### Dental Chart Improvements
+- [ ] Visual indicator for teeth with comments (distinguish from teeth without comments)
+- [ ] Mark teeth as "removed/missing" for extraction cases
+- [ ] Show tooth comments on hover
 
-### Phase 13: Landing Page and Marketing - DONE
-**PRs:** #73-78
+#### UX Improvements
+- [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
+- [ ] Improve date/time picker UI (investigate user-friendly packages, replace browser defaults)
+- [ ] Phone placeholder based on user's location
 
----
+### Appointment Images (Local Storage)
+- [ ] Configure Multer for file uploads
+- [ ] Local folder storage implementation (organized by tenant)
+- [ ] Storage tracking per tenant (disk usage)
+- [ ] Storage limit verification middleware
+- [ ] Image upload/download/delete endpoints
 
-### Phase 14: Testing - DONE
-**PRs:** #79-101
-**Final state:** 338 backend tests + 851 frontend tests + 4 E2E suites with Playwright
-
-#### ✅ Epic 14.1: Frontend Unit Tests - Zustand Stores (PRs #79-85)
-#### ✅ Epic 14.2: Frontend Unit Tests - API Clients (PRs #86-92)
-#### ✅ Epic 14.3: Frontend Unit Tests - Hooks & Utils (PR #93)
-#### ✅ Epic 14.4: Frontend Component Tests - Auth (PR #94)
-#### ✅ Epic 14.5: Frontend Component Tests - CRUD Pages (PRs #95-98)
-#### ✅ Epic 14.6: Frontend Component Tests - Forms & UI (PRs #99-100) - Epic 14.6.2 DEFERRED
-#### ✅ Epic 14.7: E2E Tests with Playwright (PR #101)
-
----
-
-### Phase 15: Documentation and Deploy - DONE
-**PRs:** #102-103, #105-107
-
-#### ✅ Task 15.1: Documentation (PR #102)
-Complete documentation suite: INSTALLATION.md, ENVIRONMENT.md, DEVELOPMENT.md, API.md, README.md
-
-#### ✅ Task 15.2: Production Preparation (PR #103)
-CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.example, SSL setup
-
-#### ✅ Task 15.3: Production Deployment Fixes (PRs #105-107)
-**PR #105:** Fixed CI pipeline issues
-- Excluded test files from production build (tsconfig.app.json)
-- Fixed pnpm version conflict in GitHub Actions
-- Added ESLint config for apps/web
-- Fixed DATABASE_URL for Prisma generation in CI
-- Relaxed linting rules (no-explicit-any, no-unused-vars as warnings)
-- All CI checks passing: Lint ✅, Test Backend (338) ✅, Test Frontend (851) ✅, Build ✅
-
-**PR #106:** URL-encoded database passwords in connection strings
-- Added POSTGRES_PASSWORD_ENCODED and REDIS_PASSWORD_ENCODED variables
-- Fixed DATABASE_URL and REDIS_URL to use URL-encoded passwords
-- Plain passwords (/, +, =) were breaking URL parsing
-- docs/PRODUCTION-PASSWORD-FIX.md with migration guide
-
-**PR #107:** Hotfix for API startup crash loop
-- Removed automatic migrations from container startup
-- API now starts directly without wait-for-db.sh script
-- Migrations applied manually in production (14 tables)
-- Future migrations run via Coolify post-deployment hook or manually
-
-**PR #111:** Added favicon to app (PR #111)
-- Copied favicon.svg from apps/web to apps/app
-- Updated index.html to use /favicon.svg
-- Consistent branding across web and app
-
-**PR #110:** Fixed PostgreSQL DNS conflict (PR #110)
-- Renamed PostgreSQL service from "postgres" to "dental-postgres"
-- Resolved DNS conflict with Coolify's PostgreSQL instance
-- Updated DATABASE_URL to use new hostname
-- Fixed authentication errors in production
-
-**PR #112:** Fixed dropdown menu positioning in tables
-- Created useDropdownPosition hook for viewport-aware positioning
-- Updated AdminUsersPage and AdminTenantsPage
-- Dropdowns now open upward when near bottom of viewport
-- Fixes visual bug where menus were cut off by pagination
-
-**PR #113:** Fixed dropdown overflow with fixed positioning
-- Changed dropdown positioning from absolute to fixed
-- Calculate exact coordinates using getBoundingClientRect()
-- Dropdowns no longer clipped by table's overflow-hidden
-- Works correctly with both many and few table records
-- Proper state cleanup in all close scenarios
-
-**PR #114:** Added Uruguayan peso (UYU) currency and Montevideo timezone
-- Added UYU (Peso Uruguayo) to currencies list
-- Added America/Montevideo to timezones list
-- Sorted currencies alphabetically for better UX
-- Enables proper regional settings for Uruguayan clinics
+### Deferred Features
+- [ ] Onboarding flow for new tenants
+- [ ] User profile page
+- [ ] DoctorPicker component (searchable combobox)
+- [ ] FullCalendar integration (using custom view for now)
+- [ ] Weekly calendar view
+- [ ] Prescriptions component
+- [ ] og-image.png (1200x630px) for apps/web/public/
+- [ ] Subscriptions and payments (dLocal integration)
+- [ ] Welcome email when creating tenant
 
 ---
 
@@ -337,15 +281,113 @@ CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.exa
 
 ---
 
+## Future Epics (Large-Scale Initiatives)
+
+### Epic: Desktop Application (Windows / Mac / Linux)
+**Goal:** Native desktop app with offline-first capabilities
+
+**Key Features:**
+- [ ] Cross-platform desktop app (Electron or Tauri)
+- [ ] UI/UX similar to web application
+- [ ] Offline-first architecture with local database (SQLite)
+- [ ] Automatic sync when online (conflict resolution strategy)
+- [ ] Background sync service
+- [ ] Offline indicators and sync status
+- [ ] Local data encryption
+- [ ] Auto-updates mechanism
+
+**Technical Considerations:**
+- Sync engine design (operational transformation or CRDT)
+- Conflict resolution for appointments, patient records, etc.
+- Local storage limits and cleanup strategy
+- Migration path from web-only to hybrid usage
+
+---
+
+### Epic: Mobile Applications (iOS / Android)
+**Goal:** Two mobile apps - one for clinic staff, one for patients
+
+---
+
+#### App 1: DentalClinic Pro (Admin & Doctors) - Multi-role
+
+**Target Users:** Clinic administrators and doctors
+
+**Shared Features (All Roles):**
+- [ ] Login with role detection (Admin/Doctor)
+- [ ] Multi-language support (ES/EN/AR)
+- [ ] Push notifications
+- [ ] Offline reading + sync queue
+- [ ] Biometric authentication
+
+**Admin Features:**
+- [ ] View/manage all clinic appointments (daily/weekly agenda)
+- [ ] Patient check-in functionality
+- [ ] Create/edit/cancel appointments
+- [ ] Search patients and view basic info
+- [ ] Register payments on-the-spot
+- [ ] View and register daily expenses
+- [ ] View pending labworks
+- [ ] Quick access to patient contacts (call/WhatsApp)
+- [ ] Send appointment reminders
+- [ ] Dashboard: daily summary (appointments, income, expenses)
+
+**Doctor Features:**
+- [ ] View only ASSIGNED appointments (daily/weekly)
+- [ ] Mark appointments as completed
+- [ ] View complete patient file before/during consultation
+- [ ] Dental chart viewer (read-only on mobile, edit on desktop)
+- [ ] Complete treatment history
+- [ ] View notes from previous appointments
+- [ ] Access patient documents/PDFs
+- [ ] Add quick notes post-consultation
+- [ ] Register treatments performed (simplified UI)
+- [ ] Mark labworks as sent/received
+
+---
+
+#### App 2: DentalClinic (Patients) - Separate App
+
+**Target Users:** Patients (end users)
+
+**Key Features:**
+- [ ] View upcoming appointments
+- [ ] Appointment history
+- [ ] Medical/dental history viewer
+- [ ] Treatment records and dental chart (read-only)
+- [ ] Expenses and payment history
+- [ ] Push notifications for appointment reminders
+- [ ] Document viewer (PDFs, prescriptions, treatment plans)
+- [ ] Profile management
+- [ ] Multi-language support (ES/EN/AR)
+- [ ] Request appointment (pending approval by clinic)
+
+**Authentication:**
+- [ ] Patient-specific auth flow (separate from clinic staff)
+- [ ] Biometric authentication support
+- [ ] Secure token storage
+
+---
+
+**Technical Stack Options:**
+- React Native (leverage existing React knowledge)
+- Flutter (native performance)
+- Progressive Web App (PWA) as MVP
+
+**Offline Strategy:**
+- Clinic Staff App: More critical - read offline + queue changes for sync
+- Patient App: Read-only offline for recent data
+
+---
+
 ## Future Improvements / Backlog
 
 ### High Priority
-- [ ] Rate limiting with Redis (persistence and scalability)
 - [ ] E2E tests for admin panel
 - [ ] Welcome email when creating tenant
+- [ ] Audit logging for superadmin actions
 
 ### Medium Priority
-- [ ] Audit logging for superadmin actions
 - [ ] Pagination in admin endpoints
 - [ ] 2FA for super admin
 - [ ] Dark mode toggle
@@ -400,11 +442,12 @@ enum ToothCondition {
 
 ## Coolify Deployment
 
-> **WORKING** - PRs #33-36, #38-40, #43
->
-> **Guide**: [docs/COOLIFY-DEPLOYMENT.md](docs/COOLIFY-DEPLOYMENT.md)
-> **Troubleshooting**: [docs/COOLIFY-TROUBLESHOOTING.md](docs/COOLIFY-TROUBLESHOOTING.md)
+Application deployed and running in production.
+
+**Guides:**
+- [docs/COOLIFY-DEPLOYMENT.md](docs/COOLIFY-DEPLOYMENT.md)
+- [docs/COOLIFY-TROUBLESHOOTING.md](docs/COOLIFY-TROUBLESHOOTING.md)
 
 ---
 
-*Last update: 31 January, 2026 - Production fixes: DNS conflict resolution, favicon addition, and dropdown menu positioning*
+*Last update: 31 January, 2026 - Documentation cleanup*
