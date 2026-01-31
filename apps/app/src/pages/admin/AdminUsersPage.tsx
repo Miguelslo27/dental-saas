@@ -35,6 +35,7 @@ export function AdminUsersPage() {
   const [page, setPage] = useState(1)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const [dropdownOpenUpward, setDropdownOpenUpward] = useState(false)
   const [resetPasswordModal, setResetPasswordModal] = useState<{ userId: string; email: string } | null>(null)
   const [newPassword, setNewPassword] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
@@ -287,7 +288,18 @@ export function AdminUsersPage() {
                       <td className="px-6 py-4">
                         <div className="relative">
                           <button
-                            onClick={() => setOpenMenu(openMenu === user.id ? null : user.id)}
+                            onClick={(e) => {
+                              if (openMenu === user.id) {
+                                setOpenMenu(null)
+                              } else {
+                                const button = e.currentTarget
+                                const rect = button.getBoundingClientRect()
+                                const viewportHeight = window.innerHeight
+                                const shouldOpenUpward = rect.bottom > viewportHeight * 0.6
+                                setDropdownOpenUpward(shouldOpenUpward)
+                                setOpenMenu(user.id)
+                              }
+                            }}
                             className="p-2 hover:bg-gray-100 rounded-lg"
                             disabled={actionLoading === user.id || user.role === 'SUPER_ADMIN'}
                           >
@@ -304,7 +316,9 @@ export function AdminUsersPage() {
                                 className="fixed inset-0 z-0"
                                 onClick={() => setOpenMenu(null)}
                               />
-                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-10">
+                              <div className={`absolute right-0 w-48 bg-white rounded-lg shadow-lg border z-10 ${
+                                dropdownOpenUpward ? 'bottom-full mb-2' : 'mt-2'
+                              }`}>
                                 <Link
                                   to={`/admin/users/${user.id}`}
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
