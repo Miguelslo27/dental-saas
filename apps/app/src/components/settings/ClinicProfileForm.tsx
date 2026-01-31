@@ -10,6 +10,7 @@ const TIMEZONES = [
   { value: 'America/Bogota', label: 'Colombia (Bogotá)' },
   { value: 'America/Mexico_City', label: 'México (Ciudad de México)' },
   { value: 'America/Lima', label: 'Perú (Lima)' },
+  { value: 'America/Montevideo', label: 'Uruguay (Montevideo)' },
   { value: 'America/Caracas', label: 'Venezuela (Caracas)' },
   { value: 'America/New_York', label: 'Estados Unidos (Nueva York)' },
   { value: 'America/Los_Angeles', label: 'Estados Unidos (Los Ángeles)' },
@@ -20,13 +21,14 @@ const TIMEZONES = [
 // Common currencies
 const CURRENCIES = [
   { value: 'ARS', label: 'Peso Argentino (ARS)' },
+  { value: 'BRL', label: 'Real Brasileño (BRL)' },
   { value: 'CLP', label: 'Peso Chileno (CLP)' },
   { value: 'COP', label: 'Peso Colombiano (COP)' },
+  { value: 'EUR', label: 'Euro (EUR)' },
   { value: 'MXN', label: 'Peso Mexicano (MXN)' },
   { value: 'PEN', label: 'Sol Peruano (PEN)' },
   { value: 'USD', label: 'Dólar Estadounidense (USD)' },
-  { value: 'EUR', label: 'Euro (EUR)' },
-  { value: 'BRL', label: 'Real Brasileño (BRL)' },
+  { value: 'UYU', label: 'Peso Uruguayo (UYU)' },
 ]
 
 interface ClinicProfileFormProps {

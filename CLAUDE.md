@@ -313,6 +313,12 @@ CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.exa
 - Works correctly with both many and few table records
 - Proper state cleanup in all close scenarios
 
+**PR #114:** Added Uruguayan peso (UYU) currency and Montevideo timezone
+- Added UYU (Peso Uruguayo) to currencies list
+- Added America/Montevideo to timezones list
+- Sorted currencies alphabetically for better UX
+- Enables proper regional settings for Uruguayan clinics
+
 ---
 
 ## SaaS Business Model
