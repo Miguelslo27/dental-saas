@@ -25,7 +25,7 @@ export function AdminTenantsPage() {
   const [page, setPage] = useState(1)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
-  const [dropdownOpenUpward, setDropdownOpenUpward] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number; openUpward: boolean } | null>(null)
 
   const fetchTenants = useCallback(async () => {
     try {
@@ -69,6 +69,7 @@ export function AdminTenantsPage() {
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
+      setDropdownPosition(null)
     }
   }
 
@@ -86,6 +87,7 @@ export function AdminTenantsPage() {
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
+      setDropdownPosition(null)
     }
   }
 
@@ -232,12 +234,19 @@ export function AdminTenantsPage() {
                             onClick={(e) => {
                               if (openMenu === tenant.id) {
                                 setOpenMenu(null)
+                                setDropdownPosition(null)
                               } else {
                                 const button = e.currentTarget
                                 const rect = button.getBoundingClientRect()
                                 const viewportHeight = window.innerHeight
-                                const shouldOpenUpward = rect.bottom > viewportHeight * 0.6
-                                setDropdownOpenUpward(shouldOpenUpward)
+                                const viewportWidth = window.innerWidth
+                                const dropdownHeight = 120 // approximate height of menu (3 items)
+
+                                const shouldOpenUpward = rect.bottom + dropdownHeight > viewportHeight
+                                const top = shouldOpenUpward ? rect.top - dropdownHeight : rect.bottom
+                                const right = viewportWidth - rect.right
+
+                                setDropdownPosition({ top, right, openUpward: shouldOpenUpward })
                                 setOpenMenu(tenant.id)
                               }
                             }}
@@ -251,19 +260,29 @@ export function AdminTenantsPage() {
                             )}
                           </button>
 
-                          {openMenu === tenant.id && (
+                          {openMenu === tenant.id && dropdownPosition && (
                             <>
                               <div
                                 className="fixed inset-0 z-0"
-                                onClick={() => setOpenMenu(null)}
+                                onClick={() => {
+                                  setOpenMenu(null)
+                                  setDropdownPosition(null)
+                                }}
                               />
-                              <div className={`absolute right-0 w-48 bg-white rounded-lg shadow-lg border z-10 ${
-                                dropdownOpenUpward ? 'bottom-full mb-2' : 'mt-2'
-                              }`}>
+                              <div
+                                className="fixed w-48 bg-white rounded-lg shadow-lg border z-10"
+                                style={{
+                                  top: `${dropdownPosition.top}px`,
+                                  right: `${dropdownPosition.right}px`,
+                                }}
+                              >
                                 <Link
                                   to={`/admin/tenants/${tenant.id}`}
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  onClick={() => setOpenMenu(null)}
+                                  onClick={() => {
+                                    setOpenMenu(null)
+                                    setDropdownPosition(null)
+                                  }}
                                 >
                                   <Eye className="h-4 w-4" />
                                   Ver detalles

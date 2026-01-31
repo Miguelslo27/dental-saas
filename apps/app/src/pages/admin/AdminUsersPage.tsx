@@ -35,7 +35,7 @@ export function AdminUsersPage() {
   const [page, setPage] = useState(1)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [openMenu, setOpenMenu] = useState<string | null>(null)
-  const [dropdownOpenUpward, setDropdownOpenUpward] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number; openUpward: boolean } | null>(null)
   const [resetPasswordModal, setResetPasswordModal] = useState<{ userId: string; email: string } | null>(null)
   const [newPassword, setNewPassword] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
@@ -83,6 +83,7 @@ export function AdminUsersPage() {
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
+      setDropdownPosition(null)
     }
   }
 
@@ -100,6 +101,7 @@ export function AdminUsersPage() {
     } finally {
       setActionLoading(null)
       setOpenMenu(null)
+      setDropdownPosition(null)
     }
   }
 
@@ -291,12 +293,19 @@ export function AdminUsersPage() {
                             onClick={(e) => {
                               if (openMenu === user.id) {
                                 setOpenMenu(null)
+                                setDropdownPosition(null)
                               } else {
                                 const button = e.currentTarget
                                 const rect = button.getBoundingClientRect()
                                 const viewportHeight = window.innerHeight
-                                const shouldOpenUpward = rect.bottom > viewportHeight * 0.6
-                                setDropdownOpenUpward(shouldOpenUpward)
+                                const viewportWidth = window.innerWidth
+                                const dropdownHeight = 160 // approximate height of menu
+
+                                const shouldOpenUpward = rect.bottom + dropdownHeight > viewportHeight
+                                const top = shouldOpenUpward ? rect.top - dropdownHeight : rect.bottom
+                                const right = viewportWidth - rect.right
+
+                                setDropdownPosition({ top, right, openUpward: shouldOpenUpward })
                                 setOpenMenu(user.id)
                               }
                             }}
@@ -310,19 +319,29 @@ export function AdminUsersPage() {
                             )}
                           </button>
 
-                          {openMenu === user.id && user.role !== 'SUPER_ADMIN' && (
+                          {openMenu === user.id && user.role !== 'SUPER_ADMIN' && dropdownPosition && (
                             <>
                               <div
                                 className="fixed inset-0 z-0"
-                                onClick={() => setOpenMenu(null)}
+                                onClick={() => {
+                                  setOpenMenu(null)
+                                  setDropdownPosition(null)
+                                }}
                               />
-                              <div className={`absolute right-0 w-48 bg-white rounded-lg shadow-lg border z-10 ${
-                                dropdownOpenUpward ? 'bottom-full mb-2' : 'mt-2'
-                              }`}>
+                              <div
+                                className="fixed w-48 bg-white rounded-lg shadow-lg border z-10"
+                                style={{
+                                  top: `${dropdownPosition.top}px`,
+                                  right: `${dropdownPosition.right}px`,
+                                }}
+                              >
                                 <Link
                                   to={`/admin/users/${user.id}`}
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  onClick={() => setOpenMenu(null)}
+                                  onClick={() => {
+                                    setOpenMenu(null)
+                                    setDropdownPosition(null)
+                                  }}
                                 >
                                   <Eye className="h-4 w-4" />
                                   Ver detalles
@@ -331,6 +350,7 @@ export function AdminUsersPage() {
                                   onClick={() => {
                                     setResetPasswordModal({ userId: user.id, email: user.email })
                                     setOpenMenu(null)
+                                    setDropdownPosition(null)
                                   }}
                                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                 >
