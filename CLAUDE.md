@@ -306,6 +306,13 @@ CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.exa
 - Dropdowns now open upward when near bottom of viewport
 - Fixes visual bug where menus were cut off by pagination
 
+**PR #113:** Fixed dropdown overflow with fixed positioning
+- Changed dropdown positioning from absolute to fixed
+- Calculate exact coordinates using getBoundingClientRect()
+- Dropdowns no longer clipped by table's overflow-hidden
+- Works correctly with both many and few table records
+- Proper state cleanup in all close scenarios
+
 ---
 
 ## SaaS Business Model
