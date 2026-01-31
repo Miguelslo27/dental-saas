@@ -289,6 +289,23 @@ CI/CD pipeline, PRODUCTION.md guide, backup/restore scripts, .env.production.exa
 - Migrations applied manually in production (14 tables)
 - Future migrations run via Coolify post-deployment hook or manually
 
+**PR #111:** Added favicon to app (PR #111)
+- Copied favicon.svg from apps/web to apps/app
+- Updated index.html to use /favicon.svg
+- Consistent branding across web and app
+
+**PR #110:** Fixed PostgreSQL DNS conflict (PR #110)
+- Renamed PostgreSQL service from "postgres" to "dental-postgres"
+- Resolved DNS conflict with Coolify's PostgreSQL instance
+- Updated DATABASE_URL to use new hostname
+- Fixed authentication errors in production
+
+**PR #112:** Fixed dropdown menu positioning in tables
+- Created useDropdownPosition hook for viewport-aware positioning
+- Updated AdminUsersPage and AdminTenantsPage
+- Dropdowns now open upward when near bottom of viewport
+- Fixes visual bug where menus were cut off by pagination
+
 ---
 
 ## SaaS Business Model
@@ -377,4 +394,4 @@ enum ToothCondition {
 
 ---
 
-*Last update: 27 January, 2026 - Phase 15: Complete documentation and production preparation (CI/CD, production guide, backup/restore scripts, SSL setup)*
+*Last update: 31 January, 2026 - Production fixes: DNS conflict resolution, favicon addition, and dropdown menu positioning*
