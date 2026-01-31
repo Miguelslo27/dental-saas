@@ -3,7 +3,7 @@
 # NOTE: Default values are provided for preview deployments.
 # Production deployments MUST override these via Coolify environment variables.
 services:
-  postgres:
+  dental-postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -67,7 +67,8 @@ services:
       PORT: ${PORT:-5001}
       # Defaults for preview deployments (override in Coolify for production)
       # NOTE: Passwords should use alphanumeric characters only to avoid URL encoding issues
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
+      # IMPORTANT: Using "dental-postgres" as hostname to avoid conflicts with Coolify's postgres service
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dental_preview}:${POSTGRES_PASSWORD:-preview_password_not_for_production}@dental-postgres:5432/${POSTGRES_DB:-dental_preview}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD:-preview_redis_password}@redis:6379
       # CORS_ORIGIN must match the public URL of the frontend in production.
       # Expected format: "https://example.com" (no trailing slash).
@@ -83,7 +84,7 @@ services:
     # NOTE: Coolify handles routing via its reverse proxy (Traefik).
     # Do not expose ports directly - use Coolify's domain configuration instead.
     depends_on:
-      postgres:
+      dental-postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
