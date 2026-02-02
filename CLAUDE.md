@@ -208,7 +208,7 @@ All core features completed (15 phases):
 ### High Priority
 
 #### Bugs & Fixes
-- [ ] Fix appointment edit form: patient and doctor not pre-selected with current values
+- [x] Fix appointment edit form: patient and doctor not pre-selected with current values
 - [ ] Fix superadmin panel: cannot view clinic and user details
 
 #### Roles & Permissions

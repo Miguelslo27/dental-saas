@@ -122,13 +122,13 @@ export function AppointmentFormModal({
     }
   }
 
-  // Reset form when appointment changes or modal opens
+  // Reset form when appointment changes or modal opens (after options are loaded)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !loadingOptions) {
       if (appointment) {
         const startDate = new Date(appointment.startTime)
         const endDate = new Date(appointment.endTime)
-        
+
         reset({
           patientId: appointment.patientId,
           doctorId: appointment.doctorId,
@@ -157,7 +157,7 @@ export function AppointmentFormModal({
         })
       }
     }
-  }, [appointment, isOpen, defaultDate, reset])
+  }, [appointment, isOpen, defaultDate, reset, loadingOptions])
 
   // Handle Escape key
   useEffect(() => {
