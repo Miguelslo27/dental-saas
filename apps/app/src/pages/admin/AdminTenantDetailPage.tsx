@@ -219,7 +219,7 @@ export function AdminTenantDetailPage() {
                   <Users className="h-5 w-5 text-blue-600" />
                   <span className="text-sm text-gray-700">Usuarios</span>
                 </div>
-                <span className="text-lg font-semibold text-gray-900">{tenant._count.users}</span>
+                <span className="text-lg font-semibold text-gray-900">{tenant.users.length}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-3">
