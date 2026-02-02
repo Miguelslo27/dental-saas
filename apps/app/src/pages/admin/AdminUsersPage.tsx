@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router'
 import { adminUsersApi, type AdminUser, type UsersListResponse } from '@/lib/admin-api'
+import { roleColors } from '@/lib/admin-utils'
 import {
   Search,
   ChevronLeft,
@@ -16,14 +17,6 @@ import {
   XCircle,
   Building2,
 } from 'lucide-react'
-
-const roleColors: Record<string, string> = {
-  SUPER_ADMIN: 'bg-purple-100 text-purple-800',
-  OWNER: 'bg-blue-100 text-blue-800',
-  ADMIN: 'bg-indigo-100 text-indigo-800',
-  DOCTOR: 'bg-green-100 text-green-800',
-  STAFF: 'bg-gray-100 text-gray-800',
-}
 
 export function AdminUsersPage() {
   const [data, setData] = useState<UsersListResponse | null>(null)

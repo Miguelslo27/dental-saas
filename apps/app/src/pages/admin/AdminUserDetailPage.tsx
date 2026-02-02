@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router'
 import { adminUsersApi, type AdminUserDetail } from '@/lib/admin-api'
+import { roleColors } from '@/lib/admin-utils'
 import {
   ArrowLeft,
   Mail,
@@ -15,14 +16,6 @@ import {
   Shield,
   Key,
 } from 'lucide-react'
-
-const roleColors: Record<string, string> = {
-  SUPER_ADMIN: 'bg-purple-100 text-purple-800',
-  OWNER: 'bg-blue-100 text-blue-800',
-  ADMIN: 'bg-indigo-100 text-indigo-800',
-  DOCTOR: 'bg-green-100 text-green-800',
-  STAFF: 'bg-gray-100 text-gray-800',
-}
 
 export function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -175,7 +168,7 @@ export function AdminUserDetailPage() {
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <Calendar className="h-5 w-5 text-gray-400" />
-                <span>Creado: {new Date(user.createdAt).toLocaleDateString('es-ES', {
+                <span>Creado: {new Date(user.createdAt).toLocaleString('es-ES', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
@@ -185,7 +178,7 @@ export function AdminUserDetailPage() {
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <Clock className="h-5 w-5 text-gray-400" />
-                <span>Actualizado: {new Date(user.updatedAt).toLocaleDateString('es-ES', {
+                <span>Actualizado: {new Date(user.updatedAt).toLocaleString('es-ES', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
@@ -196,7 +189,7 @@ export function AdminUserDetailPage() {
               {user.lastLoginAt && (
                 <div className="flex items-center gap-3 text-gray-600">
                   <Clock className="h-5 w-5 text-gray-400" />
-                  <span>Último login: {new Date(user.lastLoginAt).toLocaleDateString('es-ES', {
+                  <span>Último login: {new Date(user.lastLoginAt).toLocaleString('es-ES', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
