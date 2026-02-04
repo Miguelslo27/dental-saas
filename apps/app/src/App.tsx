@@ -24,7 +24,9 @@ import { AdminForgotPasswordPage } from '@pages/admin/AdminForgotPasswordPage'
 import { AdminResetPasswordPage } from '@pages/admin/AdminResetPasswordPage'
 import AdminDashboardPage from '@pages/admin/AdminDashboardPage'
 import AdminTenantsPage from '@pages/admin/AdminTenantsPage'
+import AdminTenantDetailPage from '@pages/admin/AdminTenantDetailPage'
 import AdminUsersPage from '@pages/admin/AdminUsersPage'
+import AdminUserDetailPage from '@pages/admin/AdminUserDetailPage'
 
 function App() {
   return (
@@ -70,7 +72,9 @@ function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="tenants" element={<AdminTenantsPage />} />
+        <Route path="tenants/:id" element={<AdminTenantDetailPage />} />
         <Route path="users" element={<AdminUsersPage />} />
+        <Route path="users/:id" element={<AdminUserDetailPage />} />
       </Route>
     </Routes>
   )

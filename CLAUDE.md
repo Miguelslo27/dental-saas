@@ -209,7 +209,7 @@ All core features completed (15 phases):
 
 #### Bugs & Fixes
 - [x] Fix appointment edit form: patient and doctor not pre-selected with current values
-- [ ] Fix superadmin panel: cannot view clinic and user details
+- [x] Fix superadmin panel: cannot view clinic and user details
 
 #### Roles & Permissions
 - [ ] Add clinic administrators (can manage appointments, patients, labworks, expenses, doctors)
