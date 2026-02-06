@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { UserRole } from '@dental/shared'
+import type { UserRole } from '@dental/shared'
 
 export interface User {
   id: string
   email: string
   firstName: string
   lastName: string
-  role: Exclude<UserRole, UserRole.SUPER_ADMIN>
+  role: Exclude<UserRole, 'SUPER_ADMIN'>
   tenantId: string
   avatar?: string
   phone?: string
