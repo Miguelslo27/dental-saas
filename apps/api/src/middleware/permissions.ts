@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '@dental/database';
+import { UserRole } from '@dental/shared';
 
 /**
  * Granular permissions for the application
@@ -190,7 +190,7 @@ export function requirePermission(permission: Permission) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!hasPermission(user.role, permission)) {
+    if (!hasPermission(user.role as UserRole, permission)) {
       return res.status(403).json({
         error: 'Insufficient permissions',
         required: permission,
@@ -213,7 +213,7 @@ export function requireAnyPermission(permissions: Permission[]) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!hasAnyPermission(user.role, permissions)) {
+    if (!hasAnyPermission(user.role as UserRole, permissions)) {
       return res.status(403).json({
         error: 'Insufficient permissions',
         required: `Any of: ${permissions.join(', ')}`,
@@ -236,7 +236,7 @@ export function requireAllPermissions(permissions: Permission[]) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!hasAllPermissions(user.role, permissions)) {
+    if (!hasAllPermissions(user.role as UserRole, permissions)) {
       return res.status(403).json({
         error: 'Insufficient permissions',
         required: `All of: ${permissions.join(', ')}`,

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '@dental/database';
+import { UserRole } from '@dental/shared';
 import {
   Permission,
   ROLE_PERMISSIONS,
@@ -10,7 +10,7 @@ import {
   requirePermission,
   requireAnyPermission,
   requireAllPermissions,
-} from './permissions';
+} from './permissions.js';
 
 describe('Permissions System', () => {
   describe('ROLE_PERMISSIONS mapping', () => {
