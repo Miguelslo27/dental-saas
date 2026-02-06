@@ -67,7 +67,8 @@ describe('Expenses Routes - Permission Tests', () => {
       data: {
         tenantId,
         email: 'admin@expenses-test.com',
-        name: 'Admin User',
+        firstName: 'Admin',
+        lastName: 'User',
         passwordHash: hashedPassword,
         role: 'ADMIN',
       },
@@ -79,7 +80,8 @@ describe('Expenses Routes - Permission Tests', () => {
       data: {
         tenantId,
         email: 'staff@expenses-test.com',
-        name: 'Staff User',
+        firstName: 'Staff',
+        lastName: 'User',
         passwordHash: hashedPassword,
         role: 'STAFF',
       },
