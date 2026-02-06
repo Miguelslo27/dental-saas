@@ -1,5 +1,9 @@
 // Shared types for Alveo System
 
+// Re-export permissions
+export * from './permissions'
+export * from './types'
+
 export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T

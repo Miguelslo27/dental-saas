@@ -9,10 +9,12 @@ import {
   Filter,
   DollarSign,
 } from 'lucide-react'
+import { Permission } from '@dental/shared'
 import { useExpensesStore } from '@/stores/expenses.store'
 import { ExpenseCard } from '@/components/expenses/ExpenseCard'
 import { ExpenseFormModal } from '@/components/expenses/ExpenseFormModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { Can } from '@/components/auth'
 import type { Expense, CreateExpenseData, UpdateExpenseData } from '@/lib/expense-api'
 
 export function ExpensesPage() {
@@ -155,13 +157,15 @@ export function ExpensesPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="h-5 w-5" />
-          Nuevo Gasto
-        </button>
+        <Can permission={Permission.EXPENSES_CREATE}>
+          <button
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            Nuevo Gasto
+          </button>
+        </Can>
       </div>
 
       {/* Stats cards */}
@@ -331,13 +335,15 @@ export function ExpensesPage() {
               : 'Comienza registrando tu primer gasto'}
           </p>
           {!searchQuery && filters.isPaid === undefined && (
-            <button
-              onClick={handleOpenCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-5 w-5" />
-              Crear Gasto
-            </button>
+            <Can permission={Permission.EXPENSES_CREATE}>
+              <button
+                onClick={handleOpenCreate}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+                Crear Gasto
+              </button>
+            </Can>
           )}
         </div>
       )}

@@ -10,8 +10,10 @@ import {
   Package,
   User,
 } from 'lucide-react'
+import { Permission } from '@dental/shared'
 import type { Labwork } from '@/lib/labwork-api'
 import { getLabworkStatusBadge } from '@/lib/labwork-api'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface LabworkCardProps {
   labwork: Labwork
@@ -30,6 +32,7 @@ export function LabworkCard({
   onTogglePaid,
   onToggleDelivered,
 }: LabworkCardProps) {
+  const { can } = usePermissions()
   const statusBadge = getLabworkStatusBadge(labwork)
   const isDeleted = !!labwork.deletedAt
 
@@ -107,11 +110,11 @@ export function LabworkCard({
         <div className="flex gap-3 mb-4">
           <button
             onClick={() => onTogglePaid?.(labwork)}
-            disabled={isDeleted}
+            disabled={isDeleted || !can(Permission.LABWORKS_UPDATE)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${labwork.isPaid
                 ? 'bg-green-100 text-green-700 hover:bg-green-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted || !can(Permission.LABWORKS_UPDATE) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {labwork.isPaid ? (
               <CheckCircle2 className="h-4 w-4" />
@@ -123,11 +126,11 @@ export function LabworkCard({
 
           <button
             onClick={() => onToggleDelivered?.(labwork)}
-            disabled={isDeleted}
+            disabled={isDeleted || !can(Permission.LABWORKS_UPDATE)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${labwork.isDelivered
                 ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted || !can(Permission.LABWORKS_UPDATE) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Package className="h-4 w-4" />
             {labwork.isDelivered ? 'Entregado' : 'Por entregar'}
@@ -142,29 +145,35 @@ export function LabworkCard({
         {/* Actions */}
         <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
           {isDeleted && onRestore ? (
-            <button
-              onClick={() => onRestore(labwork)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Restaurar
-            </button>
+            can(Permission.LABWORKS_UPDATE) && (
+              <button
+                onClick={() => onRestore(labwork)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Restaurar
+              </button>
+            )
           ) : (
             <>
-              <button
-                onClick={() => onEdit(labwork)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Pencil className="h-4 w-4" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDelete(labwork)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar
-              </button>
+              {can(Permission.LABWORKS_UPDATE) && (
+                <button
+                  onClick={() => onEdit(labwork)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Editar
+                </button>
+              )}
+              {can(Permission.LABWORKS_DELETE) && (
+                <button
+                  onClick={() => onDelete(labwork)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </button>
+              )}
             </>
           )}
         </div>

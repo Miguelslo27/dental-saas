@@ -9,8 +9,10 @@ import {
   Clock,
   Tag,
 } from 'lucide-react'
+import { Permission } from '@dental/shared'
 import type { Expense } from '@/lib/expense-api'
 import { getExpenseStatusBadge, formatExpenseAmount } from '@/lib/expense-api'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface ExpenseCardProps {
   expense: Expense
@@ -27,6 +29,7 @@ export function ExpenseCard({
   onRestore,
   onTogglePaid,
 }: ExpenseCardProps) {
+  const { can } = usePermissions()
   const statusBadge = getExpenseStatusBadge(expense)
   const isDeleted = !!expense.deletedAt
 
@@ -109,11 +112,11 @@ export function ExpenseCard({
         <div className="mb-4">
           <button
             onClick={() => onTogglePaid?.(expense)}
-            disabled={isDeleted}
+            disabled={isDeleted || !can(Permission.EXPENSES_UPDATE)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${expense.isPaid
                 ? 'bg-green-100 text-green-700 hover:bg-green-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              } ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
+              } ${isDeleted || !can(Permission.EXPENSES_UPDATE) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {expense.isPaid ? (
               <CheckCircle2 className="h-4 w-4" />
@@ -132,29 +135,35 @@ export function ExpenseCard({
         {/* Actions */}
         <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
           {isDeleted && onRestore ? (
-            <button
-              onClick={() => onRestore(expense)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Restaurar
-            </button>
+            can(Permission.EXPENSES_UPDATE) && (
+              <button
+                onClick={() => onRestore(expense)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Restaurar
+              </button>
+            )
           ) : (
             <>
-              <button
-                onClick={() => onEdit(expense)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Pencil className="h-4 w-4" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDelete(expense)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar
-              </button>
+              {can(Permission.EXPENSES_UPDATE) && (
+                <button
+                  onClick={() => onEdit(expense)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Editar
+                </button>
+              )}
+              {can(Permission.EXPENSES_DELETE) && (
+                <button
+                  onClick={() => onDelete(expense)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </button>
+              )}
             </>
           )}
         </div>

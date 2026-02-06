@@ -10,10 +10,12 @@ import {
   DollarSign,
   Package,
 } from 'lucide-react'
+import { Permission } from '@dental/shared'
 import { useLabworksStore } from '@/stores/labworks.store'
 import { LabworkCard } from '@/components/labworks/LabworkCard'
 import { LabworkFormModal } from '@/components/labworks/LabworkFormModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { Can } from '@/components/auth'
 import type { Labwork, CreateLabworkData, UpdateLabworkData } from '@/lib/labwork-api'
 
 export function LabworksPage() {
@@ -164,13 +166,15 @@ export function LabworksPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="h-5 w-5" />
-          Nuevo Trabajo
-        </button>
+        <Can permission={Permission.LABWORKS_CREATE}>
+          <button
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            Nuevo Trabajo
+          </button>
+        </Can>
       </div>
 
       {/* Stats cards */}
@@ -373,13 +377,15 @@ export function LabworksPage() {
               : 'Comienza creando tu primer trabajo de laboratorio'}
           </p>
           {!searchQuery && filters.isPaid === undefined && filters.isDelivered === undefined && (
-            <button
-              onClick={handleOpenCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-5 w-5" />
-              Crear Trabajo
-            </button>
+            <Can permission={Permission.LABWORKS_CREATE}>
+              <button
+                onClick={handleOpenCreate}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+                Crear Trabajo
+              </button>
+            </Can>
           )}
         </div>
       )}
