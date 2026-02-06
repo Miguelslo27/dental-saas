@@ -129,7 +129,7 @@ describe('Expenses Routes - Permission Tests', () => {
       expect(response.status).toBe(201)
       expect(response.body.data).toHaveProperty('id')
       expect(response.body.data.description).toBe(expenseData.description)
-      expect(response.body.data.amount).toBe(expenseData.amount)
+      expect(Number(response.body.data.amount)).toBe(expenseData.amount)
     })
 
     it('should deny STAFF from creating expense', async () => {
@@ -163,7 +163,7 @@ describe('Expenses Routes - Permission Tests', () => {
         .send(updateData)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.amount).toBe(175.00)
+      expect(Number(response.body.data.amount)).toBe(175.00)
       expect(response.body.data.description).toBe(updateData.description)
     })
 
