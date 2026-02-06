@@ -223,7 +223,7 @@ describe('Expenses Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(Array.isArray(response.body)).toBe(true)
+      expect(Array.isArray(response.body.data)).toBe(true)
     })
 
     it('should allow ADMIN to view expenses', async () => {
@@ -232,7 +232,7 @@ describe('Expenses Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
 
       expect(response.status).toBe(200)
-      expect(Array.isArray(response.body)).toBe(true)
+      expect(Array.isArray(response.body.data)).toBe(true)
     })
   })
 })

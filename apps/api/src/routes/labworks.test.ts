@@ -90,11 +90,10 @@ describe('Labworks Routes - Permission Tests', () => {
 
     // Create a labwork as ADMIN for testing
     const labworkData = {
-      patientName: 'Test Patient',
-      description: 'Test dental work',
-      laboratory: 'Test Lab',
-      status: 'PENDING',
-      sentDate: new Date().toISOString(),
+      lab: 'Test Lab',
+      date: new Date().toISOString(),
+      note: 'Test dental work',
+      price: 100,
     }
 
     const response = await request(app)
@@ -116,11 +115,10 @@ describe('Labworks Routes - Permission Tests', () => {
   describe('POST /api/labworks (Create)', () => {
     it('should allow ADMIN to create labwork', async () => {
       const labworkData = {
-        patientName: 'John Doe',
-        description: 'Crown preparation',
-        laboratory: 'Dental Lab Inc',
-        status: 'PENDING',
-        sentDate: new Date().toISOString(),
+        lab: 'Dental Lab Inc',
+        date: new Date().toISOString(),
+        note: 'Crown preparation',
+        price: 150,
       }
 
       const response = await request(app)
@@ -130,16 +128,15 @@ describe('Labworks Routes - Permission Tests', () => {
 
       expect(response.status).toBe(201)
       expect(response.body.data).toHaveProperty('id')
-      expect(response.body.data.patientName).toBe(labworkData.patientName)
+      expect(response.body.data.lab).toBe(labworkData.lab)
     })
 
     it('should deny STAFF from creating labwork', async () => {
       const labworkData = {
-        patientName: 'Jane Smith',
-        description: 'Bridge work',
-        laboratory: 'Lab Plus',
-        status: 'PENDING',
-        sentDate: new Date().toISOString(),
+        lab: 'Lab Plus',
+        date: new Date().toISOString(),
+        note: 'Bridge work',
+        price: 200,
       }
 
       const response = await request(app)
@@ -155,8 +152,8 @@ describe('Labworks Routes - Permission Tests', () => {
   describe('PUT /api/labworks/:id (Update)', () => {
     it('should allow ADMIN to update labwork', async () => {
       const updateData = {
-        status: 'COMPLETED',
-        receivedDate: new Date().toISOString(),
+        isDelivered: true,
+        isPaid: true,
       }
 
       const response = await request(app)
@@ -165,12 +162,12 @@ describe('Labworks Routes - Permission Tests', () => {
         .send(updateData)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.status).toBe('COMPLETED')
+      expect(response.body.data.isDelivered).toBe(true)
     })
 
     it('should deny STAFF from updating labwork', async () => {
       const updateData = {
-        status: 'IN_PROGRESS',
+        isPaid: true,
       }
 
       const response = await request(app)
@@ -196,11 +193,10 @@ describe('Labworks Routes - Permission Tests', () => {
     it('should allow ADMIN to delete labwork', async () => {
       // Create a new labwork to delete
       const labworkData = {
-        patientName: 'Delete Test',
-        description: 'To be deleted',
-        laboratory: 'Test Lab',
-        status: 'PENDING',
-        sentDate: new Date().toISOString(),
+        lab: 'Test Lab',
+        date: new Date().toISOString(),
+        note: 'To be deleted',
+        price: 50,
       }
 
       const createResponse = await request(app)
@@ -225,7 +221,7 @@ describe('Labworks Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(Array.isArray(response.body)).toBe(true)
+      expect(Array.isArray(response.body.data)).toBe(true)
     })
 
     it('should allow ADMIN to view labworks', async () => {
@@ -234,7 +230,7 @@ describe('Labworks Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
 
       expect(response.status).toBe(200)
-      expect(Array.isArray(response.body)).toBe(true)
+      expect(Array.isArray(response.body.data)).toBe(true)
     })
   })
 })
