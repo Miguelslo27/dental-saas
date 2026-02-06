@@ -102,7 +102,7 @@ describe('Labworks Routes - Permission Tests', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .send(labworkData)
 
-    testLabworkId = response.body.id
+    testLabworkId = response.body.data?.id
   })
 
   afterAll(async () => {
@@ -129,8 +129,8 @@ describe('Labworks Routes - Permission Tests', () => {
         .send(labworkData)
 
       expect(response.status).toBe(201)
-      expect(response.body).toHaveProperty('id')
-      expect(response.body.patientName).toBe(labworkData.patientName)
+      expect(response.body.data).toHaveProperty('id')
+      expect(response.body.data.patientName).toBe(labworkData.patientName)
     })
 
     it('should deny STAFF from creating labwork', async () => {
@@ -165,7 +165,7 @@ describe('Labworks Routes - Permission Tests', () => {
         .send(updateData)
 
       expect(response.status).toBe(200)
-      expect(response.body.status).toBe('COMPLETED')
+      expect(response.body.data.status).toBe('COMPLETED')
     })
 
     it('should deny STAFF from updating labwork', async () => {
@@ -208,7 +208,7 @@ describe('Labworks Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send(labworkData)
 
-      const labworkId = createResponse.body.id
+      const labworkId = createResponse.body.data.id
 
       const deleteResponse = await request(app)
         .delete(`/api/labworks/${labworkId}`)

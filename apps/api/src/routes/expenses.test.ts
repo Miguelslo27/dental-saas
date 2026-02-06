@@ -101,7 +101,7 @@ describe('Expenses Routes - Permission Tests', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .send(expenseData)
 
-    testExpenseId = response.body.id
+    testExpenseId = response.body.data?.id
   })
 
   afterAll(async () => {
@@ -127,9 +127,9 @@ describe('Expenses Routes - Permission Tests', () => {
         .send(expenseData)
 
       expect(response.status).toBe(201)
-      expect(response.body).toHaveProperty('id')
-      expect(response.body.description).toBe(expenseData.description)
-      expect(response.body.amount).toBe(expenseData.amount)
+      expect(response.body.data).toHaveProperty('id')
+      expect(response.body.data.description).toBe(expenseData.description)
+      expect(response.body.data.amount).toBe(expenseData.amount)
     })
 
     it('should deny STAFF from creating expense', async () => {
@@ -163,8 +163,8 @@ describe('Expenses Routes - Permission Tests', () => {
         .send(updateData)
 
       expect(response.status).toBe(200)
-      expect(response.body.amount).toBe(175.00)
-      expect(response.body.description).toBe(updateData.description)
+      expect(response.body.data.amount).toBe(175.00)
+      expect(response.body.data.description).toBe(updateData.description)
     })
 
     it('should deny STAFF from updating expense', async () => {
@@ -206,7 +206,7 @@ describe('Expenses Routes - Permission Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send(expenseData)
 
-      const expenseId = createResponse.body.id
+      const expenseId = createResponse.body.data.id
 
       const deleteResponse = await request(app)
         .delete(`/api/expenses/${expenseId}`)
