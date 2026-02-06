@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Permission, hasPermission, hasAnyPermission, hasAllPermissions } from '@dental/shared';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../stores/auth.store';
 
 /**
  * Hook to check user permissions based on their role

@@ -68,7 +68,7 @@ describe('Labworks Routes - Permission Tests', () => {
         tenantId,
         email: 'admin@labworks-test.com',
         name: 'Admin User',
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         role: 'ADMIN',
       },
     })
@@ -80,7 +80,7 @@ describe('Labworks Routes - Permission Tests', () => {
         tenantId,
         email: 'staff@labworks-test.com',
         name: 'Staff User',
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         role: 'STAFF',
       },
     })

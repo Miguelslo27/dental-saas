@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { Permission } from '@dental/shared';
 import { usePermissions } from './usePermissions';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../stores/auth.store';
 
 // Mock the auth store
-vi.mock('../stores/authStore', () => ({
+vi.mock('../stores/auth.store', () => ({
   useAuthStore: vi.fn(),
 }));
 
