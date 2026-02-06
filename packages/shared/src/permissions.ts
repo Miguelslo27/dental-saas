@@ -1,4 +1,4 @@
-import { UserRole } from './types';
+import { UserRole } from './types.js';
 
 /**
  * Granular permissions for the application
