@@ -90,9 +90,9 @@ describe('Expenses Routes - Permission Tests', () => {
 
     // Create an expense as ADMIN for testing
     const expenseData = {
-      description: 'Test Expense',
+      note: 'Test Expense',
       amount: 150.00,
-      category: 'SUPPLIES',
+      issuer: 'Test Supplier',
       date: new Date().toISOString(),
     }
 
@@ -115,9 +115,9 @@ describe('Expenses Routes - Permission Tests', () => {
   describe('POST /api/expenses (Create)', () => {
     it('should allow ADMIN to create expense', async () => {
       const expenseData = {
-        description: 'Office supplies',
+        note: 'Office supplies',
         amount: 250.50,
-        category: 'SUPPLIES',
+        issuer: 'Office Supplier',
         date: new Date().toISOString(),
       }
 
@@ -128,15 +128,15 @@ describe('Expenses Routes - Permission Tests', () => {
 
       expect(response.status).toBe(201)
       expect(response.body.data).toHaveProperty('id')
-      expect(response.body.data.description).toBe(expenseData.description)
+      expect(response.body.data.note).toBe(expenseData.note)
       expect(Number(response.body.data.amount)).toBe(expenseData.amount)
     })
 
     it('should deny STAFF from creating expense', async () => {
       const expenseData = {
-        description: 'Unauthorized expense',
+        note: 'Unauthorized expense',
         amount: 100.00,
-        category: 'SUPPLIES',
+        issuer: 'Test',
         date: new Date().toISOString(),
       }
 
@@ -154,7 +154,7 @@ describe('Expenses Routes - Permission Tests', () => {
     it('should allow ADMIN to update expense', async () => {
       const updateData = {
         amount: 175.00,
-        description: 'Updated expense description',
+        note: 'Updated expense note',
       }
 
       const response = await request(app)
@@ -164,7 +164,7 @@ describe('Expenses Routes - Permission Tests', () => {
 
       expect(response.status).toBe(200)
       expect(Number(response.body.data.amount)).toBe(175.00)
-      expect(response.body.data.description).toBe(updateData.description)
+      expect(response.body.data.note).toBe(updateData.note)
     })
 
     it('should deny STAFF from updating expense', async () => {
@@ -195,9 +195,9 @@ describe('Expenses Routes - Permission Tests', () => {
     it('should allow ADMIN to delete expense', async () => {
       // Create a new expense to delete
       const expenseData = {
-        description: 'Expense to delete',
+        note: 'Expense to delete',
         amount: 50.00,
-        category: 'OTHER',
+        issuer: 'Test',
         date: new Date().toISOString(),
       }
 
