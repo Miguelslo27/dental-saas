@@ -39,9 +39,6 @@ export interface PlanFeatures {
   apiAccess: boolean
 }
 
-// User roles
-export type UserRole = 'superadmin' | 'admin' | 'user'
-
 // Common entity fields
 export interface BaseEntity {
   id: string

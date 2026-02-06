@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Settings, Building2, Clock, Bell, Loader2, AlertCircle, CheckCircle2, Database } from 'lucide-react'
+import { UserRole } from '@dental/shared'
 import { useSettingsStore } from '@/stores/settings.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { ClinicProfileForm } from '@/components/settings/ClinicProfileForm'
@@ -70,8 +71,8 @@ export function SettingsPage() {
     }
   }, [successMessage, clearSuccessMessage])
 
-  const canEditProfile = user?.role === 'OWNER'
-  const canEditSettings = user?.role === 'OWNER' || user?.role === 'ADMIN'
+  const canEditProfile = user?.role === UserRole.OWNER
+  const canEditSettings = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN
 
   if (isLoading && !settings && !tenantProfile) {
     return (

@@ -1,14 +1,14 @@
-import type { User } from '@/stores/auth.store'
+import { UserRole } from '@dental/shared'
 
 /**
  * Role hierarchy for RBAC
  * Higher number = more permissions
  */
-export const ROLE_HIERARCHY: Record<User['role'], number> = {
-  OWNER: 4,
-  ADMIN: 3,
-  DOCTOR: 2,
-  STAFF: 1,
+export const ROLE_HIERARCHY: Record<Exclude<UserRole, UserRole.SUPER_ADMIN>, number> = {
+  [UserRole.OWNER]: 4,
+  [UserRole.ADMIN]: 3,
+  [UserRole.DOCTOR]: 2,
+  [UserRole.STAFF]: 1,
 }
 
 /**

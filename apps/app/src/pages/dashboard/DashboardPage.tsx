@@ -24,6 +24,7 @@ import {
 } from 'recharts'
 import { useStatsStore } from '@/stores/stats.store'
 import { useAuthStore } from '@/stores/auth.store'
+import { UserRole } from '@dental/shared'
 
 // ============================================================================
 // Stat Card Component
@@ -86,7 +87,7 @@ function StatCard({ title, value, subtitle, icon, trend, linkTo, color }: StatCa
 export default function DashboardPage() {
   const { overview, appointmentStats, revenueStats, patientsGrowth, doctorPerformance, isLoading, error, fetchAllStats } = useStatsStore()
   const { user } = useAuthStore()
-  const isAdmin = user?.role === 'OWNER' || user?.role === 'ADMIN'
+  const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN
 
   useEffect(() => {
     fetchAllStats()
