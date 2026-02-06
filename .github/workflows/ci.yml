@@ -205,6 +205,9 @@ jobs:
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
+      - name: Build shared package
+        run: pnpm --filter @dental/shared build
+
       - name: Build all packages
         run: pnpm build
         env:
