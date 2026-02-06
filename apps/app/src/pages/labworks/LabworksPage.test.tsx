@@ -43,6 +43,15 @@ vi.mock('@/stores/labworks.store', () => ({
   }),
 }))
 
+// Mock usePermissions hook to grant all permissions
+vi.mock('@/hooks/usePermissions', () => ({
+  usePermissions: () => ({
+    can: () => true,
+    canAny: () => true,
+    canAll: () => true,
+  }),
+}))
+
 // Mock LabworkCard component
 vi.mock('@/components/labworks/LabworkCard', () => ({
   LabworkCard: ({ labwork, onEdit, onDelete, onRestore, onTogglePaid, onToggleDelivered }: any) => (

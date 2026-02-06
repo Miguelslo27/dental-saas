@@ -43,6 +43,15 @@ vi.mock('@/stores/expenses.store', () => ({
   }),
 }))
 
+// Mock usePermissions hook to grant all permissions
+vi.mock('@/hooks/usePermissions', () => ({
+  usePermissions: () => ({
+    can: () => true,
+    canAny: () => true,
+    canAll: () => true,
+  }),
+}))
+
 // Mock ExpenseCard component
 vi.mock('@/components/expenses/ExpenseCard', () => ({
   ExpenseCard: ({ expense, onEdit, onDelete, onRestore, onTogglePaid }: any) => (
