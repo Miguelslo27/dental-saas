@@ -234,10 +234,10 @@ All core features completed (15 phases):
 - [ ] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
 
 #### Internationalization & Localization
-- [ ] Fix PDF patient file to use configured language (currently in English)
-- [ ] Send emails based on user's selected/default language
-- [ ] Currency alignment: ensure all values respect configured currency
-- [ ] Show warning when changing currency (no automatic conversion between currencies)
+- [x] Fix PDF patient file to use configured language (currently in English)
+- [x] Send emails based on user's selected/default language
+- [x] Currency alignment: ensure all values respect configured currency
+- [x] Show warning when changing currency (no automatic conversion between currencies)
 
 #### Security & Performance
 - [ ] Rate limiting with Redis (persistence and scalability)
@@ -279,7 +279,7 @@ All core features completed (15 phases):
 - [ ] Prescriptions component
 - [ ] og-image.png (1200x630px) for apps/web/public/
 - [ ] Subscriptions and payments (dLocal integration)
-- [ ] Welcome email when creating tenant
+- [x] Welcome email when creating tenant
 
 ---
 
