@@ -195,12 +195,14 @@ authRouter.post('/forgot-password', async (req, res, next) => {
     })
 
     // Send email (fire-and-forget, don't block response)
+    // Super admin emails default to English
     const resetUrl = buildAdminResetUrl(plainToken)
     sendPasswordResetEmail({
       to: user.email,
       firstName: user.firstName,
       resetUrl,
       expiresInMinutes: TOKEN_EXPIRY_MINUTES,
+      language: 'en',
     }).catch((err) => {
       logger.error({ err, userId: user.id }, 'Failed to send password reset email')
     })

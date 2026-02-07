@@ -18,6 +18,18 @@ export type Role = UserRole
 // Re-export permissions
 export * from './permissions.js'
 
+// Translation functions
+export {
+  t,
+  formatDate,
+  formatTime,
+  formatDateTime,
+  translateStatus,
+  translateGender,
+  sanitizeFilename,
+  type Language,
+} from './translations/index.js'
+
 export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T

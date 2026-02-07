@@ -11,15 +11,32 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import { t, type Language } from '@dental/shared'
+
+// HTML escape function to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char])
+}
 
 interface WelcomeEmailProps {
   firstName: string
   clinicName: string
   loginUrl: string
+  language?: Language
 }
 
-export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailProps) {
-  const previewText = `Welcome to Alveo System! Your clinic "${clinicName}" is ready.`
+export function WelcomeEmail({ firstName, clinicName, loginUrl, language = 'es' }: WelcomeEmailProps) {
+  // Escape user-provided values to prevent XSS
+  const safeClinicName = escapeHtml(clinicName)
+  const safeFirstName = escapeHtml(firstName)
+  const previewText = t(language, 'email.welcome.preview', { clinicName: safeClinicName })
 
   return (
     <Html>
@@ -27,48 +44,39 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl }: WelcomeEmailPr
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>🦷 Welcome to Alveo System!</Heading>
+          <Heading style={heading}>{t(language, 'email.welcome.heading')}</Heading>
 
-          <Text style={paragraph}>Hi {firstName},</Text>
+          <Text style={paragraph}>{t(language, 'email.welcome.greeting', { firstName: safeFirstName })}</Text>
 
-          <Text style={paragraph}>
-            Thank you for registering <strong>{clinicName}</strong> with Alveo System.
-            Your clinic management system is now ready to use!
-          </Text>
+          <Text style={paragraph}>{t(language, 'email.welcome.thankYou', { clinicName: safeClinicName })}</Text>
 
-          <Text style={paragraph}>
-            As the clinic owner, you can now:
-          </Text>
+          <Text style={paragraph}>{t(language, 'email.welcome.asOwner')}</Text>
 
           <ul style={list}>
-            <li>Add doctors and staff members</li>
-            <li>Manage patient records</li>
-            <li>Schedule appointments</li>
-            <li>Track lab works and expenses</li>
-            <li>Generate reports and analytics</li>
+            <li>{t(language, 'email.welcome.addStaff')}</li>
+            <li>{t(language, 'email.welcome.managePatients')}</li>
+            <li>{t(language, 'email.welcome.scheduleAppointments')}</li>
+            <li>{t(language, 'email.welcome.trackLabworks')}</li>
+            <li>{t(language, 'email.welcome.generateReports')}</li>
           </ul>
 
           <Section style={buttonContainer}>
             <Button style={button} href={loginUrl}>
-              Go to your clinic dashboard
+              {t(language, 'email.welcome.buttonText')}
             </Button>
           </Section>
 
           <Hr style={hr} />
 
-          <Text style={footer}>
-            If you have any questions, reply to this email or contact our support team.
-          </Text>
+          <Text style={footer}>{t(language, 'email.welcome.questions')}</Text>
 
-          <Text style={footer}>
-            — The Alveo System Team
-          </Text>
+          <Text style={footer}>{t(language, 'email.welcome.signature')}</Text>
 
           <Hr style={hr} />
 
           <Text style={footerLinks}>
             <Link href={loginUrl} style={link}>
-              Go to Dashboard
+              {t(language, 'email.welcome.dashboardLink')}
             </Link>
           </Text>
         </Container>

@@ -17,6 +17,7 @@ export interface TenantInfo {
   logo: string | null
   timezone: string
   currency: string
+  language: string
 }
 
 /**
@@ -133,10 +134,26 @@ export const PdfService = {
         logo: true,
         timezone: true,
         currency: true,
+        settings: {
+          select: {
+            language: true,
+          },
+        },
       },
     })
 
-    return tenant
+    if (!tenant) return null
+
+    return {
+      name: tenant.name,
+      email: tenant.email,
+      phone: tenant.phone,
+      address: tenant.address,
+      logo: tenant.logo,
+      timezone: tenant.timezone,
+      currency: tenant.currency,
+      language: tenant.settings?.language || 'es',
+    }
   },
 
   /**
