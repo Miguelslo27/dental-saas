@@ -317,10 +317,6 @@ importers:
         version: 5.9.3
 
   packages/shared:
-    dependencies:
-      '@dental/database':
-        specifier: workspace:*
-        version: link:../database
     devDependencies:
       typescript:
         specifier: ^5.8.3

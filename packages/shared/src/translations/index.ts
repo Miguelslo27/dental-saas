@@ -1,10 +1,19 @@
-// Use type-only import for AppointmentStatus to avoid runtime dependency
-import type { AppointmentStatus } from '@dental/database'
 import esTranslations from './pdf-emails.es.js'
 import enTranslations from './pdf-emails.en.js'
 import arTranslations from './pdf-emails.ar.js'
 
 export type Language = 'es' | 'en' | 'ar'
+
+// Define AppointmentStatus locally to avoid dependency on @dental/database
+// This must match the enum in the database package
+export type AppointmentStatus =
+  | 'SCHEDULED'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW'
+  | 'RESCHEDULED'
 
 const translations = {
   es: esTranslations,
