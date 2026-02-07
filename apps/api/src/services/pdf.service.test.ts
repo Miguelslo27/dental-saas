@@ -47,6 +47,7 @@ function createMockTenantInfo(overrides: Partial<TenantInfo> = {}): TenantInfo {
     logo: null,
     timezone: 'America/New_York',
     currency: 'USD',
+    language: 'en',
     ...overrides,
   }
 }

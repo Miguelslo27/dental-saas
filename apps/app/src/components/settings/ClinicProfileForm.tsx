@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Loader2, Lock } from 'lucide-react'
+import { Loader2, Lock, AlertTriangle, X } from 'lucide-react'
 import { useSettingsStore } from '@/stores/settings.store'
 import type { TenantProfile, UpdateTenantProfileData } from '@/lib/settings-api'
 
@@ -49,6 +49,9 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
     currency: 'ARS',
   })
 
+  const [showCurrencyWarning, setShowCurrencyWarning] = useState(false)
+  const [pendingCurrency, setPendingCurrency] = useState<string | null>(null)
+
   // Sync form data when profile loads
   useEffect(() => {
     if (profile) {
@@ -69,6 +72,31 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
   ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCurrency = e.target.value
+    const isActualChange = profile?.currency && profile.currency !== newCurrency
+
+    if (isActualChange) {
+      setPendingCurrency(newCurrency)
+      setShowCurrencyWarning(true)
+    } else {
+      setFormData((prev) => ({ ...prev, currency: newCurrency }))
+    }
+  }
+
+  const confirmCurrencyChange = () => {
+    if (pendingCurrency) {
+      setFormData((prev) => ({ ...prev, currency: pendingCurrency }))
+    }
+    setShowCurrencyWarning(false)
+    setPendingCurrency(null)
+  }
+
+  const cancelCurrencyChange = () => {
+    setShowCurrencyWarning(false)
+    setPendingCurrency(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -237,8 +265,8 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
             id="currency"
             name="currency"
             value={formData.currency}
-            onChange={handleChange}
-            disabled={!canEdit}
+            onChange={handleCurrencyChange}
+            disabled={!canEdit || isSaving}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
             {CURRENCIES.map((curr) => (
@@ -249,6 +277,64 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
           </select>
         </div>
       </div>
+
+      {/* Currency Warning Modal */}
+      {showCurrencyWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-6 w-6 text-yellow-600" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Cambiar Moneda
+                </h3>
+              </div>
+              <button
+                onClick={cancelCurrencyChange}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-700 mb-4">
+                Estás cambiando la moneda de <strong>{profile?.currency}</strong> a{' '}
+                <strong>{pendingCurrency}</strong>.
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm font-medium text-yellow-800 mb-2">
+                  ⚠️ IMPORTANTE
+                </p>
+                <p className="text-sm text-yellow-700">
+                  Los valores existentes NO se convertirán automáticamente. Todos los montos
+                  (citas, gastos, trabajos de laboratorio) permanecerán con sus valores
+                  numéricos actuales y solo cambiarán el símbolo de moneda.
+                </p>
+              </div>
+              <p className="text-sm text-gray-600 mt-4">¿Deseas continuar?</p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 rounded-b-lg">
+              <button
+                onClick={cancelCurrencyChange}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmCurrencyChange}
+                className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors"
+              >
+                Sí, cambiar moneda
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Slug (read-only info) */}
       <div className="pt-4 border-t border-gray-200">

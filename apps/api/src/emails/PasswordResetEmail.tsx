@@ -11,19 +11,22 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import { t, type Language } from '@dental/shared'
 
 interface PasswordResetEmailProps {
   firstName: string
   resetUrl: string
   expiresInMinutes: number
+  language?: Language
 }
 
 export function PasswordResetEmail({
   firstName,
   resetUrl,
   expiresInMinutes,
+  language = 'es',
 }: PasswordResetEmailProps) {
-  const previewText = 'Reset your Alveo System password'
+  const previewText = t(language, 'email.passwordReset.preview')
 
   return (
     <Html>
@@ -31,42 +34,41 @@ export function PasswordResetEmail({
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>🔐 Password Reset Request</Heading>
+          <Heading style={heading}>{t(language, 'email.passwordReset.heading')}</Heading>
 
-          <Text style={paragraph}>Hi {firstName},</Text>
+          <Text style={paragraph}>{t(language, 'email.passwordReset.greeting', { firstName })}</Text>
 
-          <Text style={paragraph}>
-            We received a request to reset your password for your Alveo System
-            administrator account. Click the button below to set a new password:
-          </Text>
+          <Text style={paragraph}>{t(language, 'email.passwordReset.message')}</Text>
 
           <Section style={buttonContainer}>
             <Button style={button} href={resetUrl}>
-              Reset Password
+              {t(language, 'email.passwordReset.buttonText')}
             </Button>
           </Section>
 
-          <Text style={warningText}>
-            ⏱️ This link will expire in <strong>{expiresInMinutes} minutes</strong>.
-          </Text>
+          <Text
+            style={warningText}
+            dangerouslySetInnerHTML={{
+              __html: t(language, 'email.passwordReset.expiryWarning', {
+                minutes: expiresInMinutes,
+              }),
+            }}
+          />
 
           <Hr style={hr} />
 
-          <Text style={securityText}>
-            🔒 <strong>Security Notice:</strong> If you didn't request this password
-            reset, you can safely ignore this email. Your password will remain
-            unchanged.
-          </Text>
+          <Text
+            style={securityText}
+            dangerouslySetInnerHTML={{
+              __html: t(language, 'email.passwordReset.securityNotice'),
+            }}
+          />
 
-          <Text style={footer}>
-            — The Alveo System Team
-          </Text>
+          <Text style={footer}>{t(language, 'email.passwordReset.signature')}</Text>
 
           <Hr style={hr} />
 
-          <Text style={footerLinks}>
-            If the button doesn't work, copy and paste this link into your browser:
-          </Text>
+          <Text style={footerLinks}>{t(language, 'email.passwordReset.linkInstructions')}</Text>
           <Text style={linkText}>
             <Link href={resetUrl} style={link}>
               {resetUrl}

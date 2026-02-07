@@ -1,6 +1,13 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import type { PatientHistoryData, AppointmentStatus } from '../services/pdf.service.js'
-import { formatDate, formatDateTime, formatStatus } from './pdf-utils.js'
+import {
+  t,
+  formatDate as formatDateI18n,
+  formatDateTime as formatDateTimeI18n,
+  translateStatus,
+  translateGender,
+  type Language,
+} from '@dental/shared'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -219,6 +226,7 @@ interface PatientHistoryPdfProps {
 export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
   const { tenant, patient, appointments, teethNotes, generatedAt } = data
   const timezone = tenant.timezone || 'UTC'
+  const language = (tenant.language || 'es') as Language
 
   // Sort teeth notes by tooth number
   const sortedTeeth = teethNotes
@@ -240,13 +248,13 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>Patient Medical History</Text>
+        <Text style={styles.title}>{t(language, 'pdf.patient.title')}</Text>
 
         {/* Patient Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Patient Information</Text>
+          <Text style={styles.sectionTitle}>{t(language, 'pdf.patient.information')}</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Full Name:</Text>
+            <Text style={styles.label}>{t(language, 'pdf.patient.fullName')}:</Text>
             <Text style={styles.value}>
               {patient.firstName} {patient.lastName}
             </Text>
@@ -254,36 +262,38 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
           {patient.dob && (
             <>
               <View style={styles.row}>
-                <Text style={styles.label}>Date of Birth:</Text>
-                <Text style={styles.value}>{formatDate(patient.dob, timezone)}</Text>
+                <Text style={styles.label}>{t(language, 'pdf.patient.dateOfBirth')}:</Text>
+                <Text style={styles.value}>{formatDateI18n(patient.dob, language, timezone)}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Age:</Text>
-                <Text style={styles.value}>{calculateAge(patient.dob)} years</Text>
+                <Text style={styles.label}>{t(language, 'pdf.patient.age')}:</Text>
+                <Text style={styles.value}>
+                  {calculateAge(patient.dob)} {t(language, 'pdf.patient.years')}
+                </Text>
               </View>
             </>
           )}
           {patient.gender && (
             <View style={styles.row}>
-              <Text style={styles.label}>Gender:</Text>
-              <Text style={styles.value}>{patient.gender}</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.gender')}:</Text>
+              <Text style={styles.value}>{translateGender(patient.gender, language)}</Text>
             </View>
           )}
           {patient.phone && (
             <View style={styles.row}>
-              <Text style={styles.label}>Phone:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.phone')}:</Text>
               <Text style={styles.value}>{patient.phone}</Text>
             </View>
           )}
           {patient.email && (
             <View style={styles.row}>
-              <Text style={styles.label}>Email:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.email')}:</Text>
               <Text style={styles.value}>{patient.email}</Text>
             </View>
           )}
           {patient.address && (
             <View style={styles.row}>
-              <Text style={styles.label}>Address:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.address')}:</Text>
               <Text style={styles.value}>{patient.address}</Text>
             </View>
           )}
@@ -292,7 +302,7 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
         {/* Dental Chart Summary */}
         {sortedTeeth.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Dental Chart Notes</Text>
+            <Text style={styles.sectionTitle}>{t(language, 'pdf.patient.dentalChartNotes')}</Text>
             <View style={styles.teethGrid}>
               {sortedTeeth.map(([toothNum, note]) => (
                 <View key={toothNum} style={styles.toothItem}>
@@ -307,20 +317,21 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
         {/* Appointment History */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            Appointment History ({appointments.length} records)
+            {t(language, 'pdf.patient.appointmentHistory')} ({appointments.length}{' '}
+            {t(language, 'pdf.patient.records')})
           </Text>
           {appointments.length === 0 ? (
-            <Text style={styles.noData}>No appointments recorded</Text>
+            <Text style={styles.noData}>{t(language, 'pdf.patient.noAppointments')}</Text>
           ) : (
             <View style={styles.table}>
               {/* Table Header */}
               <View style={styles.tableHeader}>
-                <Text style={[styles.colDate, styles.headerText]}>Date</Text>
-                <Text style={[styles.colType, styles.headerText]}>Type</Text>
-                <Text style={[styles.colDoctor, styles.headerText]}>Doctor</Text>
-                <Text style={[styles.colStatus, styles.headerText]}>Status</Text>
-                <Text style={[styles.colCost, styles.headerText]}>Cost</Text>
-                <Text style={[styles.colNotes, styles.headerText]}>Notes</Text>
+                <Text style={[styles.colDate, styles.headerText]}>{t(language, 'pdf.table.date')}</Text>
+                <Text style={[styles.colType, styles.headerText]}>{t(language, 'pdf.table.type')}</Text>
+                <Text style={[styles.colDoctor, styles.headerText]}>{t(language, 'pdf.table.doctor')}</Text>
+                <Text style={[styles.colStatus, styles.headerText]}>{t(language, 'pdf.table.status')}</Text>
+                <Text style={[styles.colCost, styles.headerText]}>{t(language, 'pdf.table.cost')}</Text>
+                <Text style={[styles.colNotes, styles.headerText]}>{t(language, 'pdf.table.notes')}</Text>
               </View>
               {/* Table Rows */}
               {appointments.slice(0, 25).map((apt, index) => (
@@ -328,12 +339,14 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
                   key={apt.id}
                   style={[styles.tableRow, index % 2 === 1 ? styles.tableRowAlt : {}]}
                 >
-                  <Text style={styles.colDate}>{formatDate(apt.date, timezone, 'short')}</Text>
+                  <Text style={styles.colDate}>
+                    {formatDateI18n(apt.date, language, timezone, 'short')}
+                  </Text>
                   <Text style={styles.colType}>{apt.type || '-'}</Text>
                   <Text style={styles.colDoctor}>{apt.doctorName}</Text>
                   <View style={styles.colStatus}>
                     <Text style={[styles.statusBadge, getStatusStyle(apt.status)]}>
-                      {formatStatus(apt.status)}
+                      {translateStatus(apt.status, language)}
                     </Text>
                   </View>
                   <Text style={styles.colCost}>
@@ -346,7 +359,7 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
               ))}
               {appointments.length > 25 && (
                 <Text style={styles.noData}>
-                  ... and {appointments.length - 25} more appointments
+                  {t(language, 'pdf.table.andMore', { count: appointments.length - 25 })}
                 </Text>
               )}
             </View>
@@ -356,11 +369,10 @@ export function PatientHistoryPdf({ data }: PatientHistoryPdfProps) {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Generated on {formatDateTime(generatedAt, timezone)} | {tenant.name}
+            {t(language, 'pdf.common.generatedOn')} {formatDateTimeI18n(generatedAt, language, timezone)} |{' '}
+            {tenant.name}
           </Text>
-          <Text style={styles.footerText}>
-            This document contains confidential medical information.
-          </Text>
+          <Text style={styles.footerText}>{t(language, 'pdf.patient.confidentialNotice')}</Text>
         </View>
       </Page>
     </Document>

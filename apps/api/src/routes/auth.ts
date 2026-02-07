@@ -194,12 +194,21 @@ authRouter.post('/register', async (req, res, next) => {
     // Send welcome email for new tenant owners (async, fire-and-forget)
     if (isNewTenant) {
       const loginUrl = `${env.CORS_ORIGIN}/${clinicSlug}/login`
+
+      // Fetch tenant language setting
+      const tenantSettings = await prisma.tenantSettings.findUnique({
+        where: { tenantId: tenant.id },
+        select: { language: true },
+      })
+      const language = (tenantSettings?.language || 'es') as 'es' | 'en' | 'ar'
+
       // Don't await - send email in background without blocking response
       sendWelcomeEmail({
         to: email,
         firstName,
         clinicName: tenant.name,
         loginUrl,
+        language,
       }).catch(() => {
         // Error is already logged in the email service
       })
@@ -554,6 +563,17 @@ authRouter.post('/forgot-password', async (req, res, next) => {
       },
     })
 
+    // Fetch tenant language setting
+    const tenantWithSettings = await prisma.tenant.findUnique({
+      where: { id: tenant.id },
+      select: {
+        settings: {
+          select: { language: true },
+        },
+      },
+    })
+    const language = (tenantWithSettings?.settings?.language || 'es') as 'es' | 'en' | 'ar'
+
     // Send email (fire-and-forget, don't block response)
     const resetUrl = buildTenantResetUrl(plainToken, clinicSlug)
     sendPasswordResetEmail({
@@ -561,6 +581,7 @@ authRouter.post('/forgot-password', async (req, res, next) => {
       firstName: user.firstName,
       resetUrl,
       expiresInMinutes: TOKEN_EXPIRY_MINUTES,
+      language,
     }).catch((err) => {
       logger.error({ err, userId: user.id }, 'Failed to send password reset email')
     })

@@ -1,6 +1,12 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import type { AppointmentReceiptData } from '../services/pdf.service.js'
-import { formatDate, formatTime, formatStatus } from './pdf-utils.js'
+import {
+  t,
+  formatDate as formatDateI18n,
+  formatTime as formatTimeI18n,
+  translateStatus,
+  type Language,
+} from '@dental/shared'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -138,6 +144,7 @@ interface AppointmentReceiptPdfProps {
 export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
   const { tenant, patient, doctor, appointment, generatedAt } = data
   const timezone = tenant.timezone || 'UTC'
+  const language = (tenant.language || 'es') as Language
 
   return (
     <Document>
@@ -146,31 +153,35 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
         <View style={styles.header}>
           <Text style={styles.clinicName}>{tenant.name}</Text>
           {tenant.address && <Text style={styles.clinicInfo}>{tenant.address}</Text>}
-          {tenant.phone && <Text style={styles.clinicInfo}>Tel: {tenant.phone}</Text>}
+          {tenant.phone && (
+            <Text style={styles.clinicInfo}>
+              {t(language, 'pdf.common.phone')}: {tenant.phone}
+            </Text>
+          )}
           {tenant.email && <Text style={styles.clinicInfo}>{tenant.email}</Text>}
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>Appointment Receipt</Text>
+        <Text style={styles.title}>{t(language, 'pdf.appointment.receipt')}</Text>
 
         {/* Patient Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Patient Information</Text>
+          <Text style={styles.sectionTitle}>{t(language, 'pdf.appointment.patientInformation')}</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Name:</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.name')}:</Text>
             <Text style={styles.value}>
               {patient.firstName} {patient.lastName}
             </Text>
           </View>
           {patient.phone && (
             <View style={styles.row}>
-              <Text style={styles.label}>Phone:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.phone')}:</Text>
               <Text style={styles.value}>{patient.phone}</Text>
             </View>
           )}
           {patient.email && (
             <View style={styles.row}>
-              <Text style={styles.label}>Email:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.patient.email')}:</Text>
               <Text style={styles.value}>{patient.email}</Text>
             </View>
           )}
@@ -178,28 +189,31 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
 
         {/* Appointment Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Appointment Details</Text>
+          <Text style={styles.sectionTitle}>{t(language, 'pdf.appointment.appointmentDetails')}</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Date:</Text>
-            <Text style={styles.value}>{formatDate(appointment.startTime, timezone)}</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.date')}:</Text>
+            <Text style={styles.value}>{formatDateI18n(appointment.startTime, language, timezone)}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Time:</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.time')}:</Text>
             <Text style={styles.value}>
-              {formatTime(appointment.startTime, timezone)} - {formatTime(appointment.endTime, timezone)}
+              {formatTimeI18n(appointment.startTime, language, timezone)} -{' '}
+              {formatTimeI18n(appointment.endTime, language, timezone)}
             </Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Duration:</Text>
-            <Text style={styles.value}>{appointment.duration} minutes</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.duration')}:</Text>
+            <Text style={styles.value}>
+              {appointment.duration} {t(language, 'pdf.appointment.minutes')}
+            </Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Status:</Text>
-            <Text style={styles.value}>{formatStatus(appointment.status)}</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.status')}:</Text>
+            <Text style={styles.value}>{translateStatus(appointment.status, language)}</Text>
           </View>
           {appointment.type && (
             <View style={styles.row}>
-              <Text style={styles.label}>Type:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.appointment.type')}:</Text>
               <Text style={styles.value}>{appointment.type}</Text>
             </View>
           )}
@@ -207,22 +221,22 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
 
         {/* Doctor Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Attending Doctor</Text>
+          <Text style={styles.sectionTitle}>{t(language, 'pdf.appointment.attendingDoctor')}</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Name:</Text>
+            <Text style={styles.label}>{t(language, 'pdf.appointment.name')}:</Text>
             <Text style={styles.value}>
-              Dr. {doctor.firstName} {doctor.lastName}
+              {t(language, 'pdf.common.doctor')} {doctor.firstName} {doctor.lastName}
             </Text>
           </View>
           {doctor.specialty && (
             <View style={styles.row}>
-              <Text style={styles.label}>Specialty:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.appointment.specialty')}:</Text>
               <Text style={styles.value}>{doctor.specialty}</Text>
             </View>
           )}
           {doctor.licenseNumber && (
             <View style={styles.row}>
-              <Text style={styles.label}>License #:</Text>
+              <Text style={styles.label}>{t(language, 'pdf.appointment.license')}:</Text>
               <Text style={styles.value}>{doctor.licenseNumber}</Text>
             </View>
           )}
@@ -231,7 +245,7 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
         {/* Treatment Notes */}
         {appointment.notes && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Treatment Notes</Text>
+            <Text style={styles.sectionTitle}>{t(language, 'pdf.appointment.treatmentNotes')}</Text>
             <View style={styles.notesBox}>
               <Text style={styles.notesText}>{appointment.notes}</Text>
             </View>
@@ -241,20 +255,20 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
         {/* Cost Section */}
         <View style={styles.costSection}>
           <View style={styles.costRow}>
-            <Text style={styles.costLabel}>Total Cost:</Text>
+            <Text style={styles.costLabel}>{t(language, 'pdf.appointment.totalCost')}:</Text>
             <Text style={styles.costValue}>
               {tenant.currency} {appointment.cost || '0.00'}
             </Text>
           </View>
           <View style={styles.costRow}>
-            <Text style={styles.costLabel}>Payment Status:</Text>
+            <Text style={styles.costLabel}>{t(language, 'pdf.appointment.paymentStatus')}:</Text>
             <Text
               style={[
                 styles.statusBadge,
                 appointment.isPaid ? styles.statusPaid : styles.statusUnpaid,
               ]}
             >
-              {appointment.isPaid ? 'PAID' : 'PENDING'}
+              {appointment.isPaid ? t(language, 'pdf.appointment.paid') : t(language, 'pdf.appointment.pending')}
             </Text>
           </View>
         </View>
@@ -262,18 +276,17 @@ export function AppointmentReceiptPdf({ data }: AppointmentReceiptPdfProps) {
         {/* Signature Line */}
         <View style={styles.signatureLine}>
           <Text style={styles.signatureLabel}>
-            Dr. {doctor.firstName} {doctor.lastName}
+            {t(language, 'pdf.common.doctor')} {doctor.firstName} {doctor.lastName}
           </Text>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Generated on {formatDate(generatedAt, timezone)} at {formatTime(generatedAt, timezone)}
+            {t(language, 'pdf.common.generatedOn')} {formatDateI18n(generatedAt, language, timezone)}{' '}
+            {t(language, 'pdf.common.at')} {formatTimeI18n(generatedAt, language, timezone)}
           </Text>
-          <Text style={styles.footerText}>
-            This document is for informational purposes only.
-          </Text>
+          <Text style={styles.footerText}>{t(language, 'pdf.appointment.informationalNotice')}</Text>
         </View>
       </Page>
     </Document>
