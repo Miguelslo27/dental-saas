@@ -223,13 +223,15 @@ All core features completed (15 phases):
 
 #### Roles & Permissions
 - [x] Implement role-based permissions system (RBAC with granular permissions)
-  - ✅ Backend permission system with Permission enum
+  - ✅ Backend permission system with 50+ granular permissions
   - ✅ Fixed STAFF permissions (read-only for labworks and expenses)
-  - ✅ Middleware for permission checks (requirePermission, requireAnyPermission)
-  - ✅ Frontend usePermissions hook and Can component
+  - ✅ Middleware for permission checks (requirePermission, requireAnyPermission, requireAllPermissions)
+  - ✅ Frontend usePermissions hook and <Can> component
   - ✅ UI components updated with permission-based rendering
   - ✅ Comprehensive test coverage (30 backend + frontend tests)
-- [ ] Add more granular sub-role definitions if needed
+  - ✅ Single source of truth in @dental/shared (eliminated code duplication)
+  - ✅ UserRole enum consolidated and exported from shared package
+- [ ] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
 
 #### Internationalization & Localization
 - [ ] Fix PDF patient file to use configured language (currently in English)
