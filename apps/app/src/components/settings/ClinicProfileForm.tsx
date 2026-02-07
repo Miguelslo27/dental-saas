@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Loader2, Lock, AlertTriangle, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/settings.store'
 import type { TenantProfile, UpdateTenantProfileData } from '@/lib/settings-api'
 
@@ -37,6 +38,7 @@ interface ClinicProfileFormProps {
 }
 
 export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) {
+  const { t } = useTranslation()
   const { updateTenantProfile, isSaving } = useSettingsStore()
 
   const [formData, setFormData] = useState<UpdateTenantProfileData>({
@@ -287,7 +289,7 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-6 w-6 text-yellow-600" />
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Cambiar Moneda
+                  {t('settings.currencyWarning.title')}
                 </h3>
               </div>
               <button
@@ -301,20 +303,20 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
             {/* Content */}
             <div className="px-6 py-4">
               <p className="text-sm text-gray-700 mb-4">
-                Estás cambiando la moneda de <strong>{profile?.currency}</strong> a{' '}
-                <strong>{pendingCurrency}</strong>.
+                {t('settings.currencyWarning.changeFrom')} <strong>{profile?.currency}</strong>{' '}
+                {t('settings.currencyWarning.changeTo')} <strong>{pendingCurrency}</strong>.
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm font-medium text-yellow-800 mb-2">
-                  ⚠️ IMPORTANTE
+                  {t('settings.currencyWarning.importantTitle')}
                 </p>
                 <p className="text-sm text-yellow-700">
-                  Los valores existentes NO se convertirán automáticamente. Todos los montos
-                  (citas, gastos, trabajos de laboratorio) permanecerán con sus valores
-                  numéricos actuales y solo cambiarán el símbolo de moneda.
+                  {t('settings.currencyWarning.message')}
                 </p>
               </div>
-              <p className="text-sm text-gray-600 mt-4">¿Deseas continuar?</p>
+              <p className="text-sm text-gray-600 mt-4">
+                {t('settings.currencyWarning.question')}
+              </p>
             </div>
 
             {/* Footer */}
@@ -323,13 +325,13 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
                 onClick={cancelCurrencyChange}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button
                 onClick={confirmCurrencyChange}
                 className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors"
               >
-                Sí, cambiar moneda
+                {t('settings.currencyWarning.confirm')}
               </button>
             </div>
           </div>

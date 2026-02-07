@@ -13,6 +13,18 @@ import {
 } from '@react-email/components'
 import { t, type Language } from '@dental/shared'
 
+// HTML escape function to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char])
+}
+
 interface WelcomeEmailProps {
   firstName: string
   clinicName: string
@@ -21,7 +33,10 @@ interface WelcomeEmailProps {
 }
 
 export function WelcomeEmail({ firstName, clinicName, loginUrl, language = 'es' }: WelcomeEmailProps) {
-  const previewText = t(language, 'email.welcome.preview', { clinicName })
+  // Escape user-provided values to prevent XSS
+  const safeClinicName = escapeHtml(clinicName)
+  const safeFirstName = escapeHtml(firstName)
+  const previewText = t(language, 'email.welcome.preview', { clinicName: safeClinicName })
 
   return (
     <Html>
@@ -31,14 +46,9 @@ export function WelcomeEmail({ firstName, clinicName, loginUrl, language = 'es' 
         <Container style={container}>
           <Heading style={heading}>{t(language, 'email.welcome.heading')}</Heading>
 
-          <Text style={paragraph}>{t(language, 'email.welcome.greeting', { firstName })}</Text>
+          <Text style={paragraph}>{t(language, 'email.welcome.greeting', { firstName: safeFirstName })}</Text>
 
-          <Text
-            style={paragraph}
-            dangerouslySetInnerHTML={{
-              __html: t(language, 'email.welcome.thankYou', { clinicName }),
-            }}
-          />
+          <Text style={paragraph}>{t(language, 'email.welcome.thankYou', { clinicName: safeClinicName })}</Text>
 
           <Text style={paragraph}>{t(language, 'email.welcome.asOwner')}</Text>
 

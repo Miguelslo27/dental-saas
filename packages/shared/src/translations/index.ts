@@ -106,12 +106,18 @@ export function formatDateTime(date: Date, language: Language, timezone: string)
 // Translate appointment status
 export function translateStatus(status: AppointmentStatus, language: Language): string {
   const statusKey = status.toLowerCase()
-  return t(language, `status.${statusKey}`)
+  const key = `status.${statusKey}`
+  const translated = t(language, key)
+  // If translation is missing, t() returns the key itself, so we return the original status
+  return translated === key ? status : translated
 }
 
 // Translate gender
 export function translateGender(gender: string, language: Language): string {
-  return t(language, `gender.${gender}`) || gender
+  const key = `gender.${gender}`
+  const translated = t(language, key)
+  // If translation is missing, t() returns the key itself, so we return the original gender value
+  return translated === key ? gender : translated
 }
 
 // Keep sanitizeFilename here since it's not language-specific

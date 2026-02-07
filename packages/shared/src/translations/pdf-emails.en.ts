@@ -60,7 +60,7 @@ export default {
       "preview": "Welcome to Alveo System! Your clinic \"{{clinicName}}\" is ready.",
       "heading": "🦷 Welcome to Alveo System!",
       "greeting": "Hello {{firstName}},",
-      "thankYou": "Thank you for registering <strong>{{clinicName}}</strong> with Alveo System. Your clinic management system is ready to use!",
+      "thankYou": "Thank you for registering {{clinicName}} with Alveo System. Your clinic management system is ready to use!",
       "asOwner": "As the clinic owner, you can now:",
       "addStaff": "Add doctors and staff",
       "managePatients": "Manage patient records",
@@ -79,8 +79,8 @@ export default {
       "greeting": "Hello {{firstName}},",
       "message": "We received a request to reset the password for your Alveo System admin account. Click the button below to set a new password:",
       "buttonText": "Reset Password",
-      "expiryWarning": "⏱️ This link will expire in <strong>{{minutes}} minutes</strong>.",
-      "securityNotice": "🔒 <strong>Security Notice:</strong> If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.",
+      "expiryWarning": "⏱️ This link will expire in {{minutes}} minutes.",
+      "securityNotice": "🔒 Security Notice: If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.",
       "signature": "— The Alveo System Team",
       "linkInstructions": "If the button doesn't work, copy and paste this link into your browser:"
     }

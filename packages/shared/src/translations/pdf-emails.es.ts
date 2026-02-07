@@ -60,7 +60,7 @@ export default {
       "preview": "¡Bienvenido a Alveo System! Tu clínica \"{{clinicName}}\" está lista.",
       "heading": "🦷 ¡Bienvenido a Alveo System!",
       "greeting": "Hola {{firstName}},",
-      "thankYou": "Gracias por registrar <strong>{{clinicName}}</strong> en Alveo System. ¡Tu sistema de gestión de clínica está listo para usar!",
+      "thankYou": "Gracias por registrar {{clinicName}} en Alveo System. ¡Tu sistema de gestión de clínica está listo para usar!",
       "asOwner": "Como propietario de la clínica, ahora puedes:",
       "addStaff": "Agregar doctores y personal",
       "managePatients": "Gestionar registros de pacientes",
@@ -79,8 +79,8 @@ export default {
       "greeting": "Hola {{firstName}},",
       "message": "Recibimos una solicitud para restablecer tu contraseña de tu cuenta de administrador de Alveo System. Haz clic en el botón de abajo para establecer una nueva contraseña:",
       "buttonText": "Restablecer Contraseña",
-      "expiryWarning": "⏱️ Este enlace expirará en <strong>{{minutes}} minutos</strong>.",
-      "securityNotice": "🔒 <strong>Aviso de Seguridad:</strong> Si no solicitaste este restablecimiento de contraseña, puedes ignorar este correo de forma segura. Tu contraseña permanecerá sin cambios.",
+      "expiryWarning": "⏱️ Este enlace expirará en {{minutes}} minutos.",
+      "securityNotice": "🔒 Aviso de Seguridad: Si no solicitaste este restablecimiento de contraseña, puedes ignorar este correo de forma segura. Tu contraseña permanecerá sin cambios.",
       "signature": "— El Equipo de Alveo System",
       "linkInstructions": "Si el botón no funciona, copia y pega este enlace en tu navegador:"
     }

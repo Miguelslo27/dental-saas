@@ -13,6 +13,18 @@ import {
 } from '@react-email/components'
 import { t, type Language } from '@dental/shared'
 
+// HTML escape function to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char])
+}
+
 interface PasswordResetEmailProps {
   firstName: string
   resetUrl: string
@@ -26,6 +38,8 @@ export function PasswordResetEmail({
   expiresInMinutes,
   language = 'es',
 }: PasswordResetEmailProps) {
+  // Escape user-provided values to prevent XSS
+  const safeFirstName = escapeHtml(firstName)
   const previewText = t(language, 'email.passwordReset.preview')
 
   return (
@@ -36,7 +50,7 @@ export function PasswordResetEmail({
         <Container style={container}>
           <Heading style={heading}>{t(language, 'email.passwordReset.heading')}</Heading>
 
-          <Text style={paragraph}>{t(language, 'email.passwordReset.greeting', { firstName })}</Text>
+          <Text style={paragraph}>{t(language, 'email.passwordReset.greeting', { firstName: safeFirstName })}</Text>
 
           <Text style={paragraph}>{t(language, 'email.passwordReset.message')}</Text>
 
@@ -46,23 +60,15 @@ export function PasswordResetEmail({
             </Button>
           </Section>
 
-          <Text
-            style={warningText}
-            dangerouslySetInnerHTML={{
-              __html: t(language, 'email.passwordReset.expiryWarning', {
-                minutes: expiresInMinutes,
-              }),
-            }}
-          />
+          <Text style={warningText}>
+            {t(language, 'email.passwordReset.expiryWarning', {
+              minutes: expiresInMinutes,
+            })}
+          </Text>
 
           <Hr style={hr} />
 
-          <Text
-            style={securityText}
-            dangerouslySetInnerHTML={{
-              __html: t(language, 'email.passwordReset.securityNotice'),
-            }}
-          />
+          <Text style={securityText}>{t(language, 'email.passwordReset.securityNotice')}</Text>
 
           <Text style={footer}>{t(language, 'email.passwordReset.signature')}</Text>
 

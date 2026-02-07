@@ -196,6 +196,15 @@
     "sendReminder": "Enviar recordatorio",
     "saveChanges": "Guardar Cambios",
     "readOnlyNotice": "Solo el propietario o administradores pueden editar las preferencias",
+    "currencyWarning": {
+      "title": "Cambiar Moneda",
+      "changeFrom": "Estás cambiando la moneda de",
+      "changeTo": "a",
+      "importantTitle": "⚠️ IMPORTANTE",
+      "message": "Los valores existentes NO se convertirán automáticamente. Todos los montos (citas, gastos, trabajos de laboratorio) permanecerán con sus valores numéricos actuales y solo cambiarán el símbolo de moneda.",
+      "question": "¿Deseas continuar?",
+      "confirm": "Sí, cambiar moneda"
+    },
     "duration": {
       "15min": "15 minutos",
       "30min": "30 minutos",
