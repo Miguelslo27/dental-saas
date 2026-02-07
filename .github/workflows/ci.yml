@@ -106,6 +106,9 @@ jobs:
           echo "SETUP_KEY=test_setup_key_16chars" >> .env.test
           echo "NODE_ENV=test" >> .env.test
 
+      - name: Build shared package
+        run: pnpm --filter @dental/shared build
+
       - name: Generate Prisma client
         run: pnpm --filter @dental/database db:generate
         env:
@@ -159,6 +162,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared package
+        run: pnpm --filter @dental/shared build
+
       - name: Run frontend tests
         run: pnpm --filter @dental/app test
 
@@ -198,6 +204,9 @@ jobs:
         run: pnpm --filter @dental/database db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+
+      - name: Build shared package
+        run: pnpm --filter @dental/shared build
 
       - name: Build all packages
         run: pnpm build

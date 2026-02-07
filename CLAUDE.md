@@ -96,10 +96,20 @@ dental-saas/
 - JWT contains `tenantId` extracted by middleware
 - Prisma Extension handles automatic tenant filtering
 
-### Authentication
+### Authentication & Authorization
 - JWT-based authentication
-- Roles: OWNER, ADMIN, DOCTOR, STAFF
+- Roles: SUPER_ADMIN, OWNER, ADMIN, DOCTOR, STAFF
 - Super admin uses separate routes (`/admin/*`)
+- **RBAC (Role-Based Access Control):**
+  - Granular permission system with 50+ permissions
+  - Permissions: `PATIENTS_CREATE`, `LABWORKS_UPDATE`, `TENANT_DELETE`, etc.
+  - Backend: `requirePermission()` middleware for route protection
+  - Frontend: `usePermissions()` hook and `<Can>` component for UI
+  - Permission hierarchy:
+    - **STAFF:** Read-only access (view patients, appointments, labworks, expenses)
+    - **DOCTOR:** STAFF + edit dental charts + view statistics
+    - **ADMIN:** Full CRUD on operational resources (patients, appointments, doctors, labworks, expenses, users, settings)
+    - **OWNER:** ADMIN + tenant profile, billing, promote to owner, delete tenant
 
 ### API Patterns
 - Express 5 with async handlers
@@ -212,8 +222,16 @@ All core features completed (15 phases):
 - [x] Fix superadmin panel: cannot view clinic and user details
 
 #### Roles & Permissions
-- [ ] Add clinic administrators (can manage appointments, patients, labworks, expenses, doctors)
-- [ ] Implement role-based permissions system (only OWNER has full access)
+- [x] Implement role-based permissions system (RBAC with granular permissions)
+  - ✅ Backend permission system with 50+ granular permissions
+  - ✅ Fixed STAFF permissions (read-only for labworks and expenses)
+  - ✅ Middleware for permission checks (requirePermission, requireAnyPermission, requireAllPermissions)
+  - ✅ Frontend usePermissions hook and <Can> component
+  - ✅ UI components updated with permission-based rendering
+  - ✅ Comprehensive test coverage (30 backend + frontend tests)
+  - ✅ Single source of truth in @dental/shared (eliminated code duplication)
+  - ✅ UserRole enum consolidated and exported from shared package
+- [ ] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
 
 #### Internationalization & Localization
 - [ ] Fix PDF patient file to use configured language (currently in English)

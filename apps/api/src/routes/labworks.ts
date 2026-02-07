@@ -137,7 +137,7 @@ labworksRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
  * POST /api/labworks
  * Create a new labwork
  */
-labworksRouter.post('/', requireMinRole('STAFF'), async (req, res, next) => {
+labworksRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
 
@@ -174,7 +174,7 @@ labworksRouter.post('/', requireMinRole('STAFF'), async (req, res, next) => {
  * PUT /api/labworks/:id
  * Update a labwork
  */
-labworksRouter.put('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+labworksRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
     const { id } = req.params
@@ -212,7 +212,7 @@ labworksRouter.put('/:id', requireMinRole('STAFF'), async (req, res, next) => {
  * DELETE /api/labworks/:id
  * Soft delete a labwork
  */
-labworksRouter.delete('/:id', requireMinRole('STAFF'), async (req, res, next) => {
+labworksRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
     const { id } = req.params
