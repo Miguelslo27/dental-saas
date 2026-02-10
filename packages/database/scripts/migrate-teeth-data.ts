@@ -10,10 +10,15 @@
  *   pnpm --filter @dental/database migrate:teeth:dry    # Dry run (preview only)
  */
 
-import { PrismaClient } from '../generated/prisma/client/index.js'
+import 'dotenv/config'
+import { PrismaClient } from '../generated/prisma/client.js'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 async function migrateTeethData(dryRun = false) {
-  const prisma = new PrismaClient()
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+  })
+  const prisma = new PrismaClient({ adapter })
 
   try {
     console.log(`\n${'='.repeat(60)}`)
