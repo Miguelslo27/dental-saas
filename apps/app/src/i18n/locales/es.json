@@ -118,6 +118,29 @@
     "enterNotes": "Ingrese observaciones sobre este diente...",
     "deleteNote": "Eliminar nota",
     "notesRecorded": "Notas registradas",
+    "toothStatus": "Estado",
+    "noNotes": "Sin notas",
+    "status": {
+      "healthy": "Saludable",
+      "caries": "Caries",
+      "filled": "Empastado",
+      "crown": "Corona",
+      "root_canal": "Endodoncia",
+      "missing": "Ausente",
+      "extracted": "Extraído",
+      "implant": "Implante",
+      "bridge": "Puente"
+    },
+    "toothType": {
+      "Central Incisor": "Incisivo central",
+      "Lateral Incisor": "Incisivo lateral",
+      "Canine": "Canino",
+      "First Premolar": "Primer premolar",
+      "Second Premolar": "Segundo premolar",
+      "First Molar": "Primer molar",
+      "Second Molar": "Segundo molar",
+      "Third Molar": "Tercer molar"
+    },
     "form": {
       "firstName": "Nombre",
       "lastName": "Apellido",

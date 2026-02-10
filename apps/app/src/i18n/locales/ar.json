@@ -118,6 +118,29 @@
     "enterNotes": "أدخل ملاحظات حول هذا السن...",
     "deleteNote": "حذف الملاحظة",
     "notesRecorded": "ملاحظات مسجلة",
+    "toothStatus": "الحالة",
+    "noNotes": "بدون ملاحظات",
+    "status": {
+      "healthy": "سليم",
+      "caries": "تسوس",
+      "filled": "حشوة",
+      "crown": "تاج",
+      "root_canal": "علاج عصب",
+      "missing": "مفقود",
+      "extracted": "مخلوع",
+      "implant": "زراعة",
+      "bridge": "جسر"
+    },
+    "toothType": {
+      "Central Incisor": "قاطع مركزي",
+      "Lateral Incisor": "قاطع جانبي",
+      "Canine": "ناب",
+      "First Premolar": "ضاحك أول",
+      "Second Premolar": "ضاحك ثاني",
+      "First Molar": "طاحن أول",
+      "Second Molar": "طاحن ثاني",
+      "Third Molar": "طاحن ثالث"
+    },
     "form": {
       "firstName": "الاسم الأول",
       "lastName": "الاسم الأخير",

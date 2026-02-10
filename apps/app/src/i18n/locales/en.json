@@ -118,6 +118,29 @@
     "enterNotes": "Enter observations about this tooth...",
     "deleteNote": "Delete note",
     "notesRecorded": "Notes recorded",
+    "toothStatus": "Status",
+    "noNotes": "No notes",
+    "status": {
+      "healthy": "Healthy",
+      "caries": "Caries",
+      "filled": "Filled",
+      "crown": "Crown",
+      "root_canal": "Root canal",
+      "missing": "Missing",
+      "extracted": "Extracted",
+      "implant": "Implant",
+      "bridge": "Bridge"
+    },
+    "toothType": {
+      "Central Incisor": "Central Incisor",
+      "Lateral Incisor": "Lateral Incisor",
+      "Canine": "Canine",
+      "First Premolar": "First Premolar",
+      "Second Premolar": "Second Premolar",
+      "First Molar": "First Molar",
+      "Second Molar": "Second Molar",
+      "Third Molar": "Third Molar"
+    },
     "form": {
       "firstName": "First name",
       "lastName": "Last name",
