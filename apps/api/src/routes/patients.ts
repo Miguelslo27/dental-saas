@@ -17,7 +17,6 @@ import {
 } from '../services/patient.service.js'
 import { PdfService } from '../services/pdf.service.js'
 import { PatientHistoryPdf, sanitizeFilename } from '../pdfs/index.js'
-import { ToothStatus } from '@dental/shared'
 
 const patientsRouter: IRouter = Router()
 
