@@ -14,6 +14,7 @@ import {
   X,
   FileText,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Odontogram } from 'react-odontogram'
 import '@/assets/odontogram.css'
 import {
@@ -64,12 +65,12 @@ function getStatusColorClass(status: ToothStatus): string {
   const classes: Record<ToothStatus, string> = {
     [ToothStatus.CARIES]: 'bg-red-50 border-red-200',
     [ToothStatus.FILLED]: 'bg-blue-50 border-blue-200',
-    [ToothStatus.CROWN]: 'bg-blue-50 border-blue-200',
-    [ToothStatus.ROOT_CANAL]: 'bg-blue-50 border-blue-200',
+    [ToothStatus.CROWN]: 'bg-cyan-50 border-cyan-200',
+    [ToothStatus.ROOT_CANAL]: 'bg-indigo-50 border-indigo-200',
     [ToothStatus.MISSING]: 'bg-gray-50 border-gray-300',
     [ToothStatus.EXTRACTED]: 'bg-gray-50 border-gray-300',
-    [ToothStatus.IMPLANT]: 'bg-purple-50 border-purple-200',
-    [ToothStatus.BRIDGE]: 'bg-purple-50 border-purple-200',
+    [ToothStatus.IMPLANT]: 'bg-violet-50 border-violet-200',
+    [ToothStatus.BRIDGE]: 'bg-pink-50 border-pink-200',
     [ToothStatus.HEALTHY]: 'bg-amber-50 border-amber-200',
   }
   return classes[status]
@@ -79,12 +80,12 @@ function getStatusTextColorClass(status: ToothStatus): string {
   const classes: Record<ToothStatus, string> = {
     [ToothStatus.CARIES]: 'text-red-800',
     [ToothStatus.FILLED]: 'text-blue-800',
-    [ToothStatus.CROWN]: 'text-blue-800',
-    [ToothStatus.ROOT_CANAL]: 'text-blue-800',
+    [ToothStatus.CROWN]: 'text-cyan-800',
+    [ToothStatus.ROOT_CANAL]: 'text-indigo-800',
     [ToothStatus.MISSING]: 'text-gray-700',
     [ToothStatus.EXTRACTED]: 'text-gray-700',
-    [ToothStatus.IMPLANT]: 'text-purple-800',
-    [ToothStatus.BRIDGE]: 'text-purple-800',
+    [ToothStatus.IMPLANT]: 'text-violet-800',
+    [ToothStatus.BRIDGE]: 'text-pink-800',
     [ToothStatus.HEALTHY]: 'text-amber-800',
   }
   return classes[status]
@@ -120,11 +121,6 @@ function ToothDetailsModal({
   const titleId = useId()
   const textareaId = useId()
   const statusId = useId()
-
-  useEffect(() => {
-    setNote(currentData.note)
-    setStatus(currentData.status)
-  }, [currentData, toothNumber])
 
   if (!isOpen) return null
 
@@ -267,6 +263,7 @@ function ToothDetailsModal({
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const [patient, setPatient] = useState<Patient | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -278,6 +275,7 @@ export default function PatientDetailPage() {
   const [isToothModalOpen, setIsToothModalOpen] = useState(false)
   const [isSavingTooth, setIsSavingTooth] = useState(false)
   const [showPrimaryTeeth, setShowPrimaryTeeth] = useState(false)
+  const [odontogramKey, setOdontogramKey] = useState(0)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
 
   // Fetch patient data
@@ -317,6 +315,8 @@ export default function PatientDetailPage() {
       setSelectedTooth(fdiNumber)
       setSelectedToothType(lastTooth.type)
       setIsToothModalOpen(true)
+      // Reset odontogram to clear the library's internal selection state
+      setOdontogramKey(k => k + 1)
     }
   }, [])
 
@@ -403,32 +403,67 @@ export default function PatientDetailPage() {
     }
   }
 
-  // Generate color map based on tooth status
-  const teethColors: Record<string, string> = {}
-  for (const [toothNumber, toothData] of Object.entries(teeth)) {
-    switch (toothData.status) {
-      case ToothStatus.CARIES:
-        teethColors[toothNumber] = '#ef4444' // red
-        break
-      case ToothStatus.FILLED:
-      case ToothStatus.CROWN:
-      case ToothStatus.ROOT_CANAL:
-        teethColors[toothNumber] = '#3b82f6' // blue
-        break
+  // Generate per-tooth color based on status
+  function getToothColor(status: ToothStatus, hasNote: boolean): string | null {
+    switch (status) {
+      case ToothStatus.CARIES: return '#ef4444'       // red
+      case ToothStatus.FILLED: return '#3b82f6'       // blue
+      case ToothStatus.CROWN: return '#06b6d4'        // cyan
+      case ToothStatus.ROOT_CANAL: return '#6366f1'   // indigo
       case ToothStatus.MISSING:
-      case ToothStatus.EXTRACTED:
-        teethColors[toothNumber] = '#9ca3af' // gray
-        break
-      case ToothStatus.IMPLANT:
-      case ToothStatus.BRIDGE:
-        teethColors[toothNumber] = '#8b5cf6' // purple
-        break
-      case ToothStatus.HEALTHY:
-        if (toothData.note) {
-          teethColors[toothNumber] = '#f59e0b' // amber (has notes)
-        }
-        break
+      case ToothStatus.EXTRACTED: return '#9ca3af'    // gray
+      case ToothStatus.IMPLANT: return '#8b5cf6'      // violet
+      case ToothStatus.BRIDGE: return '#ec4899'       // pink
+      case ToothStatus.HEALTHY: return hasNote ? '#f59e0b' : null // amber
     }
+  }
+
+  // Generate dynamic CSS to color individual teeth in the SVG
+  // The library renders each tooth as <g class="teeth-{quadrant}{toothIndex}">
+  // where quadrant is 1-4 and toothIndex is 1-8 (position within quadrant)
+  // FDI notation: tooth "11" = quadrant 1, tooth 1 → class "teeth-11"
+  const teethStyleRules: string[] = []
+  for (const [toothNumber, toothData] of Object.entries(teeth)) {
+    const color = getToothColor(toothData.status, !!toothData.note)
+    if (!color) continue
+    const isMissing = toothData.status === ToothStatus.MISSING || toothData.status === ToothStatus.EXTRACTED
+    // Set tooth outline + fill color via CSS, scoped to permanent teeth only
+    if (isMissing) {
+      teethStyleRules.push(
+        `.odontogram-permanent g.teeth-${toothNumber}{color:${color};opacity:0.25}`,
+      )
+    } else {
+      teethStyleRules.push(
+        `.odontogram-permanent g.teeth-${toothNumber}{color:${color}}`,
+        `.odontogram-permanent g.teeth-${toothNumber} path:nth-of-type(2){fill:${color};opacity:0.3}`,
+      )
+    }
+  }
+
+  // Custom tooltip content for the odontogram
+  const renderToothTooltip = (payload?: ToothDetail) => {
+    if (!payload) return null
+    const fdi = payload.notations.fdi
+    const toothData = teeth[fdi]
+    const statusKey = toothData?.status || ToothStatus.HEALTHY
+    const note = toothData?.note || ''
+    const truncatedNote = note.length > 80 ? note.slice(0, 80) + '...' : note
+
+    return (
+      <div style={{ maxWidth: 250 }}>
+        <div style={{ fontWeight: 600 }}>
+          {t('patients.tooth')} {fdi} — {t(`patients.toothType.${payload.type}`, payload.type)}
+        </div>
+        <div style={{ marginTop: 2 }}>
+          {t('patients.toothStatus')}: {t(`patients.status.${statusKey}`)}
+        </div>
+        {note && (
+          <div style={{ marginTop: 4, opacity: 0.85, fontStyle: 'italic' }}>
+            {truncatedNote}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -577,18 +612,24 @@ export default function PatientDetailPage() {
           </label>
         </div>
 
+        {/* Dynamic per-tooth status colors */}
+        {teethStyleRules.length > 0 && (
+          <style dangerouslySetInnerHTML={{ __html: teethStyleRules.join('') }} />
+        )}
+
         {/* Combined Dental Chart - Permanent with Primary overlaid */}
         <div className="relative flex flex-col items-center">
           {/* Permanent Teeth (base layer) */}
           <div className="odontogram-permanent">
             <Odontogram
+              key={`permanent-${odontogramKey}`}
               onChange={handleOdontogramChange}
               theme="light"
-              colors={teethColors}
+              colors={{}}
               notation="FDI"
               maxTeeth={8}
               showTooltip={true}
-              tooltip={{ placement: 'top', margin: 8 }}
+              tooltip={{ placement: 'bottom', margin: 8, content: renderToothTooltip }}
             />
           </div>
 
@@ -596,16 +637,17 @@ export default function PatientDetailPage() {
           {showPrimaryTeeth && (
             <div
               className="odontogram-primary absolute inset-0 flex items-center justify-center pointer-events-none [&_.Odontogram_g]:pointer-events-auto"
-              style={{ transform: 'scale(0.55)' }}
+              style={{ transform: 'scale(0.65)' }}
             >
               <Odontogram
+                key={`primary-${odontogramKey}`}
                 onChange={handleOdontogramChange}
                 theme="light"
-                colors={teethColors}
+                colors={{}}
                 notation="FDI"
                 maxTeeth={5}
                 showTooltip={true}
-                tooltip={{ placement: 'bottom', margin: 4 }}
+                tooltip={{ placement: 'bottom', margin: 4, content: renderToothTooltip }}
               />
             </div>
           )}
@@ -614,43 +656,41 @@ export default function PatientDetailPage() {
         {/* Status Color Legend - outside relative container to avoid affecting primary teeth overlay */}
         <div className="mt-6 pt-4 border-t border-gray-100">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Leyenda de estados</h3>
-          <div className="flex flex-wrap gap-3 text-xs">
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded bg-red-500" />
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }} />
               <span className="text-gray-600">Caries</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded bg-blue-500" />
-              <span className="text-gray-600">Tratado</span>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }} />
+              <span className="text-gray-600">Empastado</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded bg-gray-400" />
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#06b6d4' }} />
+              <span className="text-gray-600">Corona</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#6366f1' }} />
+              <span className="text-gray-600">Endodoncia</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#9ca3af' }} />
               <span className="text-gray-600">Ausente/Extraído</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded bg-purple-500" />
-              <span className="text-gray-600">Implante/Puente</span>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8b5cf6' }} />
+              <span className="text-gray-600">Implante</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded bg-amber-500" />
-              <span className="text-gray-600">Saludable con notas</span>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ec4899' }} />
+              <span className="text-gray-600">Puente</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f59e0b' }} />
+              <span className="text-gray-600">Con notas</span>
             </div>
           </div>
         </div>
-
-        {/* Legend when showing primary teeth */}
-        {showPrimaryTeeth && (
-          <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded border border-blue-400 bg-blue-100" />
-              Permanentes
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded border border-emerald-500 bg-emerald-100" />
-              Temporales
-            </span>
-          </div>
-        )}
 
         {/* Teeth data summary */}
         {Object.keys(teeth).length > 0 && (
@@ -691,6 +731,7 @@ export default function PatientDetailPage() {
 
       {/* Tooth Details Modal */}
       <ToothDetailsModal
+        key={selectedTooth || ''}
         isOpen={isToothModalOpen}
         onClose={() => {
           setIsToothModalOpen(false)
