@@ -377,7 +377,7 @@ const VALID_TEETH = [...VALID_PERMANENT_TEETH, ...VALID_PRIMARY_TEETH]
  * Converts old string format to new ToothData format
  */
 function normalizeTeethData(teeth: Prisma.JsonValue): TeethData {
-  if (!teeth || teeth === Prisma.JsonNull) return {}
+  if (!teeth || teeth === null) return {}
 
   const rawTeeth = teeth as Record<string, unknown>
   const normalized: TeethData = {}
@@ -475,7 +475,7 @@ export async function updatePatientTeeth(
   const updated = await prisma.patient.update({
     where: { id: patientId },
     data: {
-      teeth: Object.keys(mergedTeeth).length > 0 ? mergedTeeth : JsonNull,
+      teeth: Object.keys(mergedTeeth).length > 0 ? (mergedTeeth as unknown as JsonInputValue) : JsonNull,
     },
     select: PATIENT_SELECT,
   })
