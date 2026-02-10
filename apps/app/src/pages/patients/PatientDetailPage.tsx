@@ -46,21 +46,6 @@ interface ToothDetail {
 // Helper Functions
 // ============================================================================
 
-function getStatusLabel(status: ToothStatus): string {
-  const labels: Record<ToothStatus, string> = {
-    [ToothStatus.HEALTHY]: 'Saludable',
-    [ToothStatus.CARIES]: 'Caries',
-    [ToothStatus.FILLED]: 'Empastado',
-    [ToothStatus.CROWN]: 'Corona',
-    [ToothStatus.ROOT_CANAL]: 'Endodoncia',
-    [ToothStatus.MISSING]: 'Ausente',
-    [ToothStatus.EXTRACTED]: 'Extraído',
-    [ToothStatus.IMPLANT]: 'Implante',
-    [ToothStatus.BRIDGE]: 'Puente',
-  }
-  return labels[status]
-}
-
 function getStatusColorClass(status: ToothStatus): string {
   const classes: Record<ToothStatus, string> = {
     [ToothStatus.CARIES]: 'bg-red-50 border-red-200',
@@ -116,6 +101,7 @@ function ToothDetailsModal({
   currentData = { note: '', status: ToothStatus.HEALTHY },
   isLoading = false,
 }: ToothDetailsModalProps) {
+  const { t } = useTranslation()
   const [note, setNote] = useState(currentData.note)
   const [status, setStatus] = useState(currentData.status)
   const titleId = useId()
@@ -151,7 +137,7 @@ function ToothDetailsModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
             <h2 id={titleId} className="text-lg font-semibold text-gray-900">
-              Diente #{toothNumber}
+              {t('patients.tooth')} #{toothNumber}
             </h2>
             <p className="text-sm text-gray-500">{toothType}</p>
           </div>
@@ -169,7 +155,7 @@ function ToothDetailsModal({
           {/* Status Selector */}
           <div>
             <label htmlFor={statusId} className="block text-sm font-medium text-gray-700 mb-2">
-              Estado del diente
+              {t('patients.toothStatus')}
             </label>
             <select
               id={statusId}
@@ -178,35 +164,35 @@ function ToothDetailsModal({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               disabled={isLoading}
             >
-              <option value={ToothStatus.HEALTHY}>Saludable</option>
-              <option value={ToothStatus.CARIES}>Caries</option>
-              <option value={ToothStatus.FILLED}>Empastado</option>
-              <option value={ToothStatus.CROWN}>Corona</option>
-              <option value={ToothStatus.ROOT_CANAL}>Endodoncia</option>
-              <option value={ToothStatus.MISSING}>Ausente</option>
-              <option value={ToothStatus.EXTRACTED}>Extraído</option>
-              <option value={ToothStatus.IMPLANT}>Implante</option>
-              <option value={ToothStatus.BRIDGE}>Puente</option>
+              <option value={ToothStatus.HEALTHY}>{t('patients.status.healthy')}</option>
+              <option value={ToothStatus.CARIES}>{t('patients.status.caries')}</option>
+              <option value={ToothStatus.FILLED}>{t('patients.status.filled')}</option>
+              <option value={ToothStatus.CROWN}>{t('patients.status.crown')}</option>
+              <option value={ToothStatus.ROOT_CANAL}>{t('patients.status.root_canal')}</option>
+              <option value={ToothStatus.MISSING}>{t('patients.status.missing')}</option>
+              <option value={ToothStatus.EXTRACTED}>{t('patients.status.extracted')}</option>
+              <option value={ToothStatus.IMPLANT}>{t('patients.status.implant')}</option>
+              <option value={ToothStatus.BRIDGE}>{t('patients.status.bridge')}</option>
             </select>
           </div>
 
           {/* Notes Textarea */}
           <div>
             <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-2">
-              Notas clínicas
+              {t('patients.clinicalNotes')}
             </label>
             <textarea
               id={textareaId}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Ingrese observaciones sobre este diente..."
+              placeholder={t('patients.enterNotes')}
               rows={4}
               maxLength={1000}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               disabled={isLoading}
             />
             <p className="text-xs text-gray-400 mt-1 text-right">
-              {note.length}/1000 caracteres
+              {note.length}/1000 {t('patients.characters')}
             </p>
           </div>
         </div>
@@ -221,7 +207,7 @@ function ToothDetailsModal({
                 disabled={isLoading}
                 className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
               >
-                Eliminar
+                {t('common.delete')}
               </button>
             )}
           </div>
@@ -232,7 +218,7 @@ function ToothDetailsModal({
               disabled={isLoading}
               className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               type="button"
@@ -243,10 +229,10 @@ function ToothDetailsModal({
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Guardando...
+                  {t('patients.saving')}
                 </>
               ) : (
-                'Guardar'
+                t('common.save')
               )}
             </button>
           </div>
@@ -655,39 +641,39 @@ export default function PatientDetailPage() {
 
         {/* Status Color Legend - outside relative container to avoid affecting primary teeth overlay */}
         <div className="mt-6 pt-4 border-t border-gray-100">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Leyenda de estados</h3>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">{t('patients.statusLegend')}</h3>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }} />
-              <span className="text-gray-600">Caries</span>
+              <span className="text-gray-600">{t('patients.status.caries')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }} />
-              <span className="text-gray-600">Empastado</span>
+              <span className="text-gray-600">{t('patients.status.filled')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#06b6d4' }} />
-              <span className="text-gray-600">Corona</span>
+              <span className="text-gray-600">{t('patients.status.crown')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#6366f1' }} />
-              <span className="text-gray-600">Endodoncia</span>
+              <span className="text-gray-600">{t('patients.status.root_canal')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#9ca3af' }} />
-              <span className="text-gray-600">Ausente/Extraído</span>
+              <span className="text-gray-600">{t('patients.missingExtracted')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8b5cf6' }} />
-              <span className="text-gray-600">Implante</span>
+              <span className="text-gray-600">{t('patients.status.implant')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ec4899' }} />
-              <span className="text-gray-600">Puente</span>
+              <span className="text-gray-600">{t('patients.status.bridge')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f59e0b' }} />
-              <span className="text-gray-600">Con notas</span>
+              <span className="text-gray-600">{t('patients.withNotes')}</span>
             </div>
           </div>
         </div>
@@ -696,7 +682,7 @@ export default function PatientDetailPage() {
         {Object.keys(teeth).length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-100">
             <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Dientes registrados ({Object.keys(teeth).length})
+              {t('patients.registeredTeeth')} ({Object.keys(teeth).length})
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(teeth).map(([toothNumber, toothData]) => (
@@ -711,10 +697,10 @@ export default function PatientDetailPage() {
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className={`text-sm font-medium ${getStatusTextColorClass(toothData.status)}`}>
-                      Diente #{toothNumber}
+                      {t('patients.tooth')} #{toothNumber}
                     </span>
                     <span className="text-xs px-2 py-0.5 rounded bg-white/50 font-medium">
-                      {getStatusLabel(toothData.status)}
+                      {t(`patients.status.${toothData.status}`)}
                     </span>
                   </div>
                   {toothData.note && (

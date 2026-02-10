@@ -120,6 +120,12 @@
     "notesRecorded": "ملاحظات مسجلة",
     "toothStatus": "الحالة",
     "noNotes": "بدون ملاحظات",
+    "statusLegend": "دليل الحالات",
+    "registeredTeeth": "الأسنان المسجلة",
+    "withNotes": "مع ملاحظات",
+    "missingExtracted": "مفقود/مخلوع",
+    "characters": "حرف",
+    "saving": "جاري الحفظ...",
     "status": {
       "healthy": "سليم",
       "caries": "تسوس",

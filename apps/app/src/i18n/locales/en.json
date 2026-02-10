@@ -120,6 +120,12 @@
     "notesRecorded": "Notes recorded",
     "toothStatus": "Status",
     "noNotes": "No notes",
+    "statusLegend": "Status legend",
+    "registeredTeeth": "Registered teeth",
+    "withNotes": "With notes",
+    "missingExtracted": "Missing/Extracted",
+    "characters": "characters",
+    "saving": "Saving...",
     "status": {
       "healthy": "Healthy",
       "caries": "Caries",
