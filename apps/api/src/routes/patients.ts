@@ -17,6 +17,7 @@ import {
 } from '../services/patient.service.js'
 import { PdfService } from '../services/pdf.service.js'
 import { PatientHistoryPdf, sanitizeFilename } from '../pdfs/index.js'
+import { ToothStatus } from '@dental/shared'
 
 const patientsRouter: IRouter = Router()
 
@@ -388,10 +389,25 @@ patientsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) =>
 // Dental Chart (Teeth) Routes
 // ============================================================================
 
-// Teeth update schema - object with tooth numbers as keys and notes as values
+// Teeth update schema - object with tooth numbers as keys and ToothData as values
+const toothDataSchema = z.object({
+  note: z.string().max(1000, 'Note cannot exceed 1000 characters'),
+  status: z.enum([
+    'healthy',
+    'caries',
+    'filled',
+    'crown',
+    'root_canal',
+    'missing',
+    'extracted',
+    'implant',
+    'bridge',
+  ] as const, { errorMap: () => ({ message: 'Invalid tooth status' }) }),
+})
+
 const teethUpdateSchema = z.record(
   z.string().regex(/^\d{2}$/, 'Invalid tooth number format'),
-  z.string().max(1000, 'Note cannot exceed 1000 characters')
+  toothDataSchema
 )
 
 /**
