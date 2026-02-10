@@ -254,9 +254,12 @@ All core features completed (15 phases):
 - [ ] Country dropdown for phone number area code
 
 #### Dental Chart Improvements
-- [ ] Visual indicator for teeth with comments (distinguish from teeth without comments)
-- [ ] Mark teeth as "removed/missing" for extraction cases
-- [ ] Show tooth comments on hover
+- [x] Visual indicator for teeth with comments (distinguish from teeth without comments)
+- [x] Mark teeth as "removed/missing" for extraction cases
+- [x] Show tooth comments on hover
+- [x] Structured tooth status tracking (9 statuses with unique colors)
+- [x] Two-column layout (odontogram left, teeth cards right)
+- [x] Inline delete button on tooth cards
 
 #### UX Improvements
 - [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
