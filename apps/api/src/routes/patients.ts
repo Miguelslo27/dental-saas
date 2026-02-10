@@ -1,6 +1,7 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
 import React from 'react'
+import { type TeethData } from '@dental/shared'
 import { requireMinRole } from '../middleware/auth.js'
 import {
   listPatients,
@@ -388,10 +389,21 @@ patientsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) =>
 // Dental Chart (Teeth) Routes
 // ============================================================================
 
-// Teeth update schema - object with tooth numbers as keys and notes as values
+// Teeth update schema - object with tooth numbers as keys and ToothData as values
+const toothDataSchema = z.object({
+  note: z.string().max(1000, 'Note cannot exceed 1000 characters'),
+  status: z.string().refine(
+    (val): val is string => [
+      'healthy', 'caries', 'filled', 'crown', 'root_canal',
+      'missing', 'extracted', 'implant', 'bridge',
+    ].includes(val),
+    { message: 'Invalid tooth status' }
+  ),
+})
+
 const teethUpdateSchema = z.record(
   z.string().regex(/^\d{2}$/, 'Invalid tooth number format'),
-  z.string().max(1000, 'Note cannot exceed 1000 characters')
+  toothDataSchema
 )
 
 /**
@@ -440,7 +452,7 @@ patientsRouter.patch('/:id/teeth', requireMinRole('STAFF'), async (req, res, nex
       })
     }
 
-    const result = await updatePatientTeeth(tenantId, id, parsed.data)
+    const result = await updatePatientTeeth(tenantId, id, parsed.data as TeethData)
 
     if (!result.success) {
       const statusCode = result.errorCode === 'NOT_FOUND' ? 404 : 400

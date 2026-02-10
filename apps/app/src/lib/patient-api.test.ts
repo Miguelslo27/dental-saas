@@ -10,6 +10,8 @@ import {
   getPatientStats,
   getPatientTeeth,
   updatePatientTeeth,
+  updateToothData,
+  deleteToothData,
   updateToothNote,
   deleteToothNote,
   calculateAge,
@@ -286,7 +288,10 @@ describe('patient-api', () => {
   describe('Dental Chart API', () => {
     describe('getPatientTeeth', () => {
       it('should fetch patient teeth data', async () => {
-        const teethData = { '11': 'cavity', '21': 'filled' }
+        const teethData = {
+          '11': { note: 'cavity', status: 'caries' },
+          '21': { note: 'filled', status: 'filled' },
+        }
         vi.mocked(apiClient.get).mockResolvedValue({
           data: { success: true, data: teethData },
         })
@@ -300,7 +305,10 @@ describe('patient-api', () => {
 
     describe('updatePatientTeeth', () => {
       it('should update patient teeth data', async () => {
-        const teethUpdate = { '11': 'treated', '12': 'cavity' }
+        const teethUpdate = {
+          '11': { note: 'treated', status: 'filled' },
+          '12': { note: 'cavity', status: 'caries' },
+        }
         vi.mocked(apiClient.patch).mockResolvedValue({
           data: { success: true, data: mockPatient },
         })
@@ -312,8 +320,38 @@ describe('patient-api', () => {
       })
     })
 
-    describe('updateToothNote', () => {
-      it('should update a single tooth note', async () => {
+    describe('updateToothData', () => {
+      it('should update a single tooth data with note and status', async () => {
+        vi.mocked(apiClient.patch).mockResolvedValue({
+          data: { success: true, data: mockPatient },
+        })
+
+        const result = await updateToothData('patient-123', '11', { note: 'new note', status: 'caries' })
+
+        expect(apiClient.patch).toHaveBeenCalledWith('/patients/patient-123/teeth', {
+          '11': { note: 'new note', status: 'caries' },
+        })
+        expect(result).toEqual(mockPatient)
+      })
+    })
+
+    describe('deleteToothData', () => {
+      it('should delete tooth data by setting empty note and healthy status', async () => {
+        vi.mocked(apiClient.patch).mockResolvedValue({
+          data: { success: true, data: mockPatient },
+        })
+
+        const result = await deleteToothData('patient-123', '11')
+
+        expect(apiClient.patch).toHaveBeenCalledWith('/patients/patient-123/teeth', {
+          '11': { note: '', status: 'healthy' },
+        })
+        expect(result).toEqual(mockPatient)
+      })
+    })
+
+    describe('updateToothNote (deprecated)', () => {
+      it('should update a single tooth note with healthy status', async () => {
         vi.mocked(apiClient.patch).mockResolvedValue({
           data: { success: true, data: mockPatient },
         })
@@ -321,21 +359,23 @@ describe('patient-api', () => {
         const result = await updateToothNote('patient-123', '11', 'new note')
 
         expect(apiClient.patch).toHaveBeenCalledWith('/patients/patient-123/teeth', {
-          '11': 'new note',
+          '11': { note: 'new note', status: 'healthy' },
         })
         expect(result).toEqual(mockPatient)
       })
     })
 
-    describe('deleteToothNote', () => {
-      it('should delete a tooth note by setting empty string', async () => {
+    describe('deleteToothNote (deprecated)', () => {
+      it('should delete a tooth note', async () => {
         vi.mocked(apiClient.patch).mockResolvedValue({
           data: { success: true, data: mockPatient },
         })
 
         const result = await deleteToothNote('patient-123', '11')
 
-        expect(apiClient.patch).toHaveBeenCalledWith('/patients/patient-123/teeth', { '11': '' })
+        expect(apiClient.patch).toHaveBeenCalledWith('/patients/patient-123/teeth', {
+          '11': { note: '', status: 'healthy' },
+        })
         expect(result).toEqual(mockPatient)
       })
     })

@@ -716,7 +716,10 @@ describe('Patients API', () => {
           tenantId,
           firstName: 'Teeth',
           lastName: 'Test',
-          teeth: { '11': 'Crown needed', '21': 'Healthy' },
+          teeth: {
+            '11': { note: 'Crown needed', status: 'crown' },
+            '21': { note: 'Healthy', status: 'healthy' },
+          },
         },
       })
       patientId = patient.id
@@ -730,8 +733,8 @@ describe('Patients API', () => {
       expect(response.status).toBe(200)
       expect(response.body.success).toBe(true)
       expect(response.body.data).toEqual({
-        '11': 'Crown needed',
-        '21': 'Healthy',
+        '11': { note: 'Crown needed', status: 'crown' },
+        '21': { note: 'Healthy', status: 'healthy' },
       })
     })
 
@@ -779,24 +782,27 @@ describe('Patients API', () => {
           tenantId,
           firstName: 'Teeth',
           lastName: 'Update',
-          teeth: { '11': 'Existing note' },
+          teeth: { '11': { note: 'Existing note', status: 'healthy' } },
         },
       })
       patientId = patient.id
     })
 
-    it('should update teeth notes for a patient', async () => {
+    it('should update teeth data for a patient', async () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '21': 'New cavity', '31': 'Root canal' })
+        .send({
+          '21': { note: 'New cavity', status: 'caries' },
+          '31': { note: 'Root canal', status: 'root_canal' },
+        })
 
       expect(response.status).toBe(200)
       expect(response.body.success).toBe(true)
       expect(response.body.data.teeth).toEqual({
-        '11': 'Existing note',
-        '21': 'New cavity',
-        '31': 'Root canal',
+        '11': { note: 'Existing note', status: 'healthy' },
+        '21': { note: 'New cavity', status: 'caries' },
+        '31': { note: 'Root canal', status: 'root_canal' },
       })
     })
 
@@ -804,38 +810,41 @@ describe('Patients API', () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '11': 'Updated note', '22': 'Another note' })
+        .send({
+          '11': { note: 'Updated note', status: 'filled' },
+          '22': { note: 'Another note', status: 'healthy' },
+        })
 
       expect(response.status).toBe(200)
       expect(response.body.data.teeth).toEqual({
-        '11': 'Updated note',
-        '22': 'Another note',
+        '11': { note: 'Updated note', status: 'filled' },
+        '22': { note: 'Another note', status: 'healthy' },
       })
     })
 
-    it('should remove tooth note when value is empty string', async () => {
-      // First add a note
+    it('should remove tooth data when note is empty and status is healthy', async () => {
+      // First add a tooth entry
       await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '21': 'To be removed' })
+        .send({ '21': { note: 'To be removed', status: 'caries' } })
 
-      // Then remove it
+      // Then remove it (empty note + healthy status)
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '21': '' })
+        .send({ '21': { note: '', status: 'healthy' } })
 
       expect(response.status).toBe(200)
       expect(response.body.data.teeth['21']).toBeUndefined()
-      expect(response.body.data.teeth['11']).toBe('Existing note')
+      expect(response.body.data.teeth['11']).toEqual({ note: 'Existing note', status: 'healthy' })
     })
 
     it('should return 400 for invalid tooth number', async () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '99': 'Invalid tooth' })
+        .send({ '99': { note: 'Invalid tooth', status: 'healthy' } })
 
       expect(response.status).toBe(400)
       expect(response.body.success).toBe(false)
@@ -846,17 +855,37 @@ describe('Patients API', () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '11': longNote })
+        .send({ '11': { note: longNote, status: 'healthy' } })
 
       expect(response.status).toBe(400)
       expect(response.body.success).toBe(false)
+    })
+
+    it('should return 400 for invalid tooth status', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '11': { note: 'Test', status: 'invalid_status' } })
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should update tooth status without note', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ '12': { note: '', status: 'missing' } })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.teeth['12']).toEqual({ note: '', status: 'missing' })
     })
 
     it('should return 404 for non-existent patient', async () => {
       const response = await request(app)
         .patch('/api/patients/non-existent-id/teeth')
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '11': 'Test' })
+        .send({ '11': { note: 'Test', status: 'healthy' } })
 
       expect(response.status).toBe(404)
     })
@@ -865,21 +894,24 @@ describe('Patients API', () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ '41': 'Admin note' })
+        .send({ '41': { note: 'Admin note', status: 'caries' } })
 
       expect(response.status).toBe(200)
-      expect(response.body.data.teeth['41']).toBe('Admin note')
+      expect(response.body.data.teeth['41']).toEqual({ note: 'Admin note', status: 'caries' })
     })
 
     it('should support primary teeth notation (51-85)', async () => {
       const response = await request(app)
         .patch(`/api/patients/${patientId}/teeth`)
         .set('Authorization', `Bearer ${staffToken}`)
-        .send({ '51': 'Primary tooth note', '75': 'Another primary' })
+        .send({
+          '51': { note: 'Primary tooth note', status: 'healthy' },
+          '75': { note: 'Another primary', status: 'caries' },
+        })
 
       expect(response.status).toBe(200)
-      expect(response.body.data.teeth['51']).toBe('Primary tooth note')
-      expect(response.body.data.teeth['75']).toBe('Another primary')
+      expect(response.body.data.teeth['51']).toEqual({ note: 'Primary tooth note', status: 'healthy' })
+      expect(response.body.data.teeth['75']).toEqual({ note: 'Another primary', status: 'caries' })
     })
   })
 })

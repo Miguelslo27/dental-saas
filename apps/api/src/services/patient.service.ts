@@ -1,6 +1,7 @@
 import { prisma, Prisma } from '@dental/database'
 import { getTenantPlanLimits } from './user.service.js'
 import { logger } from '../utils/logger.js'
+import { ToothStatus, type ToothData, type TeethData } from '@dental/shared'
 
 // Prisma JsonNull helper for nullable JSON fields
 const JsonNull = Prisma.JsonNull
@@ -372,32 +373,73 @@ const VALID_PRIMARY_TEETH = [
 const VALID_TEETH = [...VALID_PERMANENT_TEETH, ...VALID_PRIMARY_TEETH]
 
 /**
+ * Normalize teeth data to new format with backward compatibility
+ * Converts old string format to new ToothData format
+ */
+function normalizeTeethData(teeth: Prisma.JsonValue): TeethData {
+  if (!teeth || teeth === null) return {}
+
+  const rawTeeth = teeth as Record<string, unknown>
+  const normalized: TeethData = {}
+
+  for (const [toothNumber, value] of Object.entries(rawTeeth)) {
+    if (typeof value === 'string') {
+      // Old format: convert to new
+      normalized[toothNumber] = { note: value, status: ToothStatus.HEALTHY }
+    } else if (typeof value === 'object' && value !== null) {
+      // New format: use as-is
+      normalized[toothNumber] = value as ToothData
+    }
+  }
+
+  return normalized
+}
+
+/**
  * Validate teeth data format
  * @returns Error message if invalid, null if valid
  */
-export function validateTeethData(teeth: Record<string, string>): string | null {
-  for (const [toothNumber, note] of Object.entries(teeth)) {
+export function validateTeethData(teeth: TeethData): string | null {
+  const validStatuses = [
+    ToothStatus.HEALTHY,
+    ToothStatus.CARIES,
+    ToothStatus.FILLED,
+    ToothStatus.CROWN,
+    ToothStatus.ROOT_CANAL,
+    ToothStatus.MISSING,
+    ToothStatus.EXTRACTED,
+    ToothStatus.IMPLANT,
+    ToothStatus.BRIDGE,
+  ]
+
+  for (const [toothNumber, toothData] of Object.entries(teeth)) {
     if (!VALID_TEETH.includes(toothNumber)) {
       return `Invalid tooth number: ${toothNumber}. Must be a valid ISO 3950 (FDI) notation.`
     }
-    if (typeof note !== 'string') {
+    if (typeof toothData !== 'object' || toothData === null) {
+      return `Data for tooth ${toothNumber} must be an object with note and status.`
+    }
+    if (typeof toothData.note !== 'string') {
       return `Note for tooth ${toothNumber} must be a string.`
     }
-    if (note.length > 1000) {
+    if (toothData.note.length > 1000) {
       return `Note for tooth ${toothNumber} exceeds maximum length of 1000 characters.`
+    }
+    if (!validStatuses.includes(toothData.status)) {
+      return `Invalid status for tooth ${toothNumber}: ${toothData.status}`
     }
   }
   return null
 }
 
 /**
- * Update teeth notes for a patient
+ * Update teeth data for a patient
  * Merges new teeth data with existing data
  */
 export async function updatePatientTeeth(
   tenantId: string,
   patientId: string,
-  teeth: Record<string, string>
+  teeth: TeethData
 ): Promise<{ success: true; patient: SafePatient } | { success: false; error: string; errorCode: PatientErrorCode | 'INVALID_DATA' }> {
   // Validate teeth data
   const validationError = validateTeethData(teeth)
@@ -415,16 +457,17 @@ export async function updatePatientTeeth(
     return { success: false, error: 'Patient not found', errorCode: 'NOT_FOUND' }
   }
 
-  // Merge existing teeth with new teeth
-  // Empty string values will remove the tooth note
-  const existingTeeth = (existing.teeth as Record<string, string>) || {}
-  const mergedTeeth: Record<string, string> = { ...existingTeeth }
+  // Normalize existing teeth data (handles old string format)
+  const existingTeeth = normalizeTeethData(existing.teeth)
+  const mergedTeeth: TeethData = { ...existingTeeth }
 
-  for (const [toothNumber, note] of Object.entries(teeth)) {
-    if (note === '') {
+  // Merge new teeth data
+  // Empty note + healthy status = remove tooth entry
+  for (const [toothNumber, toothData] of Object.entries(teeth)) {
+    if (toothData.note === '' && toothData.status === ToothStatus.HEALTHY) {
       delete mergedTeeth[toothNumber]
     } else {
-      mergedTeeth[toothNumber] = note
+      mergedTeeth[toothNumber] = toothData
     }
   }
 
@@ -432,7 +475,7 @@ export async function updatePatientTeeth(
   const updated = await prisma.patient.update({
     where: { id: patientId },
     data: {
-      teeth: Object.keys(mergedTeeth).length > 0 ? mergedTeeth : JsonNull,
+      teeth: Object.keys(mergedTeeth).length > 0 ? (mergedTeeth as unknown as JsonInputValue) : JsonNull,
     },
     select: PATIENT_SELECT,
   })
@@ -448,7 +491,7 @@ export async function updatePatientTeeth(
 export async function getPatientTeeth(
   tenantId: string,
   patientId: string
-): Promise<{ success: true; teeth: Record<string, string> } | { success: false; error: string; errorCode: PatientErrorCode }> {
+): Promise<{ success: true; teeth: TeethData } | { success: false; error: string; errorCode: PatientErrorCode }> {
   const existing = await prisma.patient.findFirst({
     where: { id: patientId, tenantId },
     select: { teeth: true },
@@ -458,5 +501,6 @@ export async function getPatientTeeth(
     return { success: false, error: 'Patient not found', errorCode: 'NOT_FOUND' }
   }
 
-  return { success: true, teeth: (existing.teeth as Record<string, string>) || {} }
+  // Normalize teeth data (handles old string format)
+  return { success: true, teeth: normalizeTeethData(existing.teeth) }
 }

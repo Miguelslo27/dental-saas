@@ -1,4 +1,5 @@
 import { apiClient } from './api'
+import { ToothStatus, type ToothData, type TeethData } from '@dental/shared'
 
 // ============================================================================
 // Types
@@ -15,7 +16,7 @@ export interface Patient {
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null
   address: string | null
   notes: Record<string, unknown> | null
-  teeth: Record<string, string> | null
+  teeth: TeethData | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -203,44 +204,65 @@ export function getPatientInitials(patient: Pick<Patient, 'firstName' | 'lastNam
 // ============================================================================
 
 /**
- * Get dental chart (teeth notes) for a patient
+ * Get dental chart data for a patient
  */
-export async function getPatientTeeth(patientId: string): Promise<Record<string, string>> {
-  const response = await apiClient.get<ApiResponse<Record<string, string>>>(`/patients/${patientId}/teeth`)
+export async function getPatientTeeth(patientId: string): Promise<TeethData> {
+  const response = await apiClient.get<ApiResponse<TeethData>>(`/patients/${patientId}/teeth`)
   return response.data.data
 }
 
 /**
- * Update dental chart (teeth notes) for a patient
- * Merges with existing data. Empty string removes the note.
+ * Update dental chart data for a patient
+ * Merges with existing data. Empty note + healthy status removes the tooth entry.
  */
 export async function updatePatientTeeth(
   patientId: string,
-  teeth: Record<string, string>
+  teeth: TeethData
 ): Promise<Patient> {
   const response = await apiClient.patch<ApiResponse<Patient>>(`/patients/${patientId}/teeth`, teeth)
   return response.data.data
 }
 
 /**
- * Update a single tooth note
+ * Update a single tooth data (note and status)
+ */
+export async function updateToothData(
+  patientId: string,
+  toothNumber: string,
+  data: ToothData
+): Promise<Patient> {
+  return updatePatientTeeth(patientId, { [toothNumber]: data })
+}
+
+/**
+ * Delete tooth data (set to empty note with healthy status)
+ */
+export async function deleteToothData(
+  patientId: string,
+  toothNumber: string
+): Promise<Patient> {
+  return updatePatientTeeth(patientId, { [toothNumber]: { note: '', status: ToothStatus.HEALTHY } })
+}
+
+/**
+ * @deprecated Use updateToothData instead
  */
 export async function updateToothNote(
   patientId: string,
   toothNumber: string,
   note: string
 ): Promise<Patient> {
-  return updatePatientTeeth(patientId, { [toothNumber]: note })
+  return updateToothData(patientId, toothNumber, { note, status: ToothStatus.HEALTHY })
 }
 
 /**
- * Delete a tooth note (set to empty string)
+ * @deprecated Use deleteToothData instead
  */
 export async function deleteToothNote(
   patientId: string,
   toothNumber: string
 ): Promise<Patient> {
-  return updatePatientTeeth(patientId, { [toothNumber]: '' })
+  return deleteToothData(patientId, toothNumber)
 }
 
 // ============================================================================

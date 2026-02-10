@@ -79,3 +79,23 @@ export interface TenantEntity extends BaseEntity {
 export interface ArchivableEntity extends TenantEntity {
   archived: boolean
 }
+
+// Dental chart types
+export enum ToothStatus {
+  HEALTHY = 'healthy',
+  CARIES = 'caries',
+  FILLED = 'filled',
+  CROWN = 'crown',
+  ROOT_CANAL = 'root_canal',
+  MISSING = 'missing',
+  EXTRACTED = 'extracted',
+  IMPLANT = 'implant',
+  BRIDGE = 'bridge',
+}
+
+export interface ToothData {
+  note: string
+  status: ToothStatus
+}
+
+export type TeethData = Record<string, ToothData>
