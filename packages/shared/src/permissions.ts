@@ -60,6 +60,11 @@ export enum Permission {
   // Export
   DATA_EXPORT = 'data:export',
 
+  // Attachments
+  ATTACHMENTS_VIEW = 'attachments:view',
+  ATTACHMENTS_UPLOAD = 'attachments:upload',
+  ATTACHMENTS_DELETE = 'attachments:delete',
+
   // Billing
   BILLING_VIEW = 'billing:view',
   BILLING_MANAGE = 'billing:manage',
@@ -84,6 +89,7 @@ const STAFF_PERMISSIONS = [
   Permission.DENTAL_CHARTS_VIEW,
   Permission.SETTINGS_VIEW,
   Permission.USERS_VIEW,
+  Permission.ATTACHMENTS_VIEW,
 ];
 
 const ADMIN_PERMISSIONS = [
@@ -127,6 +133,10 @@ const ADMIN_PERMISSIONS = [
   Permission.SETTINGS_UPDATE,
 
   Permission.DATA_EXPORT,
+
+  Permission.ATTACHMENTS_VIEW,
+  Permission.ATTACHMENTS_UPLOAD,
+  Permission.ATTACHMENTS_DELETE,
 ];
 
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -137,9 +147,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   DOCTOR: [
     // All STAFF permissions
     ...STAFF_PERMISSIONS,
-    // Plus editing dental charts and viewing statistics
+    // Plus editing dental charts, viewing statistics, and uploading attachments
     Permission.DENTAL_CHARTS_UPDATE,
     Permission.STATISTICS_VIEW,
+    Permission.ATTACHMENTS_UPLOAD,
   ],
 
   ADMIN: ADMIN_PERMISSIONS,

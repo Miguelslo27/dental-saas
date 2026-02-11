@@ -27,6 +27,7 @@ const mockTenant = (overrides = {}) => ({
   logo: null,
   timezone: 'UTC',
   currency: 'USD',
+  storageUsedBytes: BigInt(0),
   isActive: true,
   createdAt: new Date(),
   updatedAt: new Date(),

@@ -21,9 +21,10 @@ model Plan {
   price       Decimal  @db.Decimal(10, 2) // Monthly price in USD
   
   // Limits
-  maxAdmins   Int
-  maxDoctors  Int
-  maxPatients Int
+  maxAdmins    Int
+  maxDoctors   Int
+  maxPatients  Int
+  maxStorageMb Int     @default(100)
   
   // Features (stored as JSON for flexibility)
   features    Json     @default("[]")
@@ -133,7 +134,10 @@ model Tenant {
   timezone  String   @default("America/New_York")
   /// ISO 4217 currency code (e.g., USD, EUR, GBP)
   currency  String   @db.Char(3) @default("USD")
-  
+
+  /// Total storage used by attachments in bytes
+  storageUsedBytes BigInt @default(0)
+
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,6 +150,7 @@ model Tenant {
   appointments  Appointment[]
   labworks      Labwork[]
   expenses      Expense[]
+  attachments   Attachment[]
 
   @@index([slug])
   @@index([isActive])
@@ -503,4 +508,37 @@ model PasswordResetToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("password_reset_tokens")
+}
+
+// ============================================================================
+// ATTACHMENTS (File Uploads)
+// ============================================================================
+
+enum AttachmentModule {
+  PATIENTS
+  APPOINTMENTS
+  LABWORKS
+  EXPENSES
+}
+
+model Attachment {
+  id          String           @id @default(cuid())
+  tenantId    String
+  module      AttachmentModule
+  entityId    String
+  filename    String           // Original filename (sanitized)
+  storedName  String           // UUID-based name on disk
+  mimeType    String
+  sizeBytes   Int
+  description String?          @db.Text
+  uploadedBy  String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, module, entityId])
+  @@index([entityId])
+  @@map("attachments")
 }

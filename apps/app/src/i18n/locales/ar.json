@@ -288,5 +288,18 @@
   "payment": {
     "paid": "مدفوع",
     "pending": "معلق"
+  },
+  "attachments": {
+    "title": "الصور",
+    "upload": "رفع صور",
+    "dragDrop": "اسحب وأفلت الصور هنا، أو انقر للاختيار",
+    "uploading": "جاري الرفع...",
+    "deleteConfirm": "حذف هذه الصورة؟",
+    "noImages": "لا توجد صور بعد",
+    "fileTooLarge": "الملف {{name}} يتجاوز الحجم الأقصى (10 ميجابايت)",
+    "invalidType": "نوع ملف غير صالح. يُسمح فقط بالصور (JPEG, PNG, WebP, GIF).",
+    "tooManyFiles": "الحد الأقصى {{max}} ملفات لكل رفع",
+    "storageFull": "تم تجاوز حد التخزين. قم بترقية خطتك للحصول على مساحة أكبر.",
+    "storageUsage": "التخزين: {{used}} من {{limit}} مستخدم"
   }
 }

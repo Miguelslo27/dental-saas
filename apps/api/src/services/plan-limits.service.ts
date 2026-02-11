@@ -13,6 +13,13 @@ export interface TenantUsage {
   admins: number
 }
 
+export interface StorageLimitCheckResult {
+  allowed: boolean
+  currentBytes: number
+  limitBytes: number
+  remainingBytes: number
+}
+
 export interface PlanLimitStatus {
   plan: {
     id: string
@@ -26,6 +33,7 @@ export interface PlanLimitStatus {
   doctors: LimitCheckResult
   patients: LimitCheckResult
   admins: LimitCheckResult
+  storage: StorageLimitCheckResult
 }
 
 export const PlanLimitsService = {
@@ -142,6 +150,33 @@ export const PlanLimitsService = {
   },
 
   /**
+   * Check if tenant can upload files of the given size
+   */
+  async canUploadStorage(tenantId: string, fileSizeBytes: number): Promise<StorageLimitCheckResult> {
+    const subscription = await this.getTenantSubscription(tenantId)
+
+    if (!subscription) {
+      return { allowed: false, currentBytes: 0, limitBytes: 0, remainingBytes: 0 }
+    }
+
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { storageUsedBytes: true },
+    })
+
+    const currentBytes = Number(tenant?.storageUsedBytes ?? 0)
+    const limitBytes = subscription.plan.maxStorageMb * 1024 * 1024
+    const remainingBytes = Math.max(0, limitBytes - currentBytes)
+
+    return {
+      allowed: currentBytes + fileSizeBytes <= limitBytes,
+      currentBytes,
+      limitBytes,
+      remainingBytes,
+    }
+  },
+
+  /**
    * Get complete plan limit status for a tenant
    */
   async getPlanLimitStatus(tenantId: string): Promise<PlanLimitStatus | null> {
@@ -151,7 +186,10 @@ export const PlanLimitsService = {
       return null
     }
 
-    const usage = await this.getTenantUsage(tenantId)
+    const [usage, storageCheck] = await Promise.all([
+      this.getTenantUsage(tenantId),
+      this.canUploadStorage(tenantId, 0),
+    ])
     const { plan } = subscription
 
     return {
@@ -182,6 +220,7 @@ export const PlanLimitsService = {
         limit: plan.maxAdmins,
         remaining: Math.max(0, plan.maxAdmins - usage.admins),
       },
+      storage: storageCheck,
     }
   },
 }

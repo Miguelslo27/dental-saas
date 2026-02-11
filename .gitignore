@@ -46,6 +46,9 @@ coverage/
 # Prisma
 packages/database/prisma/migrations/**/migration_lock.toml
 
+# Uploads (user file storage)
+uploads/
+
 # Misc
 *.tgz
 .cache/

@@ -15,7 +15,7 @@ async function main() {
   const plans = await Promise.all([
     prisma.plan.upsert({
       where: { name: 'free' },
-      update: {},
+      update: { maxStorageMb: 100 },
       create: {
         name: 'free',
         displayName: 'Free',
@@ -23,6 +23,7 @@ async function main() {
         maxAdmins: 1,
         maxDoctors: 3,
         maxPatients: 15,
+        maxStorageMb: 100,
         features: [
           'Basic patient management',
           'Appointment scheduling',
@@ -32,7 +33,7 @@ async function main() {
     }),
     prisma.plan.upsert({
       where: { name: 'basic' },
-      update: {},
+      update: { maxStorageMb: 1024 },
       create: {
         name: 'basic',
         displayName: 'Basic',
@@ -40,6 +41,7 @@ async function main() {
         maxAdmins: 2,
         maxDoctors: 5,
         maxPatients: 25,
+        maxStorageMb: 1024,
         features: [
           'Everything in Free',
           'Lab work tracking',
@@ -50,7 +52,7 @@ async function main() {
     }),
     prisma.plan.upsert({
       where: { name: 'enterprise' },
-      update: {},
+      update: { maxStorageMb: 5120 },
       create: {
         name: 'enterprise',
         displayName: 'Enterprise',
@@ -58,6 +60,7 @@ async function main() {
         maxAdmins: 5,
         maxDoctors: 10,
         maxPatients: 60,
+        maxStorageMb: 5120,
         features: [
           'Everything in Basic',
           'Advanced analytics',
