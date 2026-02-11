@@ -98,7 +98,7 @@ dental-saas/
 
 ### Authentication & Authorization
 - JWT-based authentication
-- Roles: SUPER_ADMIN, OWNER, ADMIN, DOCTOR, STAFF
+- Roles: SUPER_ADMIN, OWNER, ADMIN, CLINIC_ADMIN, DOCTOR, STAFF
 - Super admin uses separate routes (`/admin/*`)
 - **RBAC (Role-Based Access Control):**
   - Granular permission system with 50+ permissions
@@ -108,7 +108,8 @@ dental-saas/
   - Permission hierarchy:
     - **STAFF:** Read-only access (view patients, appointments, labworks, expenses)
     - **DOCTOR:** STAFF + edit dental charts + view statistics
-    - **ADMIN:** Full CRUD on operational resources (patients, appointments, doctors, labworks, expenses, users, settings)
+    - **CLINIC_ADMIN:** Full CRUD on operational resources (patients, appointments, doctors, labworks, expenses) but no user management, settings, or data export
+    - **ADMIN:** Full CRUD on all resources including users and settings
     - **OWNER:** ADMIN + tenant profile, billing, promote to owner, delete tenant
 
 ### API Patterns
@@ -128,7 +129,7 @@ dental-saas/
 - **Framework:** Vitest
 - **Backend:** Unit tests for services, integration tests for routes
 - **Frontend:** React Testing Library + jsdom
-- **Current count:** 587+ tests passing
+- **Current count:** 420 backend + 892 frontend = 1,312 tests passing
 
 ```bash
 # Run specific test file
@@ -199,45 +200,23 @@ Copy `.env.example` to `.env` and configure:
 
 All core features completed (15 phases):
 - Multi-tenant architecture with row-level security
-- Authentication & authorization (JWT, roles)
-- Patient management with dental charts
+- Authentication & authorization (JWT, RBAC with 6 roles)
+- Patient management with dental charts (9 statuses, odontogram)
 - Appointments, doctors, labworks, expenses
 - Dashboard with statistics
-- PDF generation & data export
+- PDF generation & data export (multi-language)
 - Internationalization (ES, EN, AR with RTL)
 - Landing page & marketing site
-- Complete test coverage (338 backend + 851 frontend + E2E)
+- Welcome email for new tenants
 - CI/CD pipeline & production deployment
 
-**Test Coverage:** 1,189 passing tests across backend, frontend, and E2E suites
+**Test Coverage:** 1,312 passing tests (420 backend + 892 frontend)
 
 ---
 
-## Pending Tasks
+## Roadmap
 
 ### High Priority
-
-#### Bugs & Fixes
-- [x] Fix appointment edit form: patient and doctor not pre-selected with current values
-- [x] Fix superadmin panel: cannot view clinic and user details
-
-#### Roles & Permissions
-- [x] Implement role-based permissions system (RBAC with granular permissions)
-  - ✅ Backend permission system with 50+ granular permissions
-  - ✅ Fixed STAFF permissions (read-only for labworks and expenses)
-  - ✅ Middleware for permission checks (requirePermission, requireAnyPermission, requireAllPermissions)
-  - ✅ Frontend usePermissions hook and <Can> component
-  - ✅ UI components updated with permission-based rendering
-  - ✅ Comprehensive test coverage (30 backend + frontend tests)
-  - ✅ Single source of truth in @dental/shared (eliminated code duplication)
-  - ✅ UserRole enum consolidated and exported from shared package
-- [x] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
-
-#### Internationalization & Localization
-- [x] Fix PDF patient file to use configured language (currently in English)
-- [x] Send emails based on user's selected/default language
-- [x] Currency alignment: ensure all values respect configured currency
-- [x] Show warning when changing currency (no automatic conversion between currencies)
 
 #### Security & Performance
 - [ ] Rate limiting with Redis (persistence and scalability)
@@ -253,27 +232,14 @@ All core features completed (15 phases):
 - [ ] Default timezone based on user's location
 - [ ] Country dropdown for phone number area code
 
-#### Dental Chart Improvements
-- [x] Visual indicator for teeth with comments (distinguish from teeth without comments)
-- [x] Mark teeth as "removed/missing" for extraction cases
-- [x] Show tooth comments on hover
-- [x] Structured tooth status tracking (9 statuses with unique colors)
-- [x] Two-column layout (odontogram left, teeth cards right)
-- [x] Inline delete button on tooth cards
-
 #### UX Improvements
 - [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
 - [ ] Improve date/time picker UI (investigate user-friendly packages, replace browser defaults)
 - [ ] Phone placeholder based on user's location
 
-### Appointment Images (Local Storage)
-- [ ] Configure Multer for file uploads
-- [ ] Local folder storage implementation (organized by tenant)
-- [ ] Storage tracking per tenant (disk usage)
-- [ ] Storage limit verification middleware
-- [ ] Image upload/download/delete endpoints
+### Backlog
 
-### Deferred Features
+#### Features
 - [ ] Onboarding flow for new tenants
 - [ ] User profile page
 - [ ] DoctorPicker component (searchable combobox)
@@ -282,7 +248,16 @@ All core features completed (15 phases):
 - [ ] Prescriptions component
 - [ ] og-image.png (1200x630px) for apps/web/public/
 - [ ] Subscriptions and payments (dLocal integration)
-- [x] Welcome email when creating tenant
+
+#### Technical
+- [ ] E2E tests for admin panel
+- [ ] Audit logging for superadmin actions
+- [ ] Pagination in admin endpoints
+- [ ] 2FA for super admin
+- [ ] Dark mode toggle
+- [ ] Dashboard with real-time metrics (WebSocket)
+- [ ] Soft delete for tenants
+- [ ] Export tenant data before deletion
 
 ---
 
@@ -401,25 +376,6 @@ All core features completed (15 phases):
 
 ---
 
-## Future Improvements / Backlog
-
-### High Priority
-- [ ] E2E tests for admin panel
-- [ ] Welcome email when creating tenant
-- [ ] Audit logging for superadmin actions
-
-### Medium Priority
-- [ ] Pagination in admin endpoints
-- [ ] 2FA for super admin
-- [ ] Dark mode toggle
-
-### Low Priority
-- [ ] Dashboard with real-time metrics (WebSocket)
-- [ ] Soft delete for tenants
-- [ ] Export tenant data before deletion
-
----
-
 ## Future Enhancement: Separate Table for Dental Chart (v2)
 
 **When to migrate:** When treatment history, structured conditions, or aggregated reports are needed.
@@ -471,4 +427,4 @@ Application deployed and running in production.
 
 ---
 
-*Last update: 31 January, 2026 - Documentation cleanup*
+*Last update: 11 February, 2026 - Roadmap cleanup, removed completed tasks*
