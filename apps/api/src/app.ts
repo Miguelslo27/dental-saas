@@ -26,6 +26,11 @@ export const app: Express = express()
 app.use(cors({ origin: env.CORS_ORIGIN }))
 app.use(express.json())
 
+// Serialize BigInt values as numbers in JSON responses (e.g. storageUsedBytes)
+app.set('json replacer', (_key: string, value: unknown) =>
+  typeof value === 'bigint' ? Number(value) : value
+)
+
 // Request logging
 app.use((req, _res, next) => {
   logger.info({ method: req.method, url: req.url }, 'Incoming request')
