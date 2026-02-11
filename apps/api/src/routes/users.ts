@@ -41,7 +41,7 @@ const createUserSchema = z.object({
   password: passwordSchema,
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  role: z.enum(['ADMIN', 'DOCTOR', 'STAFF']), // OWNER cannot be assigned via API, SUPER_ADMIN is forbidden
+  role: z.enum(['ADMIN', 'CLINIC_ADMIN', 'DOCTOR', 'STAFF']), // OWNER cannot be assigned via API, SUPER_ADMIN is forbidden
   phone: phoneSchema,
   avatar: z.string().url().optional(),
 })
@@ -56,7 +56,7 @@ const updateUserSchema = z.object({
 })
 
 const updateRoleSchema = z.object({
-  role: z.enum(['OWNER', 'ADMIN', 'DOCTOR', 'STAFF']), // SUPER_ADMIN is forbidden
+  role: z.enum(['OWNER', 'ADMIN', 'CLINIC_ADMIN', 'DOCTOR', 'STAFF']), // SUPER_ADMIN is forbidden
 })
 
 /**

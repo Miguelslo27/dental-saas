@@ -73,6 +73,7 @@ export async function countUsersByRole(tenantId: string) {
   const result: Record<string, number> = {
     OWNER: 0,
     ADMIN: 0,
+    CLINIC_ADMIN: 0,
     DOCTOR: 0,
     STAFF: 0,
   }
@@ -95,9 +96,9 @@ export async function checkRoleLimitForNewUser(
   const counts = await countUsersByRole(tenantId)
 
   // Check based on role
-  if (role === 'ADMIN' || role === 'OWNER') {
-    // OWNER and ADMIN share the maxAdmins limit
-    const adminCount = counts.OWNER + counts.ADMIN
+  if (role === 'ADMIN' || role === 'OWNER' || role === 'CLINIC_ADMIN') {
+    // OWNER, ADMIN, and CLINIC_ADMIN share the maxAdmins limit
+    const adminCount = counts.OWNER + counts.ADMIN + counts.CLINIC_ADMIN
     if (adminCount >= limits.maxAdmins) {
       return {
         allowed: false,

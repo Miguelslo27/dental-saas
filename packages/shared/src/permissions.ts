@@ -75,6 +75,7 @@ export enum Permission {
  *
  * STAFF: Read-only access to most resources
  * DOCTOR: STAFF + can edit dental charts and view statistics
+ * CLINIC_ADMIN: Full CRUD on operational resources (patients, appointments, doctors, labworks, expenses) but no user management, settings updates, or data export
  * ADMIN: Full operational control except tenant profile, billing, and owner promotion
  * OWNER: Complete access to everything
  */
@@ -90,6 +91,50 @@ const STAFF_PERMISSIONS = [
   Permission.SETTINGS_VIEW,
   Permission.USERS_VIEW,
   Permission.ATTACHMENTS_VIEW,
+];
+
+const CLINIC_ADMIN_PERMISSIONS = [
+  // Full CRUD on operational resources
+  Permission.PATIENTS_VIEW,
+  Permission.PATIENTS_CREATE,
+  Permission.PATIENTS_UPDATE,
+  Permission.PATIENTS_DELETE,
+
+  Permission.APPOINTMENTS_VIEW,
+  Permission.APPOINTMENTS_CREATE,
+  Permission.APPOINTMENTS_UPDATE,
+  Permission.APPOINTMENTS_DELETE,
+
+  Permission.DOCTORS_VIEW,
+  Permission.DOCTORS_CREATE,
+  Permission.DOCTORS_UPDATE,
+  Permission.DOCTORS_DELETE,
+
+  Permission.LABWORKS_VIEW,
+  Permission.LABWORKS_CREATE,
+  Permission.LABWORKS_UPDATE,
+  Permission.LABWORKS_DELETE,
+
+  Permission.EXPENSES_VIEW,
+  Permission.EXPENSES_CREATE,
+  Permission.EXPENSES_UPDATE,
+  Permission.EXPENSES_DELETE,
+
+  // View-only for users and settings
+  Permission.USERS_VIEW,
+  Permission.SETTINGS_VIEW,
+
+  // Dental charts
+  Permission.DENTAL_CHARTS_VIEW,
+  Permission.DENTAL_CHARTS_UPDATE,
+
+  // Statistics
+  Permission.STATISTICS_VIEW,
+
+  // Attachments
+  Permission.ATTACHMENTS_VIEW,
+  Permission.ATTACHMENTS_UPLOAD,
+  Permission.ATTACHMENTS_DELETE,
 ];
 
 const ADMIN_PERMISSIONS = [
@@ -152,6 +197,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.STATISTICS_VIEW,
     Permission.ATTACHMENTS_UPLOAD,
   ],
+
+  CLINIC_ADMIN: CLINIC_ADMIN_PERMISSIONS,
 
   ADMIN: ADMIN_PERMISSIONS,
 

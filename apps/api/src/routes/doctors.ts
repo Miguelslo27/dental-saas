@@ -174,7 +174,7 @@ doctorsRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
  * GET /api/doctors/stats
  * Get doctor counts and plan limits (ADMIN+ required)
  */
-doctorsRouter.get('/stats', requireMinRole('ADMIN'), async (req, res, next) => {
+doctorsRouter.get('/stats', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
@@ -220,7 +220,7 @@ doctorsRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
  * POST /api/doctors
  * Create a new doctor (ADMIN+ required)
  */
-doctorsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
+doctorsRouter.post('/', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
@@ -272,7 +272,7 @@ doctorsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
  * PUT /api/doctors/:id
  * Update a doctor (ADMIN+ required)
  */
-doctorsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+doctorsRouter.put('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -311,7 +311,7 @@ doctorsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
  * DELETE /api/doctors/:id
  * Soft delete a doctor (ADMIN+ required)
  */
-doctorsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+doctorsRouter.delete('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -347,7 +347,7 @@ doctorsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => 
  * PUT /api/doctors/:id/restore
  * Restore a soft-deleted doctor (ADMIN+ required)
  */
-doctorsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+doctorsRouter.put('/:id/restore', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params

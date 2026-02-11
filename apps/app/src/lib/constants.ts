@@ -5,8 +5,9 @@ import { UserRole } from '@dental/shared'
  * Higher number = more permissions
  */
 export const ROLE_HIERARCHY: Record<Exclude<UserRole, UserRole.SUPER_ADMIN>, number> = {
-  [UserRole.OWNER]: 4,
-  [UserRole.ADMIN]: 3,
+  [UserRole.OWNER]: 5,
+  [UserRole.ADMIN]: 4,
+  [UserRole.CLINIC_ADMIN]: 3,
   [UserRole.DOCTOR]: 2,
   [UserRole.STAFF]: 1,
 }

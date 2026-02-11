@@ -102,8 +102,9 @@ export function requireAuthWithTenant(req: Request, res: Response, next: NextFun
  * Role hierarchy for permission checks (tenant-scoped roles only)
  */
 export const ROLE_HIERARCHY = {
-  OWNER: 4,
-  ADMIN: 3,
+  OWNER: 5,
+  ADMIN: 4,
+  CLINIC_ADMIN: 3,
   DOCTOR: 2,
   STAFF: 1,
 } as const

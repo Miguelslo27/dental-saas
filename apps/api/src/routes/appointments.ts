@@ -276,7 +276,7 @@ appointmentsRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) =
  * Create a new appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
+appointmentsRouter.post('/', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const parse = createAppointmentSchema.safeParse(req.body)
@@ -313,7 +313,7 @@ appointmentsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => 
  * Update an existing appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+appointmentsRouter.put('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -366,7 +366,7 @@ appointmentsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) =
  * Mark an appointment as completed
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.put('/:id/mark-done', requireMinRole('ADMIN'), async (req, res, next) => {
+appointmentsRouter.put('/:id/mark-done', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -405,7 +405,7 @@ appointmentsRouter.put('/:id/mark-done', requireMinRole('ADMIN'), async (req, re
  * Restore a soft-deleted appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+appointmentsRouter.put('/:id/restore', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -465,7 +465,7 @@ appointmentsRouter.get('/:id/pdf', requireMinRole('STAFF'), async (req, res, nex
  * Soft delete an appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+appointmentsRouter.delete('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params

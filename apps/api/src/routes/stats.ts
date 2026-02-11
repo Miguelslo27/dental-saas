@@ -169,7 +169,7 @@ statsRouter.get('/patients-growth', async (req, res, next) => {
  * Get doctor performance statistics for current month
  * Access: OWNER and ADMIN only
  */
-statsRouter.get('/doctors-performance', requireMinRole('ADMIN'), async (req, res, next) => {
+statsRouter.get('/doctors-performance', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
