@@ -131,9 +131,9 @@ model Tenant {
   // Branding
   logo      String?  // URL to logo
   /// IANA timezone identifier (e.g., "America/New_York", "Europe/London")
-  timezone  String   @default("America/New_York")
-  /// ISO 4217 currency code (e.g., USD, EUR, GBP)
-  currency  String   @db.Char(3) @default("USD")
+  timezone  String   @default("America/Montevideo")
+  /// ISO 4217 currency code (e.g., USD, EUR, UYU)
+  currency  String   @db.Char(3) @default("UYU")
 
   /// Total storage used by attachments in bytes
   storageUsedBytes BigInt @default(0)
