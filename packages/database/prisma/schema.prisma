@@ -377,11 +377,12 @@ enum AppointmentStatus {
 }
 
 enum UserRole {
-  SUPER_ADMIN // Platform super administrator, no tenant
-  OWNER       // Tenant owner, full access
-  ADMIN       // Administrative access
-  DOCTOR      // Can manage patients and appointments
-  STAFF       // Limited access
+  SUPER_ADMIN  // Platform super administrator, no tenant
+  OWNER        // Tenant owner, full access
+  ADMIN        // Administrative access
+  CLINIC_ADMIN // Operational management (no user/settings management)
+  DOCTOR       // Can manage patients and appointments
+  STAFF        // Limited access
 }
 
 // ============================================================================

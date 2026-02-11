@@ -24,6 +24,7 @@ vi.mock('@dental/database', () => ({
     SUPER_ADMIN: 'SUPER_ADMIN',
     OWNER: 'OWNER',
     ADMIN: 'ADMIN',
+    CLINIC_ADMIN: 'CLINIC_ADMIN',
     DOCTOR: 'DOCTOR',
     STAFF: 'STAFF',
   },
@@ -100,6 +101,7 @@ describe('user.service', () => {
       expect(counts).toEqual({
         OWNER: 1,
         ADMIN: 2,
+        CLINIC_ADMIN: 0,
         DOCTOR: 3,
         STAFF: 0,
       })
@@ -140,6 +142,30 @@ describe('user.service', () => {
 
       expect(result.allowed).toBe(false)
       expect(result.message).toContain('Doctor limit reached')
+    })
+
+    it('should deny adding CLINIC_ADMIN when admin limit reached', async () => {
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 1 admin
+      vi.mocked(prisma.user.groupBy).mockResolvedValue([
+        { role: 'OWNER', _count: { id: 1 } },
+      ] as any)
+
+      const result = await userService.checkRoleLimitForNewUser('tenant-1', 'CLINIC_ADMIN')
+
+      expect(result.allowed).toBe(false)
+      expect(result.message).toContain('Admin limit reached')
+    })
+
+    it('should count CLINIC_ADMIN toward admin limit', async () => {
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 1 admin
+      vi.mocked(prisma.user.groupBy).mockResolvedValue([
+        { role: 'CLINIC_ADMIN', _count: { id: 1 } },
+      ] as any)
+
+      const result = await userService.checkRoleLimitForNewUser('tenant-1', 'ADMIN')
+
+      expect(result.allowed).toBe(false)
+      expect(result.message).toContain('Admin limit reached')
     })
 
     it('should allow adding doctor when under limit', async () => {

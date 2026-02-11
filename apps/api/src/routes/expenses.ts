@@ -134,7 +134,7 @@ expensesRouter.get('/:id', requireMinRole('STAFF'), async (req, res, next) => {
  * POST /api/expenses
  * Create a new expense
  */
-expensesRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
+expensesRouter.post('/', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
 
@@ -163,7 +163,7 @@ expensesRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
  * PUT /api/expenses/:id
  * Update an expense
  */
-expensesRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+expensesRouter.put('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
     const { id } = req.params
@@ -201,7 +201,7 @@ expensesRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
  * DELETE /api/expenses/:id
  * Soft delete an expense
  */
-expensesRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+expensesRouter.delete('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
     const { id } = req.params
@@ -226,7 +226,7 @@ expensesRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) =>
  * PUT /api/expenses/:id/restore
  * Restore a soft-deleted expense
  */
-expensesRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+expensesRouter.put('/:id/restore', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId!
     const { id } = req.params

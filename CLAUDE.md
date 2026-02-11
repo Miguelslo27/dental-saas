@@ -231,7 +231,7 @@ All core features completed (15 phases):
   - ✅ Comprehensive test coverage (30 backend + frontend tests)
   - ✅ Single source of truth in @dental/shared (eliminated code duplication)
   - ✅ UserRole enum consolidated and exported from shared package
-- [ ] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
+- [x] Add clinic administrators role (can manage appointments, patients, labworks, expenses, doctors)
 
 #### Internationalization & Localization
 - [x] Fix PDF patient file to use configured language (currently in English)

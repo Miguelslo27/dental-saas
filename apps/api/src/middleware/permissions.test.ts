@@ -50,6 +50,43 @@ describe('Permissions System', () => {
       expect(doctorPermissions).not.toContain(Permission.EXPENSES_CREATE);
     });
 
+    it('should grant CLINIC_ADMIN operational CRUD but not user management or settings updates', () => {
+      const clinicAdminPermissions = ROLE_PERMISSIONS.CLINIC_ADMIN;
+
+      // Should have full CRUD on operational resources
+      expect(clinicAdminPermissions).toContain(Permission.PATIENTS_CREATE);
+      expect(clinicAdminPermissions).toContain(Permission.PATIENTS_UPDATE);
+      expect(clinicAdminPermissions).toContain(Permission.PATIENTS_DELETE);
+      expect(clinicAdminPermissions).toContain(Permission.APPOINTMENTS_CREATE);
+      expect(clinicAdminPermissions).toContain(Permission.DOCTORS_CREATE);
+      expect(clinicAdminPermissions).toContain(Permission.LABWORKS_CREATE);
+      expect(clinicAdminPermissions).toContain(Permission.EXPENSES_CREATE);
+
+      // Should have dental chart + statistics + attachments
+      expect(clinicAdminPermissions).toContain(Permission.DENTAL_CHARTS_VIEW);
+      expect(clinicAdminPermissions).toContain(Permission.DENTAL_CHARTS_UPDATE);
+      expect(clinicAdminPermissions).toContain(Permission.STATISTICS_VIEW);
+      expect(clinicAdminPermissions).toContain(Permission.ATTACHMENTS_VIEW);
+      expect(clinicAdminPermissions).toContain(Permission.ATTACHMENTS_UPLOAD);
+      expect(clinicAdminPermissions).toContain(Permission.ATTACHMENTS_DELETE);
+
+      // Should have view-only for users and settings
+      expect(clinicAdminPermissions).toContain(Permission.USERS_VIEW);
+      expect(clinicAdminPermissions).toContain(Permission.SETTINGS_VIEW);
+
+      // Should NOT have user management, settings update, data export, or owner-exclusive permissions
+      expect(clinicAdminPermissions).not.toContain(Permission.USERS_CREATE);
+      expect(clinicAdminPermissions).not.toContain(Permission.USERS_UPDATE);
+      expect(clinicAdminPermissions).not.toContain(Permission.USERS_DELETE);
+      expect(clinicAdminPermissions).not.toContain(Permission.SETTINGS_UPDATE);
+      expect(clinicAdminPermissions).not.toContain(Permission.DATA_EXPORT);
+      expect(clinicAdminPermissions).not.toContain(Permission.USERS_PROMOTE_OWNER);
+      expect(clinicAdminPermissions).not.toContain(Permission.TENANT_PROFILE_UPDATE);
+      expect(clinicAdminPermissions).not.toContain(Permission.TENANT_DELETE);
+      expect(clinicAdminPermissions).not.toContain(Permission.BILLING_VIEW);
+      expect(clinicAdminPermissions).not.toContain(Permission.BILLING_MANAGE);
+    });
+
     it('should grant ADMIN full operational control', () => {
       const adminPermissions = ROLE_PERMISSIONS.ADMIN;
 
@@ -343,9 +380,26 @@ describe('Permissions System', () => {
       expect(hasPermission(UserRole.ADMIN, Permission.EXPENSES_DELETE)).toBe(true);
     });
 
+    it('should verify CLINIC_ADMIN can manage operational resources', () => {
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.PATIENTS_CREATE)).toBe(true);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.APPOINTMENTS_CREATE)).toBe(true);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.DOCTORS_CREATE)).toBe(true);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.LABWORKS_CREATE)).toBe(true);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.EXPENSES_CREATE)).toBe(true);
+    });
+
+    it('should verify CLINIC_ADMIN cannot manage users or update settings', () => {
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.USERS_CREATE)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.USERS_UPDATE)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.USERS_DELETE)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.SETTINGS_UPDATE)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.DATA_EXPORT)).toBe(false);
+    });
+
     it('should verify only OWNER can update tenant profile', () => {
       expect(hasPermission(UserRole.STAFF, Permission.TENANT_PROFILE_UPDATE)).toBe(false);
       expect(hasPermission(UserRole.DOCTOR, Permission.TENANT_PROFILE_UPDATE)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.TENANT_PROFILE_UPDATE)).toBe(false);
       expect(hasPermission(UserRole.ADMIN, Permission.TENANT_PROFILE_UPDATE)).toBe(false);
       expect(hasPermission(UserRole.OWNER, Permission.TENANT_PROFILE_UPDATE)).toBe(true);
     });
@@ -353,6 +407,7 @@ describe('Permissions System', () => {
     it('should verify only OWNER can promote users to OWNER', () => {
       expect(hasPermission(UserRole.STAFF, Permission.USERS_PROMOTE_OWNER)).toBe(false);
       expect(hasPermission(UserRole.DOCTOR, Permission.USERS_PROMOTE_OWNER)).toBe(false);
+      expect(hasPermission(UserRole.CLINIC_ADMIN, Permission.USERS_PROMOTE_OWNER)).toBe(false);
       expect(hasPermission(UserRole.ADMIN, Permission.USERS_PROMOTE_OWNER)).toBe(false);
       expect(hasPermission(UserRole.OWNER, Permission.USERS_PROMOTE_OWNER)).toBe(true);
     });

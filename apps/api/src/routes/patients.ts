@@ -182,7 +182,7 @@ patientsRouter.get('/', requireMinRole('STAFF'), async (req, res, next) => {
  * GET /api/patients/stats
  * Get patient counts and plan limits (ADMIN+ required)
  */
-patientsRouter.get('/stats', requireMinRole('ADMIN'), async (req, res, next) => {
+patientsRouter.get('/stats', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
@@ -262,7 +262,7 @@ patientsRouter.get('/:id/appointments', requireMinRole('STAFF'), async (req, res
  * POST /api/patients
  * Create a new patient (ADMIN+ required)
  */
-patientsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
+patientsRouter.post('/', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
@@ -315,7 +315,7 @@ patientsRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
  * PUT /api/patients/:id
  * Update a patient (ADMIN+ required)
  */
-patientsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+patientsRouter.put('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -354,7 +354,7 @@ patientsRouter.put('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
  * DELETE /api/patients/:id
  * Soft delete a patient (ADMIN+ required)
  */
-patientsRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
+patientsRouter.delete('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -475,7 +475,7 @@ patientsRouter.patch('/:id/teeth', requireMinRole('STAFF'), async (req, res, nex
  * PUT /api/patients/:id/restore
  * Restore a soft-deleted patient (ADMIN+ required)
  */
-patientsRouter.put('/:id/restore', requireMinRole('ADMIN'), async (req, res, next) => {
+patientsRouter.put('/:id/restore', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
