@@ -163,6 +163,7 @@ export function AdminUsersPage() {
             <option value="SUPER_ADMIN">Super Admin</option>
             <option value="OWNER">Owner</option>
             <option value="ADMIN">Admin</option>
+            <option value="CLINIC_ADMIN">Clinic Admin</option>
             <option value="DOCTOR">Doctor</option>
             <option value="STAFF">Staff</option>
           </select>

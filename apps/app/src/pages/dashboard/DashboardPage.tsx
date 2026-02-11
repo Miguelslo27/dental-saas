@@ -87,7 +87,7 @@ function StatCard({ title, value, subtitle, icon, trend, linkTo, color }: StatCa
 export default function DashboardPage() {
   const { overview, appointmentStats, revenueStats, patientsGrowth, doctorPerformance, isLoading, error, fetchAllStats } = useStatsStore()
   const { user } = useAuthStore()
-  const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN
+  const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN || user?.role === UserRole.CLINIC_ADMIN
 
   useEffect(() => {
     fetchAllStats()
