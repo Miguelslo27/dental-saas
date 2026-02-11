@@ -82,7 +82,5 @@ USER api
 WORKDIR /app/apps/api
 EXPOSE 3000
 
-# Start the API directly
-# Migrations should be run manually with: pnpm --filter @dental/database db:migrate
-# Or via Coolify post-deployment hook
-CMD ["node", "dist/index.js"]
+# Start: wait for DB, run migrations, then start the API
+CMD ["/app/scripts/wait-for-db.sh"]
