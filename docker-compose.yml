@@ -83,6 +83,8 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-Alveo System <onboarding@resend.dev>}
     # NOTE: Coolify handles routing via its reverse proxy (Traefik).
     # Do not expose ports directly - use Coolify's domain configuration instead.
+    volumes:
+      - uploads_data:/app/apps/api/uploads
     depends_on:
       dental-postgres:
         condition: service_healthy
@@ -150,3 +152,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  uploads_data:

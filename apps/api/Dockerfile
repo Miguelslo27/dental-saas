@@ -74,9 +74,10 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=2 /app/apps/api/scripts/wait-for-db.sh /app/scripts/wait-for-db.sh
 RUN chmod +x /app/scripts/wait-for-db.sh
 
-# Create non-root user
+# Create non-root user and uploads directory
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 api
+    adduser --system --uid 1001 api && \
+    mkdir -p /app/apps/api/uploads && chown api:nodejs /app/apps/api/uploads
 USER api
 
 WORKDIR /app/apps/api
