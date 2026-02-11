@@ -62,9 +62,10 @@ attachmentsRouter.get(
         })
       }
 
-      // Verify file exists on disk
+      // Verify file exists and get actual size from disk
+      let fileStats
       try {
-        await stat(result.filePath)
+        fileStats = await stat(result.filePath)
       } catch {
         return res.status(404).json({
           success: false,
@@ -73,7 +74,7 @@ attachmentsRouter.get(
       }
 
       res.setHeader('Content-Type', result.attachment.mimeType)
-      res.setHeader('Content-Length', result.attachment.sizeBytes)
+      res.setHeader('Content-Length', fileStats.size)
       res.setHeader(
         'Content-Disposition',
         `inline; filename="${result.attachment.filename}"`
@@ -81,6 +82,13 @@ attachmentsRouter.get(
       res.setHeader('Cache-Control', 'private, max-age=3600')
 
       const stream = createReadStream(result.filePath)
+      stream.on('error', (err) => {
+        if (!res.headersSent) {
+          next(err)
+        } else {
+          res.destroy()
+        }
+      })
       stream.pipe(res)
     } catch (e) {
       next(e)
