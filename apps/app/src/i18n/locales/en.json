@@ -279,5 +279,18 @@
   "payment": {
     "paid": "Paid",
     "pending": "Pending"
+  },
+  "attachments": {
+    "title": "Images",
+    "upload": "Upload images",
+    "dragDrop": "Drag & drop images here, or click to select",
+    "uploading": "Uploading...",
+    "deleteConfirm": "Delete this image?",
+    "noImages": "No images yet",
+    "fileTooLarge": "File {{name}} exceeds the maximum size (10MB)",
+    "invalidType": "Invalid file type. Only images are allowed (JPEG, PNG, WebP, GIF).",
+    "tooManyFiles": "Maximum {{max}} files per upload",
+    "storageFull": "Storage limit exceeded. Upgrade your plan for more storage.",
+    "storageUsage": "Storage: {{used}} of {{limit}} used"
   }
 }

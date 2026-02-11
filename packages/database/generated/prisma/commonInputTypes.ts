@@ -287,6 +287,33 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type BigIntFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntFilter<$PrismaModel> | bigint | number
+}
+
+export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _max?: Prisma.NestedBigIntFilter<$PrismaModel>
+}
+
 export type EnumUserRoleFilter<$PrismaModel = never> = {
   equals?: $Enums.UserRole | Prisma.EnumUserRoleFieldRefInput<$PrismaModel>
   in?: $Enums.UserRole[] | Prisma.ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -397,6 +424,23 @@ export type EnumAppointmentStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAppointmentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAppointmentStatusFilter<$PrismaModel>
+}
+
+export type EnumAttachmentModuleFilter<$PrismaModel = never> = {
+  equals?: $Enums.AttachmentModule | Prisma.EnumAttachmentModuleFieldRefInput<$PrismaModel>
+  in?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel> | $Enums.AttachmentModule
+}
+
+export type EnumAttachmentModuleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AttachmentModule | Prisma.EnumAttachmentModuleFieldRefInput<$PrismaModel>
+  in?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAttachmentModuleWithAggregatesFilter<$PrismaModel> | $Enums.AttachmentModule
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -658,6 +702,33 @@ export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type NestedBigIntFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntFilter<$PrismaModel> | bigint | number
+}
+
+export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _max?: Prisma.NestedBigIntFilter<$PrismaModel>
+}
+
 export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
   equals?: $Enums.UserRole | Prisma.EnumUserRoleFieldRefInput<$PrismaModel>
   in?: $Enums.UserRole[] | Prisma.ListEnumUserRoleFieldRefInput<$PrismaModel>
@@ -741,6 +812,23 @@ export type NestedEnumAppointmentStatusWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAppointmentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAppointmentStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumAttachmentModuleFilter<$PrismaModel = never> = {
+  equals?: $Enums.AttachmentModule | Prisma.EnumAttachmentModuleFieldRefInput<$PrismaModel>
+  in?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel> | $Enums.AttachmentModule
+}
+
+export type NestedEnumAttachmentModuleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AttachmentModule | Prisma.EnumAttachmentModuleFieldRefInput<$PrismaModel>
+  in?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AttachmentModule[] | Prisma.ListEnumAttachmentModuleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAttachmentModuleWithAggregatesFilter<$PrismaModel> | $Enums.AttachmentModule
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAttachmentModuleFilter<$PrismaModel>
 }
 
 

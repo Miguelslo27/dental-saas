@@ -20,6 +20,10 @@ const envSchema = z.object({
 
   // Super Admin Setup (required for first-time superadmin creation)
   SETUP_KEY: z.string().min(16),
+
+  // File uploads
+  UPLOAD_DIR: z.string().default('uploads'),
+  MAX_FILE_SIZE_MB: z.coerce.number().default(10),
 }).refine(
   (data) => {
     // Don't allow wildcard CORS in production

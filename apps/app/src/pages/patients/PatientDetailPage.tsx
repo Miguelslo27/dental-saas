@@ -26,7 +26,9 @@ import {
   getPatientInitials,
 } from '@/lib/patient-api'
 import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
-import { ToothStatus, type ToothData } from '@dental/shared'
+import { ToothStatus, AttachmentModule, type ToothData } from '@dental/shared'
+import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ImageGallery } from '@/components/ui/ImageGallery'
 
 // ============================================================================
 // Types
@@ -263,6 +265,7 @@ export default function PatientDetailPage() {
   const [showPrimaryTeeth, setShowPrimaryTeeth] = useState(false)
   const [odontogramKey, setOdontogramKey] = useState(0)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
+  const [imageRefreshKey, setImageRefreshKey] = useState(0)
 
   // Fetch patient data
   useEffect(() => {
@@ -740,6 +743,23 @@ export default function PatientDetailPage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Images Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('attachments.title')}</h2>
+        <ImageUpload
+          module={AttachmentModule.PATIENTS}
+          entityId={patient.id}
+          onUploadComplete={() => setImageRefreshKey((k) => k + 1)}
+        />
+        <div className="mt-4">
+          <ImageGallery
+            module={AttachmentModule.PATIENTS}
+            entityId={patient.id}
+            refreshKey={imageRefreshKey}
+          />
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Receipt,
   Calendar,
@@ -8,11 +9,17 @@ import {
   CheckCircle2,
   Clock,
   Tag,
+  ImageIcon,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
-import { Permission } from '@dental/shared'
+import { useTranslation } from 'react-i18next'
+import { Permission, AttachmentModule } from '@dental/shared'
 import type { Expense } from '@/lib/expense-api'
 import { getExpenseStatusBadge, formatExpenseAmount } from '@/lib/expense-api'
 import { usePermissions } from '@/hooks/usePermissions'
+import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ImageGallery } from '@/components/ui/ImageGallery'
 
 interface ExpenseCardProps {
   expense: Expense
@@ -29,7 +36,10 @@ export function ExpenseCard({
   onRestore,
   onTogglePaid,
 }: ExpenseCardProps) {
+  const { t } = useTranslation()
   const { can } = usePermissions()
+  const [showImages, setShowImages] = useState(false)
+  const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const statusBadge = getExpenseStatusBadge(expense)
   const isDeleted = !!expense.deletedAt
 
@@ -130,6 +140,34 @@ export function ExpenseCard({
         {/* Notes */}
         {expense.note && (
           <p className="text-sm text-gray-500 mb-4 line-clamp-2">{expense.note}</p>
+        )}
+
+        {/* Images section */}
+        {!isDeleted && (
+          <div className="mb-4">
+            <button
+              onClick={() => setShowImages(!showImages)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <ImageIcon className="h-4 w-4" />
+              {t('attachments.title')}
+              {showImages ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </button>
+            {showImages && (
+              <div className="mt-3 space-y-3">
+                <ImageUpload
+                  module={AttachmentModule.EXPENSES}
+                  entityId={expense.id}
+                  onUploadComplete={() => setImageRefreshKey((k) => k + 1)}
+                />
+                <ImageGallery
+                  module={AttachmentModule.EXPENSES}
+                  entityId={expense.id}
+                  refreshKey={imageRefreshKey}
+                />
+              </div>
+            )}
+          </div>
         )}
 
         {/* Actions */}

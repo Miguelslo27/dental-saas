@@ -63,7 +63,8 @@ export const ModelName = {
   Labwork: 'Labwork',
   Expense: 'Expense',
   RefreshToken: 'RefreshToken',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  Attachment: 'Attachment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,6 +91,7 @@ export const PlanScalarFieldEnum = {
   maxAdmins: 'maxAdmins',
   maxDoctors: 'maxDoctors',
   maxPatients: 'maxPatients',
+  maxStorageMb: 'maxStorageMb',
   features: 'features',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -145,6 +147,7 @@ export const TenantScalarFieldEnum = {
   logo: 'logo',
   timezone: 'timezone',
   currency: 'currency',
+  storageUsedBytes: 'storageUsedBytes',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -320,6 +323,24 @@ export const PasswordResetTokenScalarFieldEnum = {
 } as const
 
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const AttachmentScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  module: 'module',
+  entityId: 'entityId',
+  filename: 'filename',
+  storedName: 'storedName',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  description: 'description',
+  uploadedBy: 'uploadedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
 
 
 export const SortOrder = {

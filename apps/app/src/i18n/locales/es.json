@@ -288,5 +288,18 @@
   "payment": {
     "paid": "Pagado",
     "pending": "Pendiente"
+  },
+  "attachments": {
+    "title": "Imágenes",
+    "upload": "Subir imágenes",
+    "dragDrop": "Arrastra y suelta imágenes aquí, o haz clic para seleccionar",
+    "uploading": "Subiendo...",
+    "deleteConfirm": "¿Eliminar esta imagen?",
+    "noImages": "No hay imágenes aún",
+    "fileTooLarge": "El archivo {{name}} excede el tamaño máximo (10MB)",
+    "invalidType": "Tipo de archivo no válido. Solo se permiten imágenes (JPEG, PNG, WebP, GIF).",
+    "tooManyFiles": "Máximo {{max}} archivos por carga",
+    "storageFull": "Límite de almacenamiento excedido. Mejora tu plan para más espacio.",
+    "storageUsage": "Almacenamiento: {{used}} de {{limit}} usado"
   }
 }

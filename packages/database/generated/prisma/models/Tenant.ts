@@ -20,8 +20,18 @@ export type TenantModel = runtime.Types.Result.DefaultSelection<Prisma.$TenantPa
 
 export type AggregateTenant = {
   _count: TenantCountAggregateOutputType | null
+  _avg: TenantAvgAggregateOutputType | null
+  _sum: TenantSumAggregateOutputType | null
   _min: TenantMinAggregateOutputType | null
   _max: TenantMaxAggregateOutputType | null
+}
+
+export type TenantAvgAggregateOutputType = {
+  storageUsedBytes: number | null
+}
+
+export type TenantSumAggregateOutputType = {
+  storageUsedBytes: bigint | null
 }
 
 export type TenantMinAggregateOutputType = {
@@ -34,6 +44,7 @@ export type TenantMinAggregateOutputType = {
   logo: string | null
   timezone: string | null
   currency: string | null
+  storageUsedBytes: bigint | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -49,6 +60,7 @@ export type TenantMaxAggregateOutputType = {
   logo: string | null
   timezone: string | null
   currency: string | null
+  storageUsedBytes: bigint | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -64,12 +76,21 @@ export type TenantCountAggregateOutputType = {
   logo: number
   timezone: number
   currency: number
+  storageUsedBytes: number
   isActive: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type TenantAvgAggregateInputType = {
+  storageUsedBytes?: true
+}
+
+export type TenantSumAggregateInputType = {
+  storageUsedBytes?: true
+}
 
 export type TenantMinAggregateInputType = {
   id?: true
@@ -81,6 +102,7 @@ export type TenantMinAggregateInputType = {
   logo?: true
   timezone?: true
   currency?: true
+  storageUsedBytes?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -96,6 +118,7 @@ export type TenantMaxAggregateInputType = {
   logo?: true
   timezone?: true
   currency?: true
+  storageUsedBytes?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -111,6 +134,7 @@ export type TenantCountAggregateInputType = {
   logo?: true
   timezone?: true
   currency?: true
+  storageUsedBytes?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -155,6 +179,18 @@ export type TenantAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: TenantAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: TenantSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: TenantMinAggregateInputType
@@ -185,6 +221,8 @@ export type TenantGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: TenantCountAggregateInputType | true
+  _avg?: TenantAvgAggregateInputType
+  _sum?: TenantSumAggregateInputType
   _min?: TenantMinAggregateInputType
   _max?: TenantMaxAggregateInputType
 }
@@ -199,10 +237,13 @@ export type TenantGroupByOutputType = {
   logo: string | null
   timezone: string
   currency: string
+  storageUsedBytes: bigint
   isActive: boolean
   createdAt: Date
   updatedAt: Date
   _count: TenantCountAggregateOutputType | null
+  _avg: TenantAvgAggregateOutputType | null
+  _sum: TenantSumAggregateOutputType | null
   _min: TenantMinAggregateOutputType | null
   _max: TenantMaxAggregateOutputType | null
 }
@@ -235,6 +276,7 @@ export type TenantWhereInput = {
   logo?: Prisma.StringNullableFilter<"Tenant"> | string | null
   timezone?: Prisma.StringFilter<"Tenant"> | string
   currency?: Prisma.StringFilter<"Tenant"> | string
+  storageUsedBytes?: Prisma.BigIntFilter<"Tenant"> | bigint | number
   isActive?: Prisma.BoolFilter<"Tenant"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
@@ -246,6 +288,7 @@ export type TenantWhereInput = {
   appointments?: Prisma.AppointmentListRelationFilter
   labworks?: Prisma.LabworkListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -258,6 +301,7 @@ export type TenantOrderByWithRelationInput = {
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -269,6 +313,7 @@ export type TenantOrderByWithRelationInput = {
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
   labworks?: Prisma.LabworkOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  attachments?: Prisma.AttachmentOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -284,6 +329,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   logo?: Prisma.StringNullableFilter<"Tenant"> | string | null
   timezone?: Prisma.StringFilter<"Tenant"> | string
   currency?: Prisma.StringFilter<"Tenant"> | string
+  storageUsedBytes?: Prisma.BigIntFilter<"Tenant"> | bigint | number
   isActive?: Prisma.BoolFilter<"Tenant"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
@@ -295,6 +341,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   appointments?: Prisma.AppointmentListRelationFilter
   labworks?: Prisma.LabworkListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
+  attachments?: Prisma.AttachmentListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -307,12 +354,15 @@ export type TenantOrderByWithAggregationInput = {
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TenantCountOrderByAggregateInput
+  _avg?: Prisma.TenantAvgOrderByAggregateInput
   _max?: Prisma.TenantMaxOrderByAggregateInput
   _min?: Prisma.TenantMinOrderByAggregateInput
+  _sum?: Prisma.TenantSumOrderByAggregateInput
 }
 
 export type TenantScalarWhereWithAggregatesInput = {
@@ -328,6 +378,7 @@ export type TenantScalarWhereWithAggregatesInput = {
   logo?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   timezone?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   currency?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
+  storageUsedBytes?: Prisma.BigIntWithAggregatesFilter<"Tenant"> | bigint | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Tenant"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
@@ -343,6 +394,7 @@ export type TenantCreateInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -354,6 +406,7 @@ export type TenantCreateInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -366,6 +419,7 @@ export type TenantUncheckedCreateInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -377,6 +431,7 @@ export type TenantUncheckedCreateInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -389,6 +444,7 @@ export type TenantUpdateInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -400,6 +456,7 @@ export type TenantUpdateInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -412,6 +469,7 @@ export type TenantUncheckedUpdateInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -423,6 +481,7 @@ export type TenantUncheckedUpdateInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -435,6 +494,7 @@ export type TenantCreateManyInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -450,6 +510,7 @@ export type TenantUpdateManyMutationInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -465,6 +526,7 @@ export type TenantUncheckedUpdateManyInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -485,9 +547,14 @@ export type TenantCountOrderByAggregateInput = {
   logo?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TenantAvgOrderByAggregateInput = {
+  storageUsedBytes?: Prisma.SortOrder
 }
 
 export type TenantMaxOrderByAggregateInput = {
@@ -500,6 +567,7 @@ export type TenantMaxOrderByAggregateInput = {
   logo?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -515,9 +583,14 @@ export type TenantMinOrderByAggregateInput = {
   logo?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TenantSumOrderByAggregateInput = {
+  storageUsedBytes?: Prisma.SortOrder
 }
 
 export type TenantNullableScalarRelationFilter = {
@@ -537,6 +610,14 @@ export type TenantUpdateOneRequiredWithoutSubscriptionNestedInput = {
   upsert?: Prisma.TenantUpsertWithoutSubscriptionInput
   connect?: Prisma.TenantWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSubscriptionInput, Prisma.TenantUpdateWithoutSubscriptionInput>, Prisma.TenantUncheckedUpdateWithoutSubscriptionInput>
+}
+
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type TenantCreateNestedOneWithoutSettingsInput = {
@@ -639,6 +720,20 @@ export type TenantUpdateOneRequiredWithoutExpensesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutExpensesInput, Prisma.TenantUpdateWithoutExpensesInput>, Prisma.TenantUncheckedUpdateWithoutExpensesInput>
 }
 
+export type TenantCreateNestedOneWithoutAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutAttachmentsInput, Prisma.TenantUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutAttachmentsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutAttachmentsInput, Prisma.TenantUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutAttachmentsInput
+  upsert?: Prisma.TenantUpsertWithoutAttachmentsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.TenantUpdateWithoutAttachmentsInput>, Prisma.TenantUncheckedUpdateWithoutAttachmentsInput>
+}
+
 export type TenantCreateWithoutSubscriptionInput = {
   id?: string
   name: string
@@ -649,6 +744,7 @@ export type TenantCreateWithoutSubscriptionInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -659,6 +755,7 @@ export type TenantCreateWithoutSubscriptionInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSubscriptionInput = {
@@ -671,6 +768,7 @@ export type TenantUncheckedCreateWithoutSubscriptionInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -681,6 +779,7 @@ export type TenantUncheckedCreateWithoutSubscriptionInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSubscriptionInput = {
@@ -709,6 +808,7 @@ export type TenantUpdateWithoutSubscriptionInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -719,6 +819,7 @@ export type TenantUpdateWithoutSubscriptionInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSubscriptionInput = {
@@ -731,6 +832,7 @@ export type TenantUncheckedUpdateWithoutSubscriptionInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -741,6 +843,7 @@ export type TenantUncheckedUpdateWithoutSubscriptionInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSettingsInput = {
@@ -753,6 +856,7 @@ export type TenantCreateWithoutSettingsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -763,6 +867,7 @@ export type TenantCreateWithoutSettingsInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSettingsInput = {
@@ -775,6 +880,7 @@ export type TenantUncheckedCreateWithoutSettingsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -785,6 +891,7 @@ export type TenantUncheckedCreateWithoutSettingsInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSettingsInput = {
@@ -813,6 +920,7 @@ export type TenantUpdateWithoutSettingsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -823,6 +931,7 @@ export type TenantUpdateWithoutSettingsInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSettingsInput = {
@@ -835,6 +944,7 @@ export type TenantUncheckedUpdateWithoutSettingsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -845,6 +955,7 @@ export type TenantUncheckedUpdateWithoutSettingsInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutUsersInput = {
@@ -857,6 +968,7 @@ export type TenantCreateWithoutUsersInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -867,6 +979,7 @@ export type TenantCreateWithoutUsersInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -879,6 +992,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -889,6 +1003,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -917,6 +1032,7 @@ export type TenantUpdateWithoutUsersInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -927,6 +1043,7 @@ export type TenantUpdateWithoutUsersInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -939,6 +1056,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -949,6 +1067,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutPatientsInput = {
@@ -961,6 +1080,7 @@ export type TenantCreateWithoutPatientsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -971,6 +1091,7 @@ export type TenantCreateWithoutPatientsInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutPatientsInput = {
@@ -983,6 +1104,7 @@ export type TenantUncheckedCreateWithoutPatientsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -993,6 +1115,7 @@ export type TenantUncheckedCreateWithoutPatientsInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutPatientsInput = {
@@ -1021,6 +1144,7 @@ export type TenantUpdateWithoutPatientsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1031,6 +1155,7 @@ export type TenantUpdateWithoutPatientsInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutPatientsInput = {
@@ -1043,6 +1168,7 @@ export type TenantUncheckedUpdateWithoutPatientsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1053,6 +1179,7 @@ export type TenantUncheckedUpdateWithoutPatientsInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutDoctorsInput = {
@@ -1065,6 +1192,7 @@ export type TenantCreateWithoutDoctorsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1075,6 +1203,7 @@ export type TenantCreateWithoutDoctorsInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutDoctorsInput = {
@@ -1087,6 +1216,7 @@ export type TenantUncheckedCreateWithoutDoctorsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1097,6 +1227,7 @@ export type TenantUncheckedCreateWithoutDoctorsInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutDoctorsInput = {
@@ -1125,6 +1256,7 @@ export type TenantUpdateWithoutDoctorsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1135,6 +1267,7 @@ export type TenantUpdateWithoutDoctorsInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutDoctorsInput = {
@@ -1147,6 +1280,7 @@ export type TenantUncheckedUpdateWithoutDoctorsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1157,6 +1291,7 @@ export type TenantUncheckedUpdateWithoutDoctorsInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAppointmentsInput = {
@@ -1169,6 +1304,7 @@ export type TenantCreateWithoutAppointmentsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1179,6 +1315,7 @@ export type TenantCreateWithoutAppointmentsInput = {
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAppointmentsInput = {
@@ -1191,6 +1328,7 @@ export type TenantUncheckedCreateWithoutAppointmentsInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1201,6 +1339,7 @@ export type TenantUncheckedCreateWithoutAppointmentsInput = {
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAppointmentsInput = {
@@ -1229,6 +1368,7 @@ export type TenantUpdateWithoutAppointmentsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1239,6 +1379,7 @@ export type TenantUpdateWithoutAppointmentsInput = {
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAppointmentsInput = {
@@ -1251,6 +1392,7 @@ export type TenantUncheckedUpdateWithoutAppointmentsInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1261,6 +1403,7 @@ export type TenantUncheckedUpdateWithoutAppointmentsInput = {
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutLabworksInput = {
@@ -1273,6 +1416,7 @@ export type TenantCreateWithoutLabworksInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1283,6 +1427,7 @@ export type TenantCreateWithoutLabworksInput = {
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutLabworksInput = {
@@ -1295,6 +1440,7 @@ export type TenantUncheckedCreateWithoutLabworksInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1305,6 +1451,7 @@ export type TenantUncheckedCreateWithoutLabworksInput = {
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutLabworksInput = {
@@ -1333,6 +1480,7 @@ export type TenantUpdateWithoutLabworksInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1343,6 +1491,7 @@ export type TenantUpdateWithoutLabworksInput = {
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutLabworksInput = {
@@ -1355,6 +1504,7 @@ export type TenantUncheckedUpdateWithoutLabworksInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1365,6 +1515,7 @@ export type TenantUncheckedUpdateWithoutLabworksInput = {
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutExpensesInput = {
@@ -1377,6 +1528,7 @@ export type TenantCreateWithoutExpensesInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1387,6 +1539,7 @@ export type TenantCreateWithoutExpensesInput = {
   doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutExpensesInput = {
@@ -1399,6 +1552,7 @@ export type TenantUncheckedCreateWithoutExpensesInput = {
   logo?: string | null
   timezone?: string
   currency?: string
+  storageUsedBytes?: bigint | number
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1409,6 +1563,7 @@ export type TenantUncheckedCreateWithoutExpensesInput = {
   doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
   labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutExpensesInput = {
@@ -1437,6 +1592,7 @@ export type TenantUpdateWithoutExpensesInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1447,6 +1603,7 @@ export type TenantUpdateWithoutExpensesInput = {
   doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutExpensesInput = {
@@ -1459,6 +1616,7 @@ export type TenantUncheckedUpdateWithoutExpensesInput = {
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1469,6 +1627,119 @@ export type TenantUncheckedUpdateWithoutExpensesInput = {
   doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
   labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutAttachmentsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  storageUsedBytes?: bigint | number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorCreateNestedManyWithoutTenantInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutTenantInput
+  labworks?: Prisma.LabworkCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutAttachmentsInput = {
+  id?: string
+  name: string
+  slug: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  logo?: string | null
+  timezone?: string
+  currency?: string
+  storageUsedBytes?: bigint | number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutTenantInput
+  doctors?: Prisma.DoctorUncheckedCreateNestedManyWithoutTenantInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutTenantInput
+  labworks?: Prisma.LabworkUncheckedCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutAttachmentsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutAttachmentsInput, Prisma.TenantUncheckedCreateWithoutAttachmentsInput>
+}
+
+export type TenantUpsertWithoutAttachmentsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutAttachmentsInput, Prisma.TenantUncheckedUpdateWithoutAttachmentsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutAttachmentsInput, Prisma.TenantUncheckedCreateWithoutAttachmentsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutAttachmentsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutAttachmentsInput, Prisma.TenantUncheckedUpdateWithoutAttachmentsInput>
+}
+
+export type TenantUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUpdateManyWithoutTenantNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutTenantNestedInput
+  labworks?: Prisma.LabworkUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  patients?: Prisma.PatientUncheckedUpdateManyWithoutTenantNestedInput
+  doctors?: Prisma.DoctorUncheckedUpdateManyWithoutTenantNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutTenantNestedInput
+  labworks?: Prisma.LabworkUncheckedUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -1483,6 +1754,7 @@ export type TenantCountOutputType = {
   appointments: number
   labworks: number
   expenses: number
+  attachments: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1492,6 +1764,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   appointments?: boolean | TenantCountOutputTypeCountAppointmentsArgs
   labworks?: boolean | TenantCountOutputTypeCountLabworksArgs
   expenses?: boolean | TenantCountOutputTypeCountExpensesArgs
+  attachments?: boolean | TenantCountOutputTypeCountAttachmentsArgs
 }
 
 /**
@@ -1546,6 +1819,13 @@ export type TenantCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types
   where?: Prisma.ExpenseWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttachmentWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1557,6 +1837,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   logo?: boolean
   timezone?: boolean
   currency?: boolean
+  storageUsedBytes?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1568,6 +1849,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   appointments?: boolean | Prisma.Tenant$appointmentsArgs<ExtArgs>
   labworks?: boolean | Prisma.Tenant$labworksArgs<ExtArgs>
   expenses?: boolean | Prisma.Tenant$expensesArgs<ExtArgs>
+  attachments?: boolean | Prisma.Tenant$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -1581,6 +1863,7 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   logo?: boolean
   timezone?: boolean
   currency?: boolean
+  storageUsedBytes?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1596,6 +1879,7 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   logo?: boolean
   timezone?: boolean
   currency?: boolean
+  storageUsedBytes?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1611,12 +1895,13 @@ export type TenantSelectScalar = {
   logo?: boolean
   timezone?: boolean
   currency?: boolean
+  storageUsedBytes?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "email" | "phone" | "address" | "logo" | "timezone" | "currency" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "email" | "phone" | "address" | "logo" | "timezone" | "currency" | "storageUsedBytes" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscription?: boolean | Prisma.Tenant$subscriptionArgs<ExtArgs>
   settings?: boolean | Prisma.Tenant$settingsArgs<ExtArgs>
@@ -1626,6 +1911,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   appointments?: boolean | Prisma.Tenant$appointmentsArgs<ExtArgs>
   labworks?: boolean | Prisma.Tenant$labworksArgs<ExtArgs>
   expenses?: boolean | Prisma.Tenant$expensesArgs<ExtArgs>
+  attachments?: boolean | Prisma.Tenant$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1642,6 +1928,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
     labworks: Prisma.$LabworkPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
+    attachments: Prisma.$AttachmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1663,6 +1950,10 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
      * ISO 4217 currency code (e.g., USD, EUR, GBP)
      */
     currency: string
+    /**
+     * Total storage used by attachments in bytes
+     */
+    storageUsedBytes: bigint
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -2068,6 +2359,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   appointments<T extends Prisma.Tenant$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   labworks<T extends Prisma.Tenant$labworksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$labworksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LabworkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Tenant$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attachments<T extends Prisma.Tenant$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2106,6 +2398,7 @@ export interface TenantFieldRefs {
   readonly logo: Prisma.FieldRef<"Tenant", 'String'>
   readonly timezone: Prisma.FieldRef<"Tenant", 'String'>
   readonly currency: Prisma.FieldRef<"Tenant", 'String'>
+  readonly storageUsedBytes: Prisma.FieldRef<"Tenant", 'BigInt'>
   readonly isActive: Prisma.FieldRef<"Tenant", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
@@ -2676,6 +2969,30 @@ export type Tenant$expensesArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * Tenant.attachments
+ */
+export type Tenant$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Attachment
+   */
+  select?: Prisma.AttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Attachment
+   */
+  omit?: Prisma.AttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttachmentInclude<ExtArgs> | null
+  where?: Prisma.AttachmentWhereInput
+  orderBy?: Prisma.AttachmentOrderByWithRelationInput | Prisma.AttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.AttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
 }
 
 /**

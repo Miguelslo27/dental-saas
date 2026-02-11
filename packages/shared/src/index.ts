@@ -99,3 +99,31 @@ export interface ToothData {
 }
 
 export type TeethData = Record<string, ToothData>
+
+// Attachment types
+export enum AttachmentModule {
+  PATIENTS = 'PATIENTS',
+  APPOINTMENTS = 'APPOINTMENTS',
+  LABWORKS = 'LABWORKS',
+  EXPENSES = 'EXPENSES',
+}
+
+export interface StorageUsage {
+  usedBytes: number
+  limitBytes: number
+  remainingBytes: number
+  usedMb: number
+  limitMb: number
+  percentage: number
+}
+
+export interface AttachmentInfo {
+  id: string
+  module: AttachmentModule
+  entityId: string
+  filename: string
+  mimeType: string
+  sizeBytes: number
+  description: string | null
+  createdAt: string
+}

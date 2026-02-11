@@ -1,7 +1,11 @@
-import { Clock, User, Stethoscope, MoreVertical, Edit, Trash2, RotateCcw, CheckCircle, FileText, Loader2 } from 'lucide-react'
+import { Clock, User, Stethoscope, MoreVertical, Edit, Trash2, RotateCcw, CheckCircle, FileText, Loader2, ImageIcon, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { AttachmentModule } from '@dental/shared'
 import { downloadAppointmentPdf } from '@/lib/pdf-api'
 import type { Appointment } from '@/lib/appointment-api'
+import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ImageGallery } from '@/components/ui/ImageGallery'
 import {
   getStatusLabel,
   getStatusBadgeClasses,
@@ -28,8 +32,11 @@ export function AppointmentCard({
   onComplete,
   onError,
 }: AppointmentCardProps) {
+  const { t } = useTranslation()
   const [showMenu, setShowMenu] = useState(false)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
+  const [showImages, setShowImages] = useState(false)
+  const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Close menu when clicking outside
@@ -201,6 +208,34 @@ export function AppointmentCard({
           )}
         </div>
       </div>
+
+      {/* Collapsible images section */}
+      {!isInactive && (
+        <div className="border-t border-gray-100 mt-3 pt-2">
+          <button
+            onClick={() => setShowImages(!showImages)}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <ImageIcon className="h-4 w-4" />
+            {t('attachments.title')}
+            {showImages ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          </button>
+          {showImages && (
+            <div className="mt-3 space-y-3">
+              <ImageUpload
+                module={AttachmentModule.APPOINTMENTS}
+                entityId={appointment.id}
+                onUploadComplete={() => setImageRefreshKey((k) => k + 1)}
+              />
+              <ImageGallery
+                module={AttachmentModule.APPOINTMENTS}
+                entityId={appointment.id}
+                refreshKey={imageRefreshKey}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

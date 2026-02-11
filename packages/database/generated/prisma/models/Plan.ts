@@ -31,6 +31,7 @@ export type PlanAvgAggregateOutputType = {
   maxAdmins: number | null
   maxDoctors: number | null
   maxPatients: number | null
+  maxStorageMb: number | null
 }
 
 export type PlanSumAggregateOutputType = {
@@ -38,6 +39,7 @@ export type PlanSumAggregateOutputType = {
   maxAdmins: number | null
   maxDoctors: number | null
   maxPatients: number | null
+  maxStorageMb: number | null
 }
 
 export type PlanMinAggregateOutputType = {
@@ -48,6 +50,7 @@ export type PlanMinAggregateOutputType = {
   maxAdmins: number | null
   maxDoctors: number | null
   maxPatients: number | null
+  maxStorageMb: number | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -61,6 +64,7 @@ export type PlanMaxAggregateOutputType = {
   maxAdmins: number | null
   maxDoctors: number | null
   maxPatients: number | null
+  maxStorageMb: number | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,6 +78,7 @@ export type PlanCountAggregateOutputType = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb: number
   features: number
   isActive: number
   createdAt: number
@@ -87,6 +92,7 @@ export type PlanAvgAggregateInputType = {
   maxAdmins?: true
   maxDoctors?: true
   maxPatients?: true
+  maxStorageMb?: true
 }
 
 export type PlanSumAggregateInputType = {
@@ -94,6 +100,7 @@ export type PlanSumAggregateInputType = {
   maxAdmins?: true
   maxDoctors?: true
   maxPatients?: true
+  maxStorageMb?: true
 }
 
 export type PlanMinAggregateInputType = {
@@ -104,6 +111,7 @@ export type PlanMinAggregateInputType = {
   maxAdmins?: true
   maxDoctors?: true
   maxPatients?: true
+  maxStorageMb?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -117,6 +125,7 @@ export type PlanMaxAggregateInputType = {
   maxAdmins?: true
   maxDoctors?: true
   maxPatients?: true
+  maxStorageMb?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -130,6 +139,7 @@ export type PlanCountAggregateInputType = {
   maxAdmins?: true
   maxDoctors?: true
   maxPatients?: true
+  maxStorageMb?: true
   features?: true
   isActive?: true
   createdAt?: true
@@ -231,6 +241,7 @@ export type PlanGroupByOutputType = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb: number
   features: runtime.JsonValue
   isActive: boolean
   createdAt: Date
@@ -268,6 +279,7 @@ export type PlanWhereInput = {
   maxAdmins?: Prisma.IntFilter<"Plan"> | number
   maxDoctors?: Prisma.IntFilter<"Plan"> | number
   maxPatients?: Prisma.IntFilter<"Plan"> | number
+  maxStorageMb?: Prisma.IntFilter<"Plan"> | number
   features?: Prisma.JsonFilter<"Plan">
   isActive?: Prisma.BoolFilter<"Plan"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
@@ -283,6 +295,7 @@ export type PlanOrderByWithRelationInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
   features?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -301,6 +314,7 @@ export type PlanWhereUniqueInput = Prisma.AtLeast<{
   maxAdmins?: Prisma.IntFilter<"Plan"> | number
   maxDoctors?: Prisma.IntFilter<"Plan"> | number
   maxPatients?: Prisma.IntFilter<"Plan"> | number
+  maxStorageMb?: Prisma.IntFilter<"Plan"> | number
   features?: Prisma.JsonFilter<"Plan">
   isActive?: Prisma.BoolFilter<"Plan"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
@@ -316,6 +330,7 @@ export type PlanOrderByWithAggregationInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
   features?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -338,6 +353,7 @@ export type PlanScalarWhereWithAggregatesInput = {
   maxAdmins?: Prisma.IntWithAggregatesFilter<"Plan"> | number
   maxDoctors?: Prisma.IntWithAggregatesFilter<"Plan"> | number
   maxPatients?: Prisma.IntWithAggregatesFilter<"Plan"> | number
+  maxStorageMb?: Prisma.IntWithAggregatesFilter<"Plan"> | number
   features?: Prisma.JsonWithAggregatesFilter<"Plan">
   isActive?: Prisma.BoolWithAggregatesFilter<"Plan"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Plan"> | Date | string
@@ -352,6 +368,7 @@ export type PlanCreateInput = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb?: number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: boolean
   createdAt?: Date | string
@@ -367,6 +384,7 @@ export type PlanUncheckedCreateInput = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb?: number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: boolean
   createdAt?: Date | string
@@ -382,6 +400,7 @@ export type PlanUpdateInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -397,6 +416,7 @@ export type PlanUncheckedUpdateInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -412,6 +432,7 @@ export type PlanCreateManyInput = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb?: number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: boolean
   createdAt?: Date | string
@@ -426,6 +447,7 @@ export type PlanUpdateManyMutationInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -440,6 +462,7 @@ export type PlanUncheckedUpdateManyInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -454,6 +477,7 @@ export type PlanCountOrderByAggregateInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
   features?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -465,6 +489,7 @@ export type PlanAvgOrderByAggregateInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
 }
 
 export type PlanMaxOrderByAggregateInput = {
@@ -475,6 +500,7 @@ export type PlanMaxOrderByAggregateInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -488,6 +514,7 @@ export type PlanMinOrderByAggregateInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -498,6 +525,7 @@ export type PlanSumOrderByAggregateInput = {
   maxAdmins?: Prisma.SortOrder
   maxDoctors?: Prisma.SortOrder
   maxPatients?: Prisma.SortOrder
+  maxStorageMb?: Prisma.SortOrder
 }
 
 export type PlanScalarRelationFilter = {
@@ -555,6 +583,7 @@ export type PlanCreateWithoutSubscriptionsInput = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb?: number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: boolean
   createdAt?: Date | string
@@ -569,6 +598,7 @@ export type PlanUncheckedCreateWithoutSubscriptionsInput = {
   maxAdmins: number
   maxDoctors: number
   maxPatients: number
+  maxStorageMb?: number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: boolean
   createdAt?: Date | string
@@ -599,6 +629,7 @@ export type PlanUpdateWithoutSubscriptionsInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -613,6 +644,7 @@ export type PlanUncheckedUpdateWithoutSubscriptionsInput = {
   maxAdmins?: Prisma.IntFieldUpdateOperationsInput | number
   maxDoctors?: Prisma.IntFieldUpdateOperationsInput | number
   maxPatients?: Prisma.IntFieldUpdateOperationsInput | number
+  maxStorageMb?: Prisma.IntFieldUpdateOperationsInput | number
   features?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -658,6 +690,7 @@ export type PlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   maxAdmins?: boolean
   maxDoctors?: boolean
   maxPatients?: boolean
+  maxStorageMb?: boolean
   features?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -674,6 +707,7 @@ export type PlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   maxAdmins?: boolean
   maxDoctors?: boolean
   maxPatients?: boolean
+  maxStorageMb?: boolean
   features?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -688,6 +722,7 @@ export type PlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   maxAdmins?: boolean
   maxDoctors?: boolean
   maxPatients?: boolean
+  maxStorageMb?: boolean
   features?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -702,13 +737,14 @@ export type PlanSelectScalar = {
   maxAdmins?: boolean
   maxDoctors?: boolean
   maxPatients?: boolean
+  maxStorageMb?: boolean
   features?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "displayName" | "price" | "maxAdmins" | "maxDoctors" | "maxPatients" | "features" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
+export type PlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "displayName" | "price" | "maxAdmins" | "maxDoctors" | "maxPatients" | "maxStorageMb" | "features" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
 export type PlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscriptions?: boolean | Prisma.Plan$subscriptionsArgs<ExtArgs>
   _count?: boolean | Prisma.PlanCountOutputTypeDefaultArgs<ExtArgs>
@@ -729,6 +765,7 @@ export type $PlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     maxAdmins: number
     maxDoctors: number
     maxPatients: number
+    maxStorageMb: number
     features: runtime.JsonValue
     isActive: boolean
     createdAt: Date
@@ -1164,6 +1201,7 @@ export interface PlanFieldRefs {
   readonly maxAdmins: Prisma.FieldRef<"Plan", 'Int'>
   readonly maxDoctors: Prisma.FieldRef<"Plan", 'Int'>
   readonly maxPatients: Prisma.FieldRef<"Plan", 'Int'>
+  readonly maxStorageMb: Prisma.FieldRef<"Plan", 'Int'>
   readonly features: Prisma.FieldRef<"Plan", 'Json'>
   readonly isActive: Prisma.FieldRef<"Plan", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Plan", 'DateTime'>
