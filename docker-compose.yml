@@ -101,11 +101,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Traefik labels for proper healthcheck-aware routing
-    labels:
-      - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/health"
-      - "traefik.http.services.api.loadbalancer.healthcheck.interval=10s"
-      - "traefik.http.services.api.loadbalancer.healthcheck.timeout=5s"
+    # NOTE: Do NOT add custom traefik.http.services.* labels here.
+    # Coolify auto-generates Traefik routing labels and custom ones create
+    # conflicting service definitions that cause gateway timeouts.
 
   web:
     build:
@@ -139,9 +137,9 @@ services:
     networks:
       - dental-network
       - coolify
-    # Traefik labels for proper port routing
-    labels:
-      - "traefik.http.services.app.loadbalancer.server.port=8080"
+    # NOTE: Do NOT add custom traefik.http.services.* labels here.
+    # Coolify auto-generates Traefik routing labels and custom ones create
+    # conflicting service definitions that cause gateway timeouts.
 
 networks:
   dental-network:
