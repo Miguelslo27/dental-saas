@@ -85,7 +85,7 @@ describe('LoginPage', () => {
       expect(forgotLink).toHaveAttribute('href', '/forgot-password')
     })
 
-    it('should pre-fill clinic slug from URL params', () => {
+    it('should hide clinic slug input when slug is in URL', () => {
       render(
         <MemoryRouter initialEntries={['/my-clinic/login']}>
           <Routes>
@@ -94,8 +94,28 @@ describe('LoginPage', () => {
         </MemoryRouter>
       )
 
-      const clinicSlugInput = screen.getByLabelText(/identificador de clínica/i)
-      expect(clinicSlugInput).toHaveValue('my-clinic')
+      expect(screen.queryByLabelText(/identificador de clínica/i)).not.toBeInTheDocument()
+    })
+
+    it('should show "Cambiar clínica" link pointing to /login when slug is in URL', () => {
+      render(
+        <MemoryRouter initialEntries={['/my-clinic/login']}>
+          <Routes>
+            <Route path="/:clinicSlug/login" element={<LoginPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      const changeLink = screen.getByRole('link', { name: /cambiar clínica/i })
+      expect(changeLink).toBeInTheDocument()
+      expect(changeLink).toHaveAttribute('href', '/login')
+    })
+
+    it('should show clinic slug input and hide "Cambiar clínica" when no slug in URL', () => {
+      renderLoginPage()
+
+      expect(screen.getByLabelText(/identificador de clínica/i)).toBeInTheDocument()
+      expect(screen.queryByRole('link', { name: /cambiar clínica/i })).not.toBeInTheDocument()
     })
   })
 
@@ -134,6 +154,29 @@ describe('LoginPage', () => {
 
       await waitFor(() => {
         expect(mockClearError).toHaveBeenCalled()
+        expect(mockLogin).toHaveBeenCalledWith({
+          email: 'test@example.com',
+          password: 'password123',
+          clinicSlug: 'my-clinic',
+        })
+      })
+    })
+
+    it('should submit with clinic slug from URL when input is hidden', async () => {
+      mockLogin.mockResolvedValue({})
+      render(
+        <MemoryRouter initialEntries={['/my-clinic/login']}>
+          <Routes>
+            <Route path="/:clinicSlug/login" element={<LoginPage />} />
+          </Routes>
+        </MemoryRouter>
+      )
+
+      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } })
+      fireEvent.change(getPasswordInput(), { target: { value: 'password123' } })
+      fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }))
+
+      await waitFor(() => {
         expect(mockLogin).toHaveBeenCalledWith({
           email: 'test@example.com',
           password: 'password123',
