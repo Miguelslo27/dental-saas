@@ -163,11 +163,14 @@ export function RegisterPage() {
               <input
                 {...register('clinicSlug', {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                    if (e.target.value === '') {
+                    const sanitized = generateSlug(e.target.value)
+                    if (sanitized === '') {
                       isSlugDirty.current = false
                     } else {
                       isSlugDirty.current = true
                     }
+                    e.target.value = sanitized
+                    setValue('clinicSlug', sanitized)
                   },
                 })}
                 id="clinicSlug"
@@ -181,7 +184,7 @@ export function RegisterPage() {
                 </p>
               )}
               <p className="mt-1 text-xs text-gray-500">
-                Este será el identificador único de tu clínica en la URL
+                Solo letras minúsculas, números y guiones. Ej: mi-clinica-dental
               </p>
             </div>
 

@@ -311,4 +311,60 @@ describe('RegisterPage', () => {
       })
     })
   })
+
+  describe('slug input sanitization', () => {
+    it('should convert manual slug input to lowercase', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'My-Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+    })
+
+    it('should replace spaces with hyphens in manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+    })
+
+    it('should strip special characters from manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my@clinic!' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+    })
+
+    it('should normalize diacritics in manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'clínica' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('clinica')
+      })
+    })
+
+    it('should show helper text with format instructions', () => {
+      renderRegisterPage()
+
+      expect(screen.getByText(/solo letras minúsculas, números y guiones/i)).toBeInTheDocument()
+    })
+  })
 })
