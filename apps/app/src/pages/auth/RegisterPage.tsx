@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -6,17 +6,7 @@ import { Link, Navigate } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { PASSWORD_REGEX } from '@/lib/constants'
-
-export function generateSlug(name: string): string {
-  return name
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-|-$/g, '')
-}
+import { generateSlug } from '@/lib/slug'
 
 const registerSchema = z
   .object({
@@ -57,7 +47,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const isSlugDirty = useRef(false)
+  const [isSlugDirty, setIsSlugDirty] = useState(false)
 
   const {
     register,
@@ -136,7 +126,7 @@ export function RegisterPage() {
               <input
                 {...register('clinicName', {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                    if (!isSlugDirty.current) {
+                    if (!isSlugDirty) {
                       setValue('clinicSlug', generateSlug(e.target.value))
                     }
                   },
@@ -164,11 +154,7 @@ export function RegisterPage() {
                 {...register('clinicSlug', {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                     const sanitized = generateSlug(e.target.value)
-                    if (sanitized === '') {
-                      isSlugDirty.current = false
-                    } else {
-                      isSlugDirty.current = true
-                    }
+                    setIsSlugDirty(sanitized !== '')
                     e.target.value = sanitized
                     setValue('clinicSlug', sanitized)
                   },

@@ -33,7 +33,8 @@ vi.mock('@/lib/constants', () => ({
 }))
 
 // Import after mocks
-import { RegisterPage, generateSlug } from './RegisterPage'
+import { RegisterPage } from './RegisterPage'
+import { generateSlug } from '@/lib/slug'
 
 function renderRegisterPage() {
   return render(
