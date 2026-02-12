@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -6,6 +6,17 @@ import { Link, Navigate } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { PASSWORD_REGEX } from '@/lib/constants'
+
+export function generateSlug(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-|-$/g, '')
+}
 
 const registerSchema = z
   .object({
@@ -46,9 +57,12 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const isSlugDirty = useRef(false)
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -120,7 +134,13 @@ export function RegisterPage() {
                 Nombre de la Clínica
               </label>
               <input
-                {...register('clinicName')}
+                {...register('clinicName', {
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (!isSlugDirty.current) {
+                      setValue('clinicSlug', generateSlug(e.target.value))
+                    }
+                  },
+                })}
                 id="clinicName"
                 type="text"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -141,7 +161,15 @@ export function RegisterPage() {
                 Identificador de Clínica (URL)
               </label>
               <input
-                {...register('clinicSlug')}
+                {...register('clinicSlug', {
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (e.target.value === '') {
+                      isSlugDirty.current = false
+                    } else {
+                      isSlugDirty.current = true
+                    }
+                  },
+                })}
                 id="clinicSlug"
                 type="text"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
