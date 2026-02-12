@@ -6,7 +6,7 @@ import { Link, Navigate } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { PASSWORD_REGEX } from '@/lib/constants'
-import { generateSlug } from '@/lib/slug'
+import { generateSlug, sanitizeSlugInput } from '@/lib/slug'
 
 const registerSchema = z
   .object({
@@ -153,7 +153,7 @@ export function RegisterPage() {
               <input
                 {...register('clinicSlug', {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                    const sanitized = generateSlug(e.target.value)
+                    const sanitized = sanitizeSlugInput(e.target.value)
                     setIsSlugDirty(sanitized !== '')
                     e.target.value = sanitized
                     setValue('clinicSlug', sanitized)

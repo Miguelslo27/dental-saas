@@ -34,7 +34,7 @@ vi.mock('@/lib/constants', () => ({
 
 // Import after mocks
 import { RegisterPage } from './RegisterPage'
-import { generateSlug } from '@/lib/slug'
+import { generateSlug, sanitizeSlugInput } from '@/lib/slug'
 
 function renderRegisterPage() {
   return render(
@@ -238,6 +238,24 @@ describe('RegisterPage', () => {
     })
   })
 
+  describe('sanitizeSlugInput', () => {
+    it('should preserve trailing hyphens from spaces', () => {
+      expect(sanitizeSlugInput('my ')).toBe('my-')
+    })
+
+    it('should strip leading hyphens', () => {
+      expect(sanitizeSlugInput(' clinic')).toBe('clinic')
+    })
+
+    it('should normalize diacritics', () => {
+      expect(sanitizeSlugInput('clínica')).toBe('clinica')
+    })
+
+    it('should lowercase input', () => {
+      expect(sanitizeSlugInput('MyClinic')).toBe('myclinic')
+    })
+  })
+
   describe('slug auto-generation', () => {
     it('should auto-fill slug when typing clinic name', async () => {
       renderRegisterPage()
@@ -338,6 +356,18 @@ describe('RegisterPage', () => {
       })
     })
 
+    it('should preserve trailing hyphen when typing with spaces', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my ' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-')
+      })
+    })
+
     it('should strip special characters from manual slug input', async () => {
       renderRegisterPage()
 
@@ -346,7 +376,7 @@ describe('RegisterPage', () => {
       fireEvent.change(slugInput, { target: { value: 'my@clinic!' } })
 
       await waitFor(() => {
-        expect(slugInput.value).toBe('my-clinic')
+        expect(slugInput.value).toBe('my-clinic-')
       })
     })
 
