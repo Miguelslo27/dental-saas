@@ -53,6 +53,7 @@ export function RegisterPage() {
     register,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -154,9 +155,16 @@ export function RegisterPage() {
                 {...register('clinicSlug', {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                     const sanitized = sanitizeSlugInput(e.target.value)
-                    setIsSlugDirty(sanitized !== '')
-                    e.target.value = sanitized
-                    setValue('clinicSlug', sanitized)
+                    if (sanitized === '') {
+                      setIsSlugDirty(false)
+                      const generated = generateSlug(getValues('clinicName') ?? '')
+                      e.target.value = generated
+                      setValue('clinicSlug', generated)
+                    } else {
+                      setIsSlugDirty(true)
+                      e.target.value = sanitized
+                      setValue('clinicSlug', sanitized)
+                    }
                   },
                 })}
                 id="clinicSlug"
