@@ -34,6 +34,7 @@ vi.mock('@/lib/constants', () => ({
 
 // Import after mocks
 import { RegisterPage } from './RegisterPage'
+import { generateSlug, sanitizeSlugInput } from '@/lib/slug'
 
 function renderRegisterPage() {
   return render(
@@ -207,6 +208,207 @@ describe('RegisterPage', () => {
       renderRegisterPage()
 
       expect(screen.getByText('Home Page')).toBeInTheDocument()
+    })
+  })
+
+  describe('generateSlug', () => {
+    it('should convert to lowercase and replace spaces with hyphens', () => {
+      expect(generateSlug('My Dental Clinic')).toBe('my-dental-clinic')
+    })
+
+    it('should normalize diacritics', () => {
+      expect(generateSlug('Clínica Señor')).toBe('clinica-senor')
+      expect(generateSlug('Ñandú Über')).toBe('nandu-uber')
+    })
+
+    it('should strip special characters', () => {
+      expect(generateSlug('Clinic @#$ Test')).toBe('clinic-test')
+      expect(generateSlug("Clinic's")).toBe('clinics')
+    })
+
+    it('should collapse multiple hyphens', () => {
+      expect(generateSlug('Clinic   ---  Test')).toBe('clinic-test')
+    })
+
+    it('should strip leading and trailing hyphens', () => {
+      expect(generateSlug('  -Clinic-  ')).toBe('clinic')
+    })
+
+    it('should handle empty string', () => {
+      expect(generateSlug('')).toBe('')
+    })
+  })
+
+  describe('sanitizeSlugInput', () => {
+    it('should preserve trailing hyphens from spaces', () => {
+      expect(sanitizeSlugInput('my ')).toBe('my-')
+    })
+
+    it('should strip leading hyphens', () => {
+      expect(sanitizeSlugInput(' clinic')).toBe('clinic')
+    })
+
+    it('should normalize diacritics', () => {
+      expect(sanitizeSlugInput('clínica')).toBe('clinica')
+    })
+
+    it('should lowercase input', () => {
+      expect(sanitizeSlugInput('MyClinic')).toBe('myclinic')
+    })
+  })
+
+  describe('slug auto-generation', () => {
+    it('should auto-fill slug when typing clinic name', async () => {
+      renderRegisterPage()
+
+      const clinicNameInput = screen.getByLabelText(/nombre de la clínica/i)
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(clinicNameInput, { target: { value: 'My Dental Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-dental-clinic')
+      })
+    })
+
+    it('should stop auto-generating when slug is manually edited', async () => {
+      renderRegisterPage()
+
+      const clinicNameInput = screen.getByLabelText(/nombre de la clínica/i)
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(clinicNameInput, { target: { value: 'My Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+
+      fireEvent.change(slugInput, { target: { value: 'custom-slug' } })
+
+      fireEvent.change(clinicNameInput, { target: { value: 'Another Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('custom-slug')
+      })
+    })
+
+    it('should resume auto-generating when slug is cleared', async () => {
+      renderRegisterPage()
+
+      const clinicNameInput = screen.getByLabelText(/nombre de la clínica/i)
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(clinicNameInput, { target: { value: 'My Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+
+      // Manually edit slug
+      fireEvent.change(slugInput, { target: { value: 'custom-slug' } })
+
+      // Clear slug field
+      fireEvent.change(slugInput, { target: { value: '' } })
+
+      // Change clinic name again - should auto-generate
+      fireEvent.change(clinicNameInput, { target: { value: 'New Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('new-clinic')
+      })
+    })
+
+    it('should normalize diacritics in auto-generated slug', async () => {
+      renderRegisterPage()
+
+      const clinicNameInput = screen.getByLabelText(/nombre de la clínica/i)
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(clinicNameInput, { target: { value: 'Clínica Señor' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('clinica-senor')
+      })
+    })
+  })
+
+  describe('slug input sanitization', () => {
+    it('should convert manual slug input to lowercase', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'My-Clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+    })
+
+    it('should replace spaces with hyphens in manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my clinic' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-clinic')
+      })
+    })
+
+    it('should preserve trailing hyphen when typing with spaces', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my ' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('my-')
+      })
+    })
+
+    it('should strip special characters from manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'my@clinic!' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('myclinic')
+      })
+    })
+
+    it('should not convert accent marks to hyphens', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: "mi'clinica" } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('miclinica')
+      })
+    })
+
+    it('should normalize diacritics in manual slug input', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: 'clínica' } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('clinica')
+      })
+    })
+
+    it('should show helper text with format instructions', () => {
+      renderRegisterPage()
+
+      expect(screen.getByText(/solo letras minúsculas, números y guiones/i)).toBeInTheDocument()
     })
   })
 })

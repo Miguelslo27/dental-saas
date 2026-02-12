@@ -6,6 +6,7 @@ import { Link, Navigate } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { PASSWORD_REGEX } from '@/lib/constants'
+import { generateSlug, sanitizeSlugInput } from '@/lib/slug'
 
 const registerSchema = z
   .object({
@@ -46,9 +47,13 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const [isSlugDirty, setIsSlugDirty] = useState(false)
+
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -120,7 +125,13 @@ export function RegisterPage() {
                 Nombre de la Clínica
               </label>
               <input
-                {...register('clinicName')}
+                {...register('clinicName', {
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (!isSlugDirty) {
+                      setValue('clinicSlug', generateSlug(e.target.value))
+                    }
+                  },
+                })}
                 id="clinicName"
                 type="text"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -141,7 +152,21 @@ export function RegisterPage() {
                 Identificador de Clínica (URL)
               </label>
               <input
-                {...register('clinicSlug')}
+                {...register('clinicSlug', {
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const sanitized = sanitizeSlugInput(e.target.value)
+                    if (sanitized === '') {
+                      setIsSlugDirty(false)
+                      const generated = generateSlug(getValues('clinicName') ?? '')
+                      e.target.value = generated
+                      setValue('clinicSlug', generated)
+                    } else {
+                      setIsSlugDirty(true)
+                      e.target.value = sanitized
+                      setValue('clinicSlug', sanitized)
+                    }
+                  },
+                })}
                 id="clinicSlug"
                 type="text"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -153,7 +178,7 @@ export function RegisterPage() {
                 </p>
               )}
               <p className="mt-1 text-xs text-gray-500">
-                Este será el identificador único de tu clínica en la URL
+                Solo letras minúsculas, números y guiones. Ej: mi-clinica-dental
               </p>
             </div>
 
