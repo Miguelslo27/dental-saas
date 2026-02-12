@@ -233,6 +233,14 @@ All core features completed (15 phases):
 - [ ] Country dropdown for phone number area code
 
 #### UX Improvements
+- [x] Smart login form: hide clinic ID field when slug is in URL
+- [ ] Auto-generate clinic slug from clinic name in registration form
+  - When user types clinic name, auto-generate the slug (URL identifier) in real-time
+  - Slug generation: lowercase, trim, normalize diacritics (ñ→n, á→a), replace spaces/special chars with hyphens, collapse multiple hyphens, strip leading/trailing hyphens
+  - User can still manually edit the slug after auto-generation
+  - Once user manually edits the slug, stop auto-generating (track "dirty" state)
+  - If user clears the slug field, resume auto-generating from clinic name
+  - Files: `apps/app/src/pages/auth/RegisterPage.tsx`
 - [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
 - [ ] Improve date/time picker UI (investigate user-friendly packages, replace browser defaults)
 - [ ] Phone placeholder based on user's location

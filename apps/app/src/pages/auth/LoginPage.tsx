@@ -84,27 +84,29 @@ export function LoginPage() {
           )}
 
           <div className="rounded-lg shadow-md border border-gray-200 p-6 space-y-4">
-            <div>
-              <label
-                htmlFor="clinicSlug"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Identificador de Clínica
-              </label>
-              <input
-                {...register('clinicSlug')}
-                id="clinicSlug"
-                type="text"
-                autoComplete="organization"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="mi-clinica"
-              />
-              {errors.clinicSlug && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.clinicSlug.message}
-                </p>
-              )}
-            </div>
+            {!urlClinicSlug && (
+              <div>
+                <label
+                  htmlFor="clinicSlug"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Identificador de Clínica
+                </label>
+                <input
+                  {...register('clinicSlug')}
+                  id="clinicSlug"
+                  type="text"
+                  autoComplete="organization"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="mi-clinica"
+                />
+                {errors.clinicSlug && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.clinicSlug.message}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div>
               <label
@@ -161,7 +163,17 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              {urlClinicSlug && (
+                <Link
+                  to="/login"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
+                  Cambiar clínica
+                </Link>
+              )}
+            </div>
             <div className="text-sm">
               <Link
                 to="/forgot-password"
