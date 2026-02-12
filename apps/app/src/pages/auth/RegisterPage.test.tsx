@@ -223,6 +223,7 @@ describe('RegisterPage', () => {
 
     it('should strip special characters', () => {
       expect(generateSlug('Clinic @#$ Test')).toBe('clinic-test')
+      expect(generateSlug("Clinic's")).toBe('clinics')
     })
 
     it('should collapse multiple hyphens', () => {
@@ -376,7 +377,19 @@ describe('RegisterPage', () => {
       fireEvent.change(slugInput, { target: { value: 'my@clinic!' } })
 
       await waitFor(() => {
-        expect(slugInput.value).toBe('my-clinic-')
+        expect(slugInput.value).toBe('myclinic')
+      })
+    })
+
+    it('should not convert accent marks to hyphens', async () => {
+      renderRegisterPage()
+
+      const slugInput = screen.getByLabelText(/identificador de clínica/i) as HTMLInputElement
+
+      fireEvent.change(slugInput, { target: { value: "mi'clinica" } })
+
+      await waitFor(() => {
+        expect(slugInput.value).toBe('miclinica')
       })
     })
 
