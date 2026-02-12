@@ -25,6 +25,15 @@
 
 ## Backlog
 
+### Clinic & Billing
+- [ ] Doctor commission: doctors earn a percentage per consultation/labwork
+- [ ] Patient debt screen: dedicated view to see outstanding patient balances
+- [ ] Configurable appointment duration (different lengths per appointment type)
+
+### Labworks
+- [ ] Add doctor name to labwork records
+- [ ] Add labwork status tracking (e.g. sent, in progress, received)
+
 ### Features
 - [ ] Onboarding flow for new tenants
 - [ ] User profile page
