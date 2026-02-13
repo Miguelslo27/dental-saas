@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { uploadAttachments, listAttachments, deleteAttachment, getStorageUsage, fetchAttachmentBlob } from './attachment-api'
+import { uploadAttachments, listAttachments, deleteAttachment, getStorageUsage } from './attachment-api'
 import { apiClient } from './api'
 import { AttachmentModule } from '@dental/shared'
 
@@ -102,17 +102,4 @@ describe('attachment-api', () => {
     })
   })
 
-  describe('fetchAttachmentBlob', () => {
-    it('should fetch blob with responseType blob', async () => {
-      const mockBlob = new Blob(['image-data'], { type: 'image/png' })
-      vi.mocked(apiClient.get).mockResolvedValue({ data: mockBlob })
-
-      const result = await fetchAttachmentBlob('att-123')
-
-      expect(apiClient.get).toHaveBeenCalledWith('/attachments/file/att-123', {
-        responseType: 'blob',
-      })
-      expect(result).toBe(mockBlob)
-    })
-  })
 })

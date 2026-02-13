@@ -14,12 +14,11 @@ vi.mock('@/hooks/usePermissions', () => ({
 vi.mock('@/lib/attachment-api', () => ({
   listAttachments: vi.fn(),
   deleteAttachment: vi.fn(),
-  fetchAttachmentBlob: vi.fn(),
 }))
 
-// Mock useAuthImage to avoid fetch
+// Mock useImageUrl to return a direct URL
 vi.mock('@/hooks/useAuthImage', () => ({
-  useAuthImage: () => ({ url: 'blob:mock', loading: false, error: null }),
+  useImageUrl: (id: string | null) => id ? `http://localhost:5001/api/attachments/file/${id}?token=mock` : null,
 }))
 
 describe('ImageGallery', () => {

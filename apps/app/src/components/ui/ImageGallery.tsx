@@ -5,7 +5,7 @@ import { Permission } from '@dental/shared'
 import type { AttachmentModule, AttachmentInfo } from '@dental/shared'
 import { usePermissions } from '@/hooks/usePermissions'
 import { listAttachments, deleteAttachment } from '@/lib/attachment-api'
-import { useAuthImage } from '@/hooks/useAuthImage'
+import { useImageUrl } from '@/hooks/useAuthImage'
 import { ImageLightbox } from './ImageLightbox'
 
 interface ImageGalleryProps {
@@ -15,18 +15,14 @@ interface ImageGalleryProps {
 }
 
 function ThumbnailImage({ attachment, onClick }: { attachment: AttachmentInfo; onClick: () => void }) {
-  const { url, loading } = useAuthImage(attachment.id)
+  const url = useImageUrl(attachment.id)
 
   return (
     <button
       onClick={onClick}
       className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 hover:opacity-90 transition-opacity"
     >
-      {loading ? (
-        <div className="flex items-center justify-center w-full h-full">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-        </div>
-      ) : url ? (
+      {url ? (
         <img
           src={url}
           alt={attachment.filename}

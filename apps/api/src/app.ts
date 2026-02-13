@@ -14,9 +14,9 @@ import { statsRouter } from './routes/stats.js'
 import billingRouter from './routes/billing.js'
 import { settingsRouter } from './routes/settings.js'
 import exportRouter from './routes/export.js'
-import { attachmentsRouter } from './routes/attachments.js'
+import { attachmentsRouter, fileRouter } from './routes/attachments.js'
 import { errorHandler } from './middleware/error-handler.js'
-import { requireAuthWithTenant } from './middleware/auth.js'
+import { requireAuthWithTenant, requireAuthWithTokenParam, requireTenant } from './middleware/auth.js'
 import { logger } from './utils/logger.js'
 import { env } from './config/env.js'
 
@@ -54,6 +54,7 @@ app.use('/api/users', requireAuthWithTenant, usersRouter)
 app.use('/api/labworks', requireAuthWithTenant, labworksRouter)
 app.use('/api/expenses', requireAuthWithTenant, expensesRouter)
 app.use('/api/stats', requireAuthWithTenant, statsRouter)
+app.use('/api/attachments/file', requireAuthWithTokenParam, requireTenant, fileRouter)
 app.use('/api/attachments', requireAuthWithTenant, attachmentsRouter)
 app.use('/api', settingsRouter) // /api/settings
 app.use('/api', exportRouter) // /api/export

@@ -281,6 +281,36 @@ describe('Attachments Routes', () => {
 
       expect(res.status).toBe(404)
     })
+
+    it('should stream file via ?token= query param (no Authorization header)', async () => {
+      const imageData = Buffer.from('token-param-image-data')
+      const uploadRes = await request(app)
+        .post('/api/attachments/patients/patient-token-test')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .attach('files', imageData, {
+          filename: 'token-test.png',
+          contentType: 'image/png',
+        })
+
+      const attachmentId = uploadRes.body.data[0].id
+      createdFiles.push(
+        path.join(env.UPLOAD_DIR, tenantId, 'patients', uploadRes.body.data[0].storedName)
+      )
+
+      // Access via query param instead of Authorization header
+      const res = await request(app)
+        .get(`/api/attachments/file/${attachmentId}?token=${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.headers['content-type']).toBe('image/png')
+    })
+
+    it('should reject file access with no auth at all', async () => {
+      const res = await request(app)
+        .get('/api/attachments/file/some-id')
+
+      expect(res.status).toBe(401)
+    })
   })
 
   describe('DELETE /api/attachments/:id', () => {

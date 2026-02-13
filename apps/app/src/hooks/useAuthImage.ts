@@ -1,49 +1,15 @@
-import { useState, useEffect } from 'react'
-import { fetchAttachmentBlob } from '@/lib/attachment-api'
+import { useAuthStore } from '@/stores/auth.store'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 /**
- * Hook that fetches an authenticated image by attachment ID
- * and returns a blob URL suitable for <img src>.
- * Cleans up the blob URL on unmount.
+ * Returns a direct URL for an authenticated image attachment.
+ * The JWT is passed as a query param so the browser can load it natively via <img src>.
  */
-export function useAuthImage(attachmentId: string | null) {
-  const [url, setUrl] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+export function useImageUrl(attachmentId: string | null): string | null {
+  const accessToken = useAuthStore((s) => s.accessToken)
 
-  useEffect(() => {
-    if (!attachmentId) {
-      setUrl(null)
-      return
-    }
+  if (!attachmentId || !accessToken) return null
 
-    let revoked = false
-    let objectUrl: string | null = null
-
-    setLoading(true)
-    setError(null)
-
-    fetchAttachmentBlob(attachmentId)
-      .then((blob) => {
-        if (revoked) return
-        objectUrl = URL.createObjectURL(blob)
-        setUrl(objectUrl)
-      })
-      .catch((e) => {
-        if (revoked) return
-        setError(e instanceof Error ? e.message : 'Failed to load image')
-      })
-      .finally(() => {
-        if (!revoked) setLoading(false)
-      })
-
-    return () => {
-      revoked = true
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl)
-      }
-    }
-  }, [attachmentId])
-
-  return { url, loading, error }
+  return `${API_BASE_URL}/api/attachments/file/${attachmentId}?token=${accessToken}`
 }

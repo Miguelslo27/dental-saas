@@ -50,12 +50,3 @@ export async function getStorageUsage(): Promise<StorageUsage> {
   return response.data.data
 }
 
-/**
- * Fetch an attachment file as a blob (authenticated)
- */
-export async function fetchAttachmentBlob(attachmentId: string): Promise<Blob> {
-  const response = await apiClient.get(`/attachments/file/${attachmentId}`, {
-    responseType: 'blob',
-  })
-  return response.data
-}

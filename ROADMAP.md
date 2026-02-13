@@ -2,6 +2,9 @@
 
 ## High Priority
 
+### Production Bugs
+- [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
+
 ### Security & Performance
 - [ ] Rate limiting with Redis (persistence and scalability)
 - [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
@@ -29,6 +32,43 @@
 - [ ] Doctor commission: doctors earn a percentage per consultation/labwork
 - [ ] Patient debt screen: dedicated view to see outstanding patient balances
 - [ ] Configurable appointment duration (different lengths per appointment type)
+- [ ] Patient payment tracking (entregas) — see plan below
+
+#### Plan: Patient Payment Tracking (Entregas)
+
+**Goal:** Allow admin/doctor to record patient payments toward outstanding debt, with automatic FIFO allocation to mark completed works as "Paid".
+
+**How it works:**
+1. A patient accumulates debt from completed treatments/labworks (each has a cost)
+2. Admin or doctor registers a payment (entrega) for any amount, up to the total debt
+3. The system cannot accept a payment greater than the outstanding balance
+4. Each payment is stored in a **payment history** (historial de entregas)
+5. Payments are allocated FIFO (oldest work first): once cumulative payments cover a work's cost, that work is automatically marked as **Paid**
+
+**Example:**
+- Patient has 3 works: Work A ($100), Work B ($100), Work C ($100) → total debt = $300
+- Patient pays $50 → no work fully paid yet (cumulative: $50)
+- Patient pays $60 → cumulative $110 ≥ $100 → Work A marked as "Paid"
+- Patient pays $100 → cumulative $210 ≥ $200 → Work B marked as "Paid"
+- Patient pays $90 → cumulative $300 ≥ $300 → Work C marked as "Paid", balance = $0
+
+**Backend tasks:**
+- [ ] Create `Payment` model in Prisma (id, patientId, tenantId, amount, date, notes, createdBy, createdAt)
+- [ ] Add `paymentStatus` field to billable records (treatments/labworks): `UNPAID` | `PAID`
+- [ ] Create payment service with FIFO allocation logic
+- [ ] Validation: reject payments > outstanding balance
+- [ ] API endpoints: `POST /:clinicSlug/patients/:id/payments` (create), `GET /:clinicSlug/patients/:id/payments` (list history)
+- [ ] Add permissions: `PAYMENTS_CREATE`, `PAYMENTS_VIEW`
+- [ ] Unit and integration tests for payment service and routes
+
+**Frontend tasks:**
+- [ ] Payment history tab/section in patient detail page
+- [ ] "Register Payment" button + modal (amount input, optional notes, date)
+- [ ] Show current balance (total debt - total payments) prominently
+- [ ] Visual indicator on each work showing paid/unpaid status
+- [ ] Validation: max amount = current balance, min amount > 0
+- [ ] i18n keys for ES/EN/AR
+- [ ] Frontend tests for payment components
 
 ### Labworks
 - [ ] Add doctor name to labwork records

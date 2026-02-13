@@ -173,6 +173,40 @@ export function requireSuperAdmin(req: Request, res: Response, next: NextFunctio
 }
 
 /**
+ * Middleware that accepts a JWT from the Authorization header OR a ?token= query param.
+ * Use this for routes that need to be accessible via direct URL (e.g. <img src>).
+ */
+export function requireAuthWithTokenParam(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization
+
+  // Prefer Authorization header, fall back to ?token query param
+  let token: string | undefined
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.slice(7)
+  } else if (typeof req.query.token === 'string' && req.query.token) {
+    token = req.query.token
+  }
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      error: { message: 'Missing authorization', code: 'UNAUTHENTICATED' },
+    })
+  }
+
+  try {
+    const payload = verifyAccessToken(token)
+    req.user = payload
+    next()
+  } catch {
+    return res.status(401).json({
+      success: false,
+      error: { message: 'Invalid or expired token', code: 'INVALID_TOKEN' },
+    })
+  }
+}
+
+/**
  * Combined middleware: requireAuth + requireSuperAdmin
  */
 export function requireAuthAsSuperAdmin(req: Request, res: Response, next: NextFunction) {
