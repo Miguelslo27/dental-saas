@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AttachmentInfo } from '@dental/shared'
-import { useAuthImage } from '@/hooks/useAuthImage'
+import { useImageUrl } from '@/hooks/useAuthImage'
 
 interface ImageLightboxProps {
   attachments: AttachmentInfo[]
@@ -17,7 +17,7 @@ export function ImageLightbox({
   onNavigate,
 }: ImageLightboxProps) {
   const current = attachments[currentIndex]
-  const { url, loading } = useAuthImage(current?.id ?? null)
+  const url = useImageUrl(current?.id ?? null)
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -67,9 +67,7 @@ export function ImageLightbox({
 
       {/* Image */}
       <div className="max-w-[90vw] max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-        {loading ? (
-          <div className="text-white/60 text-sm">Loading...</div>
-        ) : url ? (
+        {url ? (
           <img
             src={url}
             alt={current.filename}

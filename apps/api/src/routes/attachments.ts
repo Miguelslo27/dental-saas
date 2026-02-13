@@ -41,12 +41,18 @@ attachmentsRouter.get(
   }
 )
 
+// ============================================================================
+// File router (separate so it can use token-param auth for direct <img src>)
+// ============================================================================
+
+const fileRouter: IRouter = Router()
+
 /**
  * GET /api/attachments/file/:id
  * Stream a file (sets Content-Type header)
  */
-attachmentsRouter.get(
-  '/file/:id',
+fileRouter.get(
+  '/:id',
   requirePermission(Permission.ATTACHMENTS_VIEW),
   async (req, res, next) => {
     try {
@@ -244,4 +250,4 @@ attachmentsRouter.delete(
   }
 )
 
-export { attachmentsRouter }
+export { attachmentsRouter, fileRouter }
