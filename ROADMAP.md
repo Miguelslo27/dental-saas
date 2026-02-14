@@ -5,10 +5,6 @@
 ### Production Bugs
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
 
-### Security & Performance
-- [ ] Rate limiting with Redis (persistence and scalability)
-- [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
-
 ## Medium Priority
 
 ### Language & Regional Settings
@@ -83,6 +79,10 @@
 - [ ] Prescriptions component
 - [ ] og-image.png (1200x630px) for apps/web/public/
 - [ ] Subscriptions and payments (dLocal integration)
+
+### Security & Performance
+- [ ] Rate limiting with Redis (persistence and scalability)
+- [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
 
 ### Technical
 - [ ] E2E tests for admin panel
