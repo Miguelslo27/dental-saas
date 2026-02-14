@@ -18,6 +18,14 @@ import {
 } from '../services/patient.service.js'
 import { PdfService } from '../services/pdf.service.js'
 import { PatientHistoryPdf, sanitizeFilename } from '../pdfs/index.js'
+import {
+  createPayment,
+  listPayments,
+  deletePayment,
+  getPatientBalance,
+} from '../services/payment.service.js'
+import { requirePermission } from '../middleware/permissions.js'
+import { Permission } from '@dental/shared'
 
 const patientsRouter: IRouter = Router()
 
@@ -543,6 +551,149 @@ patientsRouter.get('/:id/history-pdf', requireMinRole('STAFF'), async (req, res,
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Length', pdfBuffer.length)
     res.send(pdfBuffer)
+  } catch (e) {
+    next(e)
+  }
+})
+
+// ============================================================================
+// Patient Payments (Entregas)
+// ============================================================================
+
+const createPaymentSchema = z.object({
+  amount: z.number().min(0.01, 'Amount must be greater than 0'),
+  date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+  note: z.string().optional(),
+})
+
+/**
+ * GET /api/patients/:id/balance
+ * Get patient balance (total debt, total paid, outstanding)
+ */
+patientsRouter.get('/:id/balance', requirePermission(Permission.PAYMENTS_VIEW), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+
+    const result = await getPatientBalance(tenantId, id)
+
+    if (!result.success) {
+      const status = result.code === 'PATIENT_NOT_FOUND' ? 404 : 500
+      res.status(status).json({ success: false, error: 'Patient not found' })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * GET /api/patients/:id/payments
+ * List payments for a patient
+ */
+patientsRouter.get('/:id/payments', requirePermission(Permission.PAYMENTS_VIEW), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id } = req.params
+    const { limit, offset } = req.query
+
+    const result = await listPayments(tenantId, id, {
+      limit: limit ? Math.min(parseInt(String(limit), 10), 100) : undefined,
+      offset: offset ? parseInt(String(offset), 10) : undefined,
+    })
+
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        limit: limit ? parseInt(String(limit), 10) : 50,
+        offset: offset ? parseInt(String(offset), 10) : 0,
+      },
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * POST /api/patients/:id/payments
+ * Create a payment for a patient
+ */
+patientsRouter.post('/:id/payments', requirePermission(Permission.PAYMENTS_CREATE), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { id: patientId } = req.params
+
+    const parsed = createPaymentSchema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        details: parsed.error.flatten().fieldErrors,
+      })
+      return
+    }
+
+    const result = await createPayment(tenantId, patientId, {
+      amount: parsed.data.amount,
+      date: new Date(parsed.data.date),
+      note: parsed.data.note,
+      createdBy: req.user!.userId,
+    })
+
+    if (!result.success) {
+      const statusMap: Record<string, number> = {
+        PATIENT_NOT_FOUND: 404,
+        EXCEEDS_BALANCE: 400,
+      }
+      const messageMap: Record<string, string> = {
+        PATIENT_NOT_FOUND: 'Patient not found',
+        EXCEEDS_BALANCE: 'Payment amount exceeds outstanding balance',
+      }
+      res.status(statusMap[result.code] || 500).json({
+        success: false,
+        error: messageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.status(201).json({ success: true, data: result.data })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * DELETE /api/patients/:patientId/payments/:paymentId
+ * Soft delete a payment
+ */
+patientsRouter.delete('/:patientId/payments/:paymentId', requirePermission(Permission.PAYMENTS_DELETE), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId!
+    const { paymentId } = req.params
+
+    const result = await deletePayment(tenantId, paymentId)
+
+    if (!result.success) {
+      const statusMap: Record<string, number> = {
+        NOT_FOUND: 404,
+        ALREADY_INACTIVE: 400,
+      }
+      const messageMap: Record<string, string> = {
+        NOT_FOUND: 'Payment not found',
+        ALREADY_INACTIVE: 'Payment is already deleted',
+      }
+      res.status(statusMap[result.code] || 500).json({
+        success: false,
+        error: messageMap[result.code] || 'Unknown error',
+      })
+      return
+    }
+
+    res.json({ success: true, data: result.data })
   } catch (e) {
     next(e)
   }
