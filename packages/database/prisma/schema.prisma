@@ -149,8 +149,9 @@ model Tenant {
   doctors       Doctor[]
   appointments  Appointment[]
   labworks      Labwork[]
-  expenses      Expense[]
-  attachments   Attachment[]
+  expenses         Expense[]
+  attachments      Attachment[]
+  patientPayments  PatientPayment[]
 
   @@index([slug])
   @@index([isActive])
@@ -262,6 +263,7 @@ model Patient {
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   labworks     Labwork[]
+  payments     PatientPayment[]
 
   @@index([tenantId])
   @@index([lastName])
@@ -476,6 +478,37 @@ model Expense {
   @@index([date])
   @@index([isPaid])
   @@map("expenses")
+}
+
+// ============================================================================
+// PATIENT PAYMENTS (Entregas)
+// ============================================================================
+
+model PatientPayment {
+  id        String   @id @default(cuid())
+  tenantId  String
+  patientId String
+
+  /// Payment amount
+  amount    Decimal  @db.Decimal(10, 2)
+  /// Date the payment was made
+  date      DateTime
+  /// Optional note about the payment
+  note      String?  @db.Text
+  /// User ID who registered the payment
+  createdBy String?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([date])
+  @@map("patient_payments")
 }
 
 model RefreshToken {

@@ -68,6 +68,11 @@ export enum Permission {
   // Billing
   BILLING_VIEW = 'billing:view',
   BILLING_MANAGE = 'billing:manage',
+
+  // Patient Payments
+  PAYMENTS_VIEW = 'payments:view',
+  PAYMENTS_CREATE = 'payments:create',
+  PAYMENTS_DELETE = 'payments:delete',
 }
 
 /**
@@ -87,6 +92,7 @@ const STAFF_PERMISSIONS = [
   Permission.DOCTORS_VIEW,
   Permission.LABWORKS_VIEW,
   Permission.EXPENSES_VIEW,
+  Permission.PAYMENTS_VIEW,
   Permission.DENTAL_CHARTS_VIEW,
   Permission.SETTINGS_VIEW,
   Permission.USERS_VIEW,
@@ -119,6 +125,10 @@ const CLINIC_ADMIN_PERMISSIONS = [
   Permission.EXPENSES_CREATE,
   Permission.EXPENSES_UPDATE,
   Permission.EXPENSES_DELETE,
+
+  Permission.PAYMENTS_VIEW,
+  Permission.PAYMENTS_CREATE,
+  Permission.PAYMENTS_DELETE,
 
   // View-only for users and settings
   Permission.USERS_VIEW,
@@ -163,6 +173,10 @@ const ADMIN_PERMISSIONS = [
   Permission.EXPENSES_CREATE,
   Permission.EXPENSES_UPDATE,
   Permission.EXPENSES_DELETE,
+
+  Permission.PAYMENTS_VIEW,
+  Permission.PAYMENTS_CREATE,
+  Permission.PAYMENTS_DELETE,
 
   Permission.USERS_VIEW,
   Permission.USERS_CREATE,
