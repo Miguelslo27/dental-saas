@@ -19,6 +19,7 @@ import { Permission, AttachmentModule } from '@dental/shared'
 import type { Labwork } from '@/lib/labwork-api'
 import { getLabworkStatusBadge } from '@/lib/labwork-api'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useAuthStore } from '@/stores/auth.store'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ImageGallery } from '@/components/ui/ImageGallery'
 
@@ -41,6 +42,7 @@ export function LabworkCard({
 }: LabworkCardProps) {
   const { t } = useTranslation()
   const { can } = usePermissions()
+  const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
   const [showImages, setShowImages] = useState(false)
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const statusBadge = getLabworkStatusBadge(labwork)
@@ -55,9 +57,10 @@ export function LabworkCard({
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat(undefined, {
       style: 'currency',
-      currency: 'USD',
+      currency,
+      currencyDisplay: 'narrowSymbol',
     }).format(price)
   }
 

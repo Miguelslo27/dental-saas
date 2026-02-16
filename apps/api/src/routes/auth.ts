@@ -469,6 +469,7 @@ authRouter.get('/me', async (req, res, next) => {
             name: true,
             slug: true,
             logo: true,
+            currency: true,
           },
         },
       },

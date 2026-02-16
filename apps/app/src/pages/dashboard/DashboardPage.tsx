@@ -87,6 +87,7 @@ function StatCard({ title, value, subtitle, icon, trend, linkTo, color }: StatCa
 export default function DashboardPage() {
   const { overview, appointmentStats, revenueStats, patientsGrowth, doctorPerformance, isLoading, error, fetchAllStats } = useStatsStore()
   const { user } = useAuthStore()
+  const currency = user?.tenant?.currency || 'USD'
   const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN || user?.role === UserRole.CLINIC_ADMIN
 
   useEffect(() => {
@@ -114,9 +115,10 @@ export default function DashboardPage() {
 
   // Format currency
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('es-MX', {
+    return new Intl.NumberFormat(undefined, {
       style: 'currency',
-      currency: 'USD',
+      currency,
+      currencyDisplay: 'narrowSymbol',
       minimumFractionDigits: 0,
     }).format(value)
   }

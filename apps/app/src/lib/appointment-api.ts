@@ -385,6 +385,7 @@ export function formatCost(cost: number | null, currency = 'USD'): string {
   return new Intl.NumberFormat(undefined, {
     style: 'currency',
     currency,
+    currencyDisplay: 'narrowSymbol',
   }).format(cost)
 }
 
