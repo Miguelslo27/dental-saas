@@ -16,9 +16,10 @@ import {
 import { useTranslation } from 'react-i18next'
 import { Permission, AttachmentModule } from '@dental/shared'
 import type { Expense } from '@/lib/expense-api'
-import { getExpenseStatusBadge, formatExpenseAmount } from '@/lib/expense-api'
+import { getExpenseStatusBadge } from '@/lib/expense-api'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
+import { formatCurrency } from '@/lib/format'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ImageGallery } from '@/components/ui/ImageGallery'
 
@@ -93,7 +94,7 @@ export function ExpenseCard({
         {/* Amount */}
         <div className="flex items-center gap-2 mb-3 text-lg">
           <DollarSign className="h-5 w-5 text-gray-400" />
-          <span className="font-bold text-gray-900">{formatExpenseAmount(expense.amount, currency)}</span>
+          <span className="font-bold text-gray-900">{formatCurrency(expense.amount, currency)}</span>
         </div>
 
         {/* Items */}

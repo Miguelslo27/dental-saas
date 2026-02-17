@@ -1,4 +1,5 @@
 import { apiClient } from './api'
+import { formatCurrency } from './format'
 
 // ============================================================================
 // Types
@@ -382,11 +383,7 @@ export function getAppointmentDoctorName(appointment: Appointment): string {
  */
 export function formatCost(cost: number | null, currency = 'USD'): string {
   if (cost === null) return '-'
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-    currencyDisplay: 'narrowSymbol',
-  }).format(cost)
+  return formatCurrency(cost, currency)
 }
 
 // ============================================================================

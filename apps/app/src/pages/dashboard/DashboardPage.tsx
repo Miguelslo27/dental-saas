@@ -25,6 +25,7 @@ import {
 import { useStatsStore } from '@/stores/stats.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { UserRole } from '@dental/shared'
+import { formatCurrency } from '@/lib/format'
 
 // ============================================================================
 // Stat Card Component
@@ -113,16 +114,6 @@ export default function DashboardPage() {
     )
   }
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency,
-      currencyDisplay: 'narrowSymbol',
-      minimumFractionDigits: 0,
-    }).format(value)
-  }
-
   // Prepare chart data for appointments by day
   const appointmentChartData = appointmentStats?.byDay.slice(-14).map(item => ({
     date: new Date(item.date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
@@ -177,8 +168,8 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Ingresos del Mes"
-          value={formatCurrency(overview?.monthlyRevenue || 0)}
-          subtitle={overview?.pendingPayments ? `${formatCurrency(overview.pendingPayments)} pendientes` : undefined}
+          value={formatCurrency(overview?.monthlyRevenue || 0, currency)}
+          subtitle={overview?.pendingPayments ? `${formatCurrency(overview.pendingPayments, currency)} pendientes` : undefined}
           icon={<DollarSign className="h-6 w-6" />}
           color="orange"
         />
@@ -282,7 +273,7 @@ export default function DashboardPage() {
                         {doctor.completionRate}%
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right text-gray-900 font-medium">{formatCurrency(doctor.revenue)}</td>
+                    <td className="py-3 px-4 text-right text-gray-900 font-medium">{formatCurrency(doctor.revenue, currency)}</td>
                   </tr>
                 ))}
               </tbody>

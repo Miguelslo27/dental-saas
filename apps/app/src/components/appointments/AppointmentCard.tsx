@@ -11,10 +11,10 @@ import {
   getStatusLabel,
   getStatusBadgeClasses,
   formatTimeRange,
-  formatCost,
   getAppointmentPatientName,
   getAppointmentDoctorName,
 } from '@/lib/appointment-api'
+import { formatCurrency } from '@/lib/format'
 
 interface AppointmentCardProps {
   appointment: Appointment
@@ -110,7 +110,7 @@ export function AppointmentCard({
           {appointment.cost !== null && (
             <div className="mt-2 flex items-center gap-2 text-sm">
               <span className={appointment.isPaid ? 'text-green-600' : 'text-amber-600'}>
-                {formatCost(appointment.cost, currency)}
+                {formatCurrency(appointment.cost!, currency)}
               </span>
               {appointment.isPaid ? (
                 <span className="text-xs text-green-600">(Pagado)</span>
