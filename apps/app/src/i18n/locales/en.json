@@ -280,6 +280,28 @@
     "paid": "Paid",
     "pending": "Pending"
   },
+  "payments": {
+    "title": "Payments",
+    "newPayment": "New Payment",
+    "noPayments": "No payments registered",
+    "totalDebt": "Total debt",
+    "totalPaid": "Total paid",
+    "outstanding": "Outstanding balance",
+    "amount": "Amount",
+    "date": "Date",
+    "note": "Note",
+    "deleteConfirm": "Delete this payment? The patient balance will be recalculated.",
+    "paymentCreated": "Payment registered successfully",
+    "paymentDeleted": "Payment deleted successfully",
+    "noOutstandingBalance": "No outstanding balance",
+    "form": {
+      "amount": "Amount",
+      "amountHint": "Maximum: {{max}}",
+      "date": "Date",
+      "note": "Note (optional)",
+      "notePlaceholder": "E.g.: Partial cash payment..."
+    }
+  },
   "attachments": {
     "title": "Images",
     "upload": "Upload images",

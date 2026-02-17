@@ -16,6 +16,7 @@ export interface User {
     name: string
     slug: string
     logo?: string
+    currency?: string
   }
 }
 
