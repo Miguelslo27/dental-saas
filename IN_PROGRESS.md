@@ -2,11 +2,8 @@
 
 Active tasks for the current development cycle. Add tasks here before starting work.
 
-## Patient Payment Tracking (Entregas) — Frontend PR
+## Patient Payment Tracking (Entregas)
 
-- [ ] API client (`payment-api.ts`)
-- [ ] PaymentSection component (balance + payment history)
-- [ ] PaymentFormModal component (register payment)
-- [ ] i18n keys (ES/EN/AR)
-- [ ] Integration in PatientDetailPage
-- [ ] Frontend tests
+- [x] PR #137: Database model (`PatientPayment`) + permissions (`PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE`)
+- [x] PR #138: Backend service (FIFO allocation) + REST routes + integration tests
+- [ ] PR #140: Frontend — API client, PaymentSection, PaymentFormModal, i18n keys

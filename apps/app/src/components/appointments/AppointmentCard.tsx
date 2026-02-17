@@ -2,6 +2,7 @@ import { Clock, User, Stethoscope, MoreVertical, Edit, Trash2, RotateCcw, CheckC
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AttachmentModule } from '@dental/shared'
+import { useAuthStore } from '@/stores/auth.store'
 import { downloadAppointmentPdf } from '@/lib/pdf-api'
 import type { Appointment } from '@/lib/appointment-api'
 import { ImageUpload } from '@/components/ui/ImageUpload'
@@ -10,10 +11,10 @@ import {
   getStatusLabel,
   getStatusBadgeClasses,
   formatTimeRange,
-  formatCost,
   getAppointmentPatientName,
   getAppointmentDoctorName,
 } from '@/lib/appointment-api'
+import { formatCurrency } from '@/lib/format'
 
 interface AppointmentCardProps {
   appointment: Appointment
@@ -33,6 +34,7 @@ export function AppointmentCard({
   onError,
 }: AppointmentCardProps) {
   const { t } = useTranslation()
+  const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
   const [showMenu, setShowMenu] = useState(false)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const [showImages, setShowImages] = useState(false)
@@ -108,7 +110,7 @@ export function AppointmentCard({
           {appointment.cost !== null && (
             <div className="mt-2 flex items-center gap-2 text-sm">
               <span className={appointment.isPaid ? 'text-green-600' : 'text-amber-600'}>
-                {formatCost(appointment.cost)}
+                {formatCurrency(appointment.cost!, currency)}
               </span>
               {appointment.isPaid ? (
                 <span className="text-xs text-green-600">(Pagado)</span>

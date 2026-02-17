@@ -181,9 +181,4 @@ export function getExpenseStatusBadge(expense: Expense): { label: string; varian
 /**
  * Format expense amount as currency
  */
-export function formatExpenseAmount(amount: number): string {
-  return new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount)
-}
+export { formatCurrency as formatExpenseAmount } from './format'

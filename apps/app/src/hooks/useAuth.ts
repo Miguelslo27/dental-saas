@@ -34,6 +34,7 @@ export function useAuth() {
           lastName: response.user.lastName,
           role: response.user.role,
           tenantId: response.user.tenantId,
+          tenant: response.user.tenant,
         }
         setAuth(authUser, response.accessToken, response.refreshToken)
         navigate('/')
@@ -67,9 +68,10 @@ export function useAuth() {
           lastName: response.user.lastName,
           role: response.user.role,
           tenantId: response.user.tenantId,
+          tenant: response.user.tenant,
         }
         setAuth(authUser, response.accessToken, response.refreshToken)
-        
+
         // Redirect to success page with clinic info
         const clinicName = payload.clinicName || 'tu clínica'
         const clinicSlug = payload.clinicSlug || ''
