@@ -4,6 +4,7 @@
 
 ### Production Bugs
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
+- [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)
 
 ### Security & Performance
 - [ ] Rate limiting with Redis (persistence and scalability)
