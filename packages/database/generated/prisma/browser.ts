@@ -73,6 +73,11 @@ export type Labwork = Prisma.LabworkModel
  */
 export type Expense = Prisma.ExpenseModel
 /**
+ * Model PatientPayment
+ * 
+ */
+export type PatientPayment = Prisma.PatientPaymentModel
+/**
  * Model RefreshToken
  * 
  */

@@ -6,10 +6,6 @@
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
 - [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)
 
-### Security & Performance
-- [ ] Rate limiting with Redis (persistence and scalability)
-- [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
-
 ## Medium Priority
 
 ### Language & Regional Settings
@@ -54,13 +50,13 @@
 - Patient pays $90 → cumulative $300 ≥ $300 → Work C marked as "Paid", balance = $0
 
 **Backend tasks:**
-- [ ] Create `Payment` model in Prisma (id, patientId, tenantId, amount, date, notes, createdBy, createdAt)
-- [ ] Add `paymentStatus` field to billable records (treatments/labworks): `UNPAID` | `PAID`
-- [ ] Create payment service with FIFO allocation logic
-- [ ] Validation: reject payments > outstanding balance
-- [ ] API endpoints: `POST /:clinicSlug/patients/:id/payments` (create), `GET /:clinicSlug/patients/:id/payments` (list history)
-- [ ] Add permissions: `PAYMENTS_CREATE`, `PAYMENTS_VIEW`
-- [ ] Unit and integration tests for payment service and routes
+- [x] Create `PatientPayment` model in Prisma (PR #137)
+- [x] Add `isPaid` field to appointments and labworks for FIFO tracking (PR #137)
+- [x] Create payment service with FIFO allocation logic (PR #138)
+- [x] Validation: reject payments > outstanding balance (PR #138)
+- [x] API endpoints: balance, list, create, delete (PR #138)
+- [x] Add permissions: `PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE` (PR #137)
+- [x] Integration tests for payment routes — 17 tests (PR #138)
 
 **Frontend tasks:**
 - [ ] Payment history tab/section in patient detail page
@@ -84,6 +80,10 @@
 - [ ] Prescriptions component
 - [ ] og-image.png (1200x630px) for apps/web/public/
 - [ ] Subscriptions and payments (dLocal integration)
+
+### Security & Performance
+- [ ] Rate limiting with Redis (persistence and scalability)
+- [ ] Rate limiting for password recovery (3 attempts per IP in 15 min)
 
 ### Technical
 - [ ] E2E tests for admin panel

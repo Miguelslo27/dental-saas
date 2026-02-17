@@ -1,0 +1,407 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import request from 'supertest'
+import { app } from '../app.js'
+import { prisma } from '@dental/database'
+import { hashPassword } from '../services/auth.service.js'
+import { sign } from 'jsonwebtoken'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'test-secret'
+
+describe('Patient Payments Routes', () => {
+  let tenantId: string
+  let adminToken: string
+  let staffToken: string
+  let patientId: string
+  let doctorId: string
+  const testSlug = `test-payments-${Date.now()}`
+
+  function generateToken(userId: string, tenantId: string, role: string) {
+    return sign({ sub: userId, tenantId, role }, JWT_SECRET, { expiresIn: '1h' })
+  }
+
+  beforeAll(async () => {
+    const tenant = await prisma.tenant.create({
+      data: {
+        name: 'Test Clinic for Payments',
+        slug: testSlug,
+        currency: 'USD',
+        timezone: 'America/New_York',
+      },
+    })
+    tenantId = tenant.id
+
+    let freePlan = await prisma.plan.findUnique({ where: { name: 'free' } })
+    if (!freePlan) {
+      freePlan = await prisma.plan.create({
+        data: {
+          name: 'free',
+          displayName: 'Free',
+          price: 0,
+          maxAdmins: 1,
+          maxDoctors: 3,
+          maxPatients: 15,
+        },
+      })
+    }
+
+    await prisma.subscription.create({
+      data: {
+        tenantId: tenant.id,
+        planId: freePlan.id,
+        status: 'ACTIVE',
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    const hashedPassword = await hashPassword('password123')
+
+    const adminUser = await prisma.user.create({
+      data: {
+        tenantId,
+        email: 'admin@payments-test.com',
+        firstName: 'Admin',
+        lastName: 'User',
+        passwordHash: hashedPassword,
+        role: 'ADMIN',
+      },
+    })
+    adminToken = generateToken(adminUser.id, tenantId, 'ADMIN')
+
+    const staffUser = await prisma.user.create({
+      data: {
+        tenantId,
+        email: 'staff@payments-test.com',
+        firstName: 'Staff',
+        lastName: 'User',
+        passwordHash: hashedPassword,
+        role: 'STAFF',
+      },
+    })
+    staffToken = generateToken(staffUser.id, tenantId, 'STAFF')
+
+    const patient = await prisma.patient.create({
+      data: { tenantId, firstName: 'John', lastName: 'Doe' },
+    })
+    patientId = patient.id
+
+    const doctor = await prisma.doctor.create({
+      data: { tenantId, firstName: 'Dr', lastName: 'Smith' },
+    })
+    doctorId = doctor.id
+  })
+
+  afterAll(async () => {
+    await prisma.patientPayment.deleteMany({ where: { tenantId } })
+    await prisma.appointment.deleteMany({ where: { tenantId } })
+    await prisma.labwork.deleteMany({ where: { tenantId } })
+    await prisma.patient.deleteMany({ where: { tenantId } })
+    await prisma.doctor.deleteMany({ where: { tenantId } })
+    await prisma.user.deleteMany({ where: { tenantId } })
+    await prisma.subscription.deleteMany({ where: { tenantId } })
+    await prisma.tenant.delete({ where: { id: tenantId } })
+  })
+
+  describe('GET /api/patients/:id/balance', () => {
+    it('should return zero balance for patient with no billable items', async () => {
+      const res = await request(app)
+        .get(`/api/patients/${patientId}/balance`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.data).toEqual({ totalDebt: 0, totalPaid: 0, outstanding: 0 })
+    })
+
+    it('should return 404 for non-existent patient', async () => {
+      const res = await request(app)
+        .get('/api/patients/non-existent-id/balance')
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(404)
+    })
+  })
+
+  describe('POST /api/patients/:id/payments', () => {
+    it('should deny STAFF from creating payment', async () => {
+      // First create a billable item
+      await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date('2025-01-01T10:00:00Z'),
+          endTime: new Date('2025-01-01T10:30:00Z'),
+          cost: 100,
+          status: 'COMPLETED',
+        },
+      })
+
+      const res = await request(app)
+        .post(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ amount: 50, date: new Date().toISOString() })
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should allow ADMIN to create payment', async () => {
+      const res = await request(app)
+        .post(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 50, date: new Date().toISOString(), note: 'First payment' })
+
+      expect(res.status).toBe(201)
+      expect(res.body.data).toHaveProperty('id')
+      expect(Number(res.body.data.amount)).toBe(50)
+      expect(res.body.data.note).toBe('First payment')
+    })
+
+    it('should reject payment exceeding outstanding balance', async () => {
+      const res = await request(app)
+        .post(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 99999, date: new Date().toISOString() })
+
+      expect(res.status).toBe(400)
+      expect(res.body.error).toContain('exceeds')
+    })
+
+    it('should reject payment with invalid amount', async () => {
+      const res = await request(app)
+        .post(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 0, date: new Date().toISOString() })
+
+      expect(res.status).toBe(400)
+    })
+
+    it('should return 404 for non-existent patient', async () => {
+      const res = await request(app)
+        .post('/api/patients/non-existent-id/payments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 10, date: new Date().toISOString() })
+
+      expect(res.status).toBe(404)
+    })
+  })
+
+  describe('GET /api/patients/:id/payments', () => {
+    it('should allow STAFF to list payments', async () => {
+      const res = await request(app)
+        .get(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(200)
+      expect(Array.isArray(res.body.data)).toBe(true)
+      expect(res.body.data.length).toBeGreaterThan(0)
+      expect(res.body.pagination).toHaveProperty('total')
+    })
+  })
+
+  describe('DELETE /api/patients/:patientId/payments/:paymentId', () => {
+    it('should deny STAFF from deleting payment', async () => {
+      // Get first payment
+      const listRes = await request(app)
+        .get(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      const paymentId = listRes.body.data[0].id
+
+      const res = await request(app)
+        .delete(`/api/patients/${patientId}/payments/${paymentId}`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should allow ADMIN to delete payment', async () => {
+      // Create a payment to delete
+      const createRes = await request(app)
+        .post(`/api/patients/${patientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 10, date: new Date().toISOString() })
+
+      const paymentId = createRes.body.data.id
+
+      const res = await request(app)
+        .delete(`/api/patients/${patientId}/payments/${paymentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(res.status).toBe(200)
+    })
+
+    it('should return 404 for non-existent payment', async () => {
+      const res = await request(app)
+        .delete(`/api/patients/${patientId}/payments/non-existent-id`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(res.status).toBe(404)
+    })
+  })
+
+  describe('FIFO allocation logic', () => {
+    let fifoPatientId: string
+
+    beforeAll(async () => {
+      // Create a fresh patient for FIFO tests
+      const patient = await prisma.patient.create({
+        data: { tenantId, firstName: 'FIFO', lastName: 'Test' },
+      })
+      fifoPatientId = patient.id
+
+      // Create 3 appointments with costs: $100, $100, $100 (oldest first)
+      await prisma.appointment.createMany({
+        data: [
+          {
+            tenantId,
+            patientId: fifoPatientId,
+            doctorId,
+            startTime: new Date('2025-01-01T10:00:00Z'),
+            endTime: new Date('2025-01-01T10:30:00Z'),
+            cost: 100,
+            status: 'COMPLETED',
+          },
+          {
+            tenantId,
+            patientId: fifoPatientId,
+            doctorId,
+            startTime: new Date('2025-02-01T10:00:00Z'),
+            endTime: new Date('2025-02-01T10:30:00Z'),
+            cost: 100,
+            status: 'COMPLETED',
+          },
+          {
+            tenantId,
+            patientId: fifoPatientId,
+            doctorId,
+            startTime: new Date('2025-03-01T10:00:00Z'),
+            endTime: new Date('2025-03-01T10:30:00Z'),
+            cost: 100,
+            status: 'COMPLETED',
+          },
+        ],
+      })
+    })
+
+    it('should show $300 outstanding balance', async () => {
+      const res = await request(app)
+        .get(`/api/patients/${fifoPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(res.status).toBe(200)
+      expect(res.body.data.totalDebt).toBe(300)
+      expect(res.body.data.totalPaid).toBe(0)
+      expect(res.body.data.outstanding).toBe(300)
+    })
+
+    it('should not mark any appointment as paid after $50 payment', async () => {
+      await request(app)
+        .post(`/api/patients/${fifoPatientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 50, date: '2025-01-15' })
+
+      // Check balance
+      const balanceRes = await request(app)
+        .get(`/api/patients/${fifoPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(balanceRes.body.data.outstanding).toBe(250)
+
+      // Check appointments - none should be paid yet
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: fifoPatientId },
+        orderBy: { startTime: 'asc' },
+      })
+
+      expect(appointments[0].isPaid).toBe(false)
+      expect(appointments[1].isPaid).toBe(false)
+      expect(appointments[2].isPaid).toBe(false)
+    })
+
+    it('should mark first appointment as paid after additional $60 payment (cumulative $110 >= $100)', async () => {
+      await request(app)
+        .post(`/api/patients/${fifoPatientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 60, date: '2025-02-15' })
+
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: fifoPatientId },
+        orderBy: { startTime: 'asc' },
+      })
+
+      expect(appointments[0].isPaid).toBe(true)  // $110 >= $100
+      expect(appointments[1].isPaid).toBe(false)  // remaining $10 < $100
+      expect(appointments[2].isPaid).toBe(false)
+    })
+
+    it('should mark second appointment as paid after $100 payment (cumulative $210 >= $200)', async () => {
+      await request(app)
+        .post(`/api/patients/${fifoPatientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 100, date: '2025-03-15' })
+
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: fifoPatientId },
+        orderBy: { startTime: 'asc' },
+      })
+
+      expect(appointments[0].isPaid).toBe(true)
+      expect(appointments[1].isPaid).toBe(true)   // $210 >= $200
+      expect(appointments[2].isPaid).toBe(false)   // remaining $10 < $100
+    })
+
+    it('should mark all appointments as paid after final $90 payment (cumulative $300 >= $300)', async () => {
+      await request(app)
+        .post(`/api/patients/${fifoPatientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 90, date: '2025-04-15' })
+
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: fifoPatientId },
+        orderBy: { startTime: 'asc' },
+      })
+
+      expect(appointments[0].isPaid).toBe(true)
+      expect(appointments[1].isPaid).toBe(true)
+      expect(appointments[2].isPaid).toBe(true)
+
+      // Balance should be 0
+      const balanceRes = await request(app)
+        .get(`/api/patients/${fifoPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(balanceRes.body.data.outstanding).toBe(0)
+    })
+
+    it('should recalculate FIFO when a payment is deleted', async () => {
+      // Delete the last payment ($90)
+      const paymentsRes = await request(app)
+        .get(`/api/patients/${fifoPatientId}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      // Payments ordered by date desc, so first is the $90 one
+      const lastPayment = paymentsRes.body.data[0]
+
+      await request(app)
+        .delete(`/api/patients/${fifoPatientId}/payments/${lastPayment.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      // Third appointment should be unpaid again
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: fifoPatientId },
+        orderBy: { startTime: 'asc' },
+      })
+
+      expect(appointments[0].isPaid).toBe(true)   // $210 >= $100
+      expect(appointments[1].isPaid).toBe(true)    // $210 >= $200
+      expect(appointments[2].isPaid).toBe(false)   // $210 < $300
+
+      // Balance should be $90
+      const balanceRes = await request(app)
+        .get(`/api/patients/${fifoPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(balanceRes.body.data.outstanding).toBe(90)
+    })
+  })
+})
