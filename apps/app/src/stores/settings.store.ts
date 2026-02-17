@@ -123,12 +123,14 @@ export const useSettingsStore = create<SettingsState & SettingsActions>((set) =>
 
       // Sync tenant data to auth store so dashboard and other pages see updates
       const { user, setUser } = useAuthStore.getState()
-      if (user?.tenant) {
+      if (user) {
         setUser({
           ...user,
           tenant: {
             ...user.tenant,
+            id: tenantProfile.id,
             name: tenantProfile.name,
+            slug: tenantProfile.slug,
             logo: tenantProfile.logo ?? undefined,
             currency: tenantProfile.currency,
           },
