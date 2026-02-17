@@ -6,6 +6,7 @@ import {
   type UpdateSettingsData,
   type UpdateTenantProfileData,
 } from '@/lib/settings-api'
+import { useAuthStore } from '@/stores/auth.store'
 
 // ============================================================================
 // Types
@@ -119,6 +120,20 @@ export const useSettingsStore = create<SettingsState & SettingsActions>((set) =>
         isSaving: false,
         successMessage: 'Clinic profile saved successfully',
       })
+
+      // Sync tenant data to auth store so dashboard and other pages see updates
+      const { user, setUser } = useAuthStore.getState()
+      if (user?.tenant) {
+        setUser({
+          ...user,
+          tenant: {
+            ...user.tenant,
+            name: tenantProfile.name,
+            logo: tenantProfile.logo ?? undefined,
+            currency: tenantProfile.currency,
+          },
+        })
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to save clinic profile'
       set({ error: message, isSaving: false })
