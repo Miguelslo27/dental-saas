@@ -4,6 +4,7 @@ import { Plus, Trash2, Loader2, DollarSign, AlertCircle } from 'lucide-react'
 import { Permission } from '@dental/shared'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
+import { formatCurrency } from '@/lib/format'
 import {
   getPatientBalance,
   getPatientPayments,
@@ -36,13 +37,8 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const formatCurrency = useCallback(
-    (amount: number) =>
-      new Intl.NumberFormat(undefined, {
-        style: 'currency',
-        currency,
-        currencyDisplay: 'narrowSymbol',
-      }).format(amount),
+  const fmtCurrency = useCallback(
+    (amount: number) => formatCurrency(amount, currency),
     [currency]
   )
 
@@ -132,16 +128,16 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm text-gray-600">{t('payments.totalDebt')}</p>
-            <p className="text-xl font-bold text-gray-900">{formatCurrency(balance.totalDebt)}</p>
+            <p className="text-xl font-bold text-gray-900">{fmtCurrency(balance.totalDebt)}</p>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm text-gray-600">{t('payments.totalPaid')}</p>
-            <p className="text-xl font-bold text-green-600">{formatCurrency(balance.totalPaid)}</p>
+            <p className="text-xl font-bold text-green-600">{fmtCurrency(balance.totalPaid)}</p>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm text-gray-600">{t('payments.outstanding')}</p>
             <p className={`text-xl font-bold ${balance.outstanding > 0 ? 'text-amber-600' : 'text-green-600'}`}>
-              {formatCurrency(balance.outstanding)}
+              {fmtCurrency(balance.outstanding)}
             </p>
           </div>
         </div>
@@ -165,7 +161,7 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
                   <DollarSign className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{formatCurrency(payment.amount)}</p>
+                  <p className="font-semibold text-gray-900">{fmtCurrency(payment.amount)}</p>
                   <p className="text-sm text-gray-500">
                     {new Date(payment.date).toLocaleDateString(undefined, {
                       year: 'numeric',
@@ -204,7 +200,7 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
           onClose={() => setIsFormOpen(false)}
           onSubmit={handleCreatePayment}
           maxAmount={balance.outstanding}
-          formatCurrency={formatCurrency}
+          formatCurrency={fmtCurrency}
           isLoading={isSaving}
         />
       )}
