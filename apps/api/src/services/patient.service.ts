@@ -140,9 +140,10 @@ export async function createPatient(
     gender?: string
     address?: string
     notes?: JsonInputValue
+    createdBy?: string
   }
 ): Promise<SafePatient> {
-  const { firstName, lastName, email, phone, dob, gender, address, notes } = data
+  const { firstName, lastName, email, phone, dob, gender, address, notes, createdBy } = data
 
   // Handle date of birth - convert string to Date if needed
   let dobValue: Date | undefined
@@ -161,6 +162,7 @@ export async function createPatient(
       gender,
       address,
       notes: notes ?? JsonNull,
+      createdBy,
     },
     select: PATIENT_SELECT,
   })

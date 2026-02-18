@@ -230,6 +230,7 @@ model User {
   tenant              Tenant?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  doctor              Doctor?
 
   @@unique([tenantId, email]) // Email unique per tenant (nulls are distinct)
   @@index([tenantId])
@@ -260,6 +261,9 @@ model Patient {
   /// Dental chart notes per tooth (ISO 3950 notation)
   /// Format: { "11": "Crown needed", "21": "Caries", ... }
   teeth      Json?
+
+  /// User ID who created this patient record
+  createdBy  String?
 
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
@@ -310,11 +314,15 @@ model Doctor {
   /// Hourly rate for billing purposes
   hourlyRate     Decimal? @db.Decimal(10, 2)
 
+  /// Link to User account for login (nullable for unlinked doctors)
+  userId         String?  @unique
+
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
   appointments Appointment[]
 
   @@index([tenantId])
@@ -354,6 +362,9 @@ model Appointment {
   cost        Decimal?          @db.Decimal(10, 2)
   /// Whether payment has been received
   isPaid      Boolean           @default(false)
+
+  /// User ID who created this appointment
+  createdBy   String?
 
   isActive    Boolean           @default(true)
   createdAt   DateTime          @default(now())
@@ -423,6 +434,9 @@ model Labwork {
   
   /// IDs of doctors associated with this labwork (stored as JSON array)
   doctorIds   Json     @default("[]")
+
+  /// User ID who created this labwork
+  createdBy   String?
 
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
