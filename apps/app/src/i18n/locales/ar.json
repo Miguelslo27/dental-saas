@@ -289,6 +289,28 @@
     "paid": "مدفوع",
     "pending": "معلق"
   },
+  "payments": {
+    "title": "المدفوعات",
+    "newPayment": "دفعة جديدة",
+    "noPayments": "لا توجد مدفوعات مسجلة",
+    "totalDebt": "إجمالي الدين",
+    "totalPaid": "إجمالي المدفوع",
+    "outstanding": "الرصيد المستحق",
+    "amount": "المبلغ",
+    "date": "التاريخ",
+    "note": "ملاحظة",
+    "deleteConfirm": "حذف هذه الدفعة؟ سيتم إعادة حساب رصيد المريض.",
+    "paymentCreated": "تم تسجيل الدفعة بنجاح",
+    "paymentDeleted": "تم حذف الدفعة بنجاح",
+    "noOutstandingBalance": "لا يوجد رصيد مستحق",
+    "form": {
+      "amount": "المبلغ",
+      "amountHint": "الحد الأقصى: {{max}}",
+      "date": "التاريخ",
+      "note": "ملاحظة (اختياري)",
+      "notePlaceholder": "مثال: دفعة جزئية نقدية..."
+    }
+  },
   "attachments": {
     "title": "الصور",
     "upload": "رفع صور",

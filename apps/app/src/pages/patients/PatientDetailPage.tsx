@@ -26,9 +26,11 @@ import {
   getPatientInitials,
 } from '@/lib/patient-api'
 import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
-import { ToothStatus, AttachmentModule, type ToothData } from '@dental/shared'
+import { ToothStatus, AttachmentModule, Permission, type ToothData } from '@dental/shared'
+import { usePermissions } from '@/hooks/usePermissions'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ImageGallery } from '@/components/ui/ImageGallery'
+import { PaymentSection } from '@/components/payments/PaymentSection'
 
 // ============================================================================
 // Types
@@ -252,6 +254,7 @@ export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const { can } = usePermissions()
 
   const [patient, setPatient] = useState<Patient | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -762,6 +765,11 @@ export default function PatientDetailPage() {
           />
         </div>
       </div>
+
+      {/* Payments Section */}
+      {can(Permission.PAYMENTS_VIEW) && id && (
+        <PaymentSection patientId={id} />
+      )}
 
       {/* Tooth Details Modal */}
       <ToothDetailsModal
