@@ -476,6 +476,7 @@ authRouter.get('/me', async (req, res, next) => {
         tenantId: true,
         avatar: true,
         phone: true,
+        pinHash: true,
         emailVerified: true,
         lastLoginAt: true,
         createdAt: true,
@@ -498,7 +499,8 @@ authRouter.get('/me', async (req, res, next) => {
       })
     }
 
-    res.json(user)
+    const { pinHash, ...userData } = user
+    res.json({ ...userData, hasPinSet: !!pinHash })
   } catch (e) {
     next(e)
   }
@@ -711,6 +713,163 @@ authRouter.post('/reset-password', async (req, res, next) => {
     })
   } catch (err) {
     next(err)
+  }
+})
+
+// GET /api/auth/profiles - List user profiles for lock screen (no JWT required)
+const profilesQuerySchema = z.object({
+  clinicSlug: z.string().min(1),
+})
+
+authRouter.get('/profiles', async (req, res, next) => {
+  try {
+    const parse = profilesQuerySchema.safeParse(req.query)
+    if (!parse.success) {
+      return res.json([])
+    }
+
+    const tenant = await prisma.tenant.findUnique({
+      where: { slug: parse.data.clinicSlug },
+      select: { id: true },
+    })
+
+    if (!tenant) {
+      return res.json([])
+    }
+
+    const users = await prisma.user.findMany({
+      where: { tenantId: tenant.id, isActive: true, role: { not: 'SUPER_ADMIN' } },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        avatar: true,
+        pinHash: true,
+      },
+      orderBy: { firstName: 'asc' },
+    })
+
+    const profiles = users.map(({ pinHash, ...u }) => ({
+      ...u,
+      hasPinSet: !!pinHash,
+    }))
+
+    res.json(profiles)
+  } catch (e) {
+    next(e)
+  }
+})
+
+// POST /api/auth/pin-login - Authenticate with PIN (no JWT required)
+const pinLoginSchema = z.object({
+  userId: z.string().min(1),
+  pin: z.string().regex(/^\d{4}$/, 'PIN must be exactly 4 digits'),
+  clinicSlug: z.string().min(1),
+})
+
+authRouter.post('/pin-login', async (req, res, next) => {
+  try {
+    const parse = pinLoginSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+      })
+    }
+
+    const { userId, pin, clinicSlug } = parse.data
+
+    const tenant = await prisma.tenant.findUnique({
+      where: { slug: clinicSlug },
+      select: { id: true, name: true, slug: true, logo: true, currency: true },
+    })
+
+    if (!tenant) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, tenantId: tenant.id, isActive: true },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        tenantId: true,
+        avatar: true,
+        phone: true,
+        pinHash: true,
+      },
+    })
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    if (!user.pinHash) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'PIN not set', code: 'PIN_NOT_SET' },
+      })
+    }
+
+    const isValid = await verifyPassword(pin, user.pinHash)
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
+      })
+    }
+
+    // Generate tokens
+    const tokens = generateTokens({
+      userId: user.id,
+      tenantId: user.tenantId!,
+      email: user.email,
+      role: user.role,
+    })
+
+    // Store refresh token
+    const tokenHash = hashToken(tokens.refreshToken)
+    const expiresAt = getExpiryDate(env.JWT_REFRESH_EXPIRES_IN)
+    await prisma.refreshToken.create({
+      data: { userId: user.id, tokenHash, expiresAt },
+    })
+    await cleanupOldRefreshTokens(user.id)
+
+    // Update lastLoginAt
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    })
+
+    const { pinHash: _ph, ...userData } = user
+
+    res.json({
+      user: {
+        ...userData,
+        hasPinSet: true,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug,
+          logo: tenant.logo,
+          currency: tenant.currency,
+        },
+      },
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    })
+  } catch (e) {
+    next(e)
   }
 })
 

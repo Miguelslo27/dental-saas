@@ -2,7 +2,7 @@ import { prisma, UserRole } from '@dental/database'
 import { hashPassword } from './auth.service.js'
 import { logger } from '../utils/logger.js'
 
-// Fields to exclude from user responses (never expose password hash)
+// Fields to select from user queries (includes pinHash for hasPinSet derivation)
 const USER_SELECT = {
   id: true,
   tenantId: true,
@@ -12,6 +12,7 @@ const USER_SELECT = {
   role: true,
   avatar: true,
   phone: true,
+  pinHash: true,
   emailVerified: true,
   lastLoginAt: true,
   isActive: true,
@@ -28,11 +29,18 @@ export type SafeUser = {
   role: UserRole
   avatar: string | null
   phone: string | null
+  hasPinSet: boolean
   emailVerified: boolean
   lastLoginAt: Date | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+/** Strip pinHash and add hasPinSet boolean */
+function toSafeUser(user: { pinHash: string | null; [key: string]: unknown }): SafeUser {
+  const { pinHash, ...rest } = user
+  return { ...rest, hasPinSet: !!pinHash } as SafeUser
 }
 
 /**
@@ -144,7 +152,7 @@ export async function listUsers(
     orderBy: { createdAt: 'desc' },
   })
 
-  return users
+  return users.map(toSafeUser)
 }
 
 /**
@@ -156,7 +164,7 @@ export async function getUserById(tenantId: string, userId: string): Promise<Saf
     select: USER_SELECT,
   })
 
-  return user
+  return user ? toSafeUser(user) : null
 }
 
 /**
@@ -195,7 +203,7 @@ export async function createUser(
 
   logger.info({ userId: user.id, tenantId, role }, 'User created')
 
-  return user
+  return toSafeUser(user)
 }
 
 /**
@@ -231,7 +239,7 @@ export async function updateUser(
 
   logger.info({ userId, tenantId }, 'User updated')
 
-  return user
+  return toSafeUser(user)
 }
 
 /**
@@ -284,7 +292,7 @@ export async function updateUserRole(
 
   logger.info({ userId, tenantId, oldRole: existing.role, newRole }, 'User role updated')
 
-  return { success: true, user }
+  return { success: true, user: toSafeUser(user) }
 }
 
 /**
@@ -337,4 +345,26 @@ export async function getUserCount(tenantId: string): Promise<number> {
   return prisma.user.count({
     where: { tenantId, isActive: true },
   })
+}
+
+/**
+ * Set or update a user's 4-digit PIN
+ */
+export async function setUserPin(tenantId: string, userId: string, pin: string): Promise<void> {
+  const existing = await prisma.user.findFirst({
+    where: { id: userId, tenantId },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    throw new Error('User not found')
+  }
+
+  const pinHash = await hashPassword(pin)
+  await prisma.user.update({
+    where: { id: userId },
+    data: { pinHash },
+  })
+
+  logger.info({ userId, tenantId }, 'User PIN set')
 }
