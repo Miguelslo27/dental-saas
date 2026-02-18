@@ -60,13 +60,13 @@
 - [x] Integration tests for payment routes — 17 tests (PR #138)
 
 **Frontend tasks:**
-- [ ] Payment history tab/section in patient detail page
-- [ ] "Register Payment" button + modal (amount input, optional notes, date)
-- [ ] Show current balance (total debt - total payments) prominently
+- [x] Payment history tab/section in patient detail page (PR #140)
+- [x] "Register Payment" button + modal (amount input, optional notes, date) (PR #140)
+- [x] Show current balance (total debt - total payments) prominently (PR #140)
 - [ ] Visual indicator on each work showing paid/unpaid status
-- [ ] Validation: max amount = current balance, min amount > 0
-- [ ] i18n keys for ES/EN/AR
-- [ ] Frontend tests for payment components
+- [x] Validation: max amount = current balance, min amount > 0 (PR #140)
+- [x] i18n keys for ES/EN/AR (PR #140)
+- [x] Frontend tests for payment components — 7 tests (PR #140)
 
 ### Labworks
 - [ ] Add doctor name to labwork records
