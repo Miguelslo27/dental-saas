@@ -2,8 +2,9 @@
 
 Active tasks for the current development cycle. Add tasks here before starting work.
 
-## Patient Payment Tracking (Entregas) — DONE
+## Clinic User Profiles & PIN System
 
-- [x] PR #137: Database model (`PatientPayment`) + permissions (`PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE`)
-- [x] PR #138: Backend service (FIFO allocation) + REST routes + integration tests (17 tests)
-- [x] PR #140: Frontend — API client, PaymentSection, PaymentFormModal, i18n (ES/EN/AR), `/me` currency field
+- [ ] PR 1: Database schema — `pinHash` on User + `autoLockMinutes` on TenantSettings
+- [ ] PR 2: Backend — PIN service, endpoints (profiles, pin-login, set-pin, autoLockMinutes), tests
+- [ ] PR 3: Frontend — Users management page (`/users`), nav item, i18n
+- [ ] PR 4: Frontend — Lock screen, auto-lock timer, PIN setup modal, i18n
