@@ -15,6 +15,14 @@ const ROLE_COLORS: Record<string, string> = {
   STAFF: 'bg-gray-100 text-gray-800',
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: 'Owner',
+  ADMIN: 'Admin',
+  CLINIC_ADMIN: 'Clinic Admin',
+  DOCTOR: 'Doctor',
+  STAFF: 'Staff',
+}
+
 type PinStep = 'enter' | 'setup-enter' | 'setup-confirm'
 
 export function LockScreen() {
@@ -215,7 +223,7 @@ export function LockScreen() {
             <span
               className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${ROLE_COLORS[selectedProfile.role] || 'bg-gray-100 text-gray-800'}`}
             >
-              {selectedProfile.role}
+              {ROLE_LABELS[selectedProfile.role] || selectedProfile.role}
             </span>
 
             {/* Setup notice */}
@@ -300,7 +308,7 @@ export function LockScreen() {
                 <span
                   className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${ROLE_COLORS[profile.role] || 'bg-gray-100 text-gray-800'}`}
                 >
-                  {profile.role}
+                  {ROLE_LABELS[profile.role] || profile.role}
                 </span>
 
                 {!profile.hasPinSet && (

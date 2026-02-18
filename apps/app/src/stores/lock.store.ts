@@ -51,12 +51,26 @@ export const useLockStore = create<LockState & LockActions>()(
 
       pinLogin: async (userId, pin) => {
         const response = await authApi.pinLogin({ userId, pin })
-        set({ profileToken: response.profileToken, activeUser: response.user, isLocked: false })
+        set((state) => ({
+          profileToken: response.profileToken,
+          activeUser: response.user,
+          isLocked: false,
+          profiles: state.profiles.map((p) =>
+            p.id === userId ? { ...p, hasPinSet: true } : p
+          ),
+        }))
       },
 
       setupPin: async (userId, pin) => {
         const response = await authApi.setupPin({ userId, pin })
-        set({ profileToken: response.profileToken, activeUser: response.user, isLocked: false })
+        set((state) => ({
+          profileToken: response.profileToken,
+          activeUser: response.user,
+          isLocked: false,
+          profiles: state.profiles.map((p) =>
+            p.id === userId ? { ...p, hasPinSet: true } : p
+          ),
+        }))
       },
 
       reset: () => set({ ...initialState }),

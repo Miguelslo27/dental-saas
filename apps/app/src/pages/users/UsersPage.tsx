@@ -4,6 +4,7 @@ import { Plus, AlertCircle, Users, Loader2, X, MoreVertical, Shield } from 'luci
 import { Permission } from '@dental/shared'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
+import { useLockStore } from '@/stores/lock.store'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
   listUsers,
@@ -14,6 +15,7 @@ import {
   getUserStats,
   type UserProfile,
   type CreateUserData,
+  type CreateProfileData,
   type UserStats,
 } from '@/lib/users-api'
 
@@ -30,6 +32,14 @@ const ROLE_STYLES: Record<string, string> = {
 
 const ASSIGNABLE_ROLES = ['ADMIN', 'CLINIC_ADMIN', 'DOCTOR', 'STAFF'] as const
 
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: 'Owner',
+  ADMIN: 'Admin',
+  CLINIC_ADMIN: 'Clinic Admin',
+  DOCTOR: 'Doctor',
+  STAFF: 'Staff',
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -37,6 +47,7 @@ export function UsersPage() {
   const { t } = useTranslation()
   const { can } = usePermissions()
   const currentUser = useAuthStore((s) => s.user)
+  const fetchProfiles = useLockStore((s) => s.fetchProfiles)
 
   // Data
   const [users, setUsers] = useState<UserProfile[]>([])
@@ -52,6 +63,7 @@ export function UsersPage() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
   // Create form
+  const [profileOnly, setProfileOnly] = useState(true)
   const [form, setForm] = useState<CreateUserData>({
     firstName: '',
     lastName: '',
@@ -69,7 +81,7 @@ export function UsersPage() {
     try {
       setIsLoading(true)
       const [usersList, userStats] = await Promise.all([
-        listUsers({ includeInactive: true }),
+        listUsers(),
         getUserStats(),
       ])
       setUsers(usersList)
@@ -106,24 +118,33 @@ export function UsersPage() {
   // Handlers
   // -------------------------------------------------------------------------
   const resetForm = () => {
+    setProfileOnly(true)
     setForm({ firstName: '', lastName: '', email: '', password: '', role: 'STAFF' })
     setFormError(null)
   }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+    if (!form.firstName || !form.lastName) {
+      setFormError(t('users.requiredFields'))
+      return
+    }
+    if (!profileOnly && (!form.email || !form.password)) {
       setFormError(t('users.requiredFields'))
       return
     }
     setIsSubmitting(true)
     setFormError(null)
     try {
-      await createUser(form)
+      const payload: CreateUserData | CreateProfileData = profileOnly
+        ? { profileOnly: true, firstName: form.firstName, lastName: form.lastName, role: form.role }
+        : form
+      await createUser(payload)
       setShowCreateModal(false)
       resetForm()
       setSuccessMessage(t('users.createSuccess'))
       await fetchData()
+      fetchProfiles()
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('users.createError')
       setFormError(msg)
@@ -137,6 +158,7 @@ export function UsersPage() {
       await updateUser(user.id, { isActive: !user.isActive })
       setSuccessMessage(user.isActive ? t('users.deactivated') : t('users.reactivated'))
       await fetchData()
+      fetchProfiles()
     } catch {
       setError(t('users.updateError'))
     }
@@ -147,6 +169,7 @@ export function UsersPage() {
       await updateUserRole(user.id, role)
       setSuccessMessage(t('users.roleUpdated'))
       await fetchData()
+      fetchProfiles()
     } catch {
       setError(t('users.updateError'))
     }
@@ -160,6 +183,7 @@ export function UsersPage() {
       setSuccessMessage(t('users.deleteSuccess'))
       setUserToDelete(null)
       await fetchData()
+      fetchProfiles()
     } catch {
       setError(t('users.deleteError'))
     } finally {
@@ -241,96 +265,102 @@ export function UsersPage() {
 
       {/* Users table */}
       {users.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.name')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.email')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.role')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.pinStatus')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.status')}</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">{t('users.actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {users.map((user) => {
-                  const isSelf = user.id === currentUser?.id
-                  return (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">
-                        {user.firstName} {user.lastName}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">{user.email}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_STYLES[user.role] || ROLE_STYLES.STAFF}`}>
-                          {user.role}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.name')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">{t('users.email')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">{t('users.role')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">{t('users.pinStatus')}</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">{t('users.status')}</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-600">{t('users.actions')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {users.map((user) => {
+                const isSelf = user.id === currentUser?.id
+                return (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
+                      {user.firstName} {user.lastName}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 hidden sm:table-cell max-w-[200px] truncate">
+                      {user.email.endsWith('@noreply.internal') ? (
+                        <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
+                          {t('users.profileOnlyBadge')}
                         </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-xs">
-                          <span className={`h-2 w-2 rounded-full ${user.hasPinSet ? 'bg-green-500' : 'bg-gray-300'}`} />
-                          {user.hasPinSet ? t('users.pinSet') : t('users.pinNotSet')}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                          {user.isActive ? t('users.active') : t('users.inactive')}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {!isSelf && can(Permission.USERS_UPDATE) && (
-                          <div className="relative inline-block">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === user.id ? null : user.id) }}
-                              className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </button>
-                            {openMenuId === user.id && (
-                              <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                                {/* Role change */}
-                                {ASSIGNABLE_ROLES.filter((r) => r !== user.role).map((role) => (
-                                  <button
-                                    key={role}
-                                    onClick={() => { handleRoleChange(user, role); setOpenMenuId(null) }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    {t('users.editRole')}: {role}
-                                  </button>
-                                ))}
-                                <hr className="my-1 border-gray-100" />
-                                {/* Toggle active */}
+                      ) : (
+                        user.email
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_STYLES[user.role] || ROLE_STYLES.STAFF}`}>
+                        {ROLE_LABELS[user.role] || user.role}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="inline-flex items-center gap-1.5 text-xs">
+                        <span className={`h-2 w-2 rounded-full ${user.hasPinSet ? 'bg-green-500' : 'bg-gray-300'}`} />
+                        {user.hasPinSet ? t('users.pinSet') : t('users.pinNotSet')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {user.isActive ? t('users.active') : t('users.inactive')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {!isSelf && can(Permission.USERS_UPDATE) && (
+                        <div className="relative inline-block">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === user.id ? null : user.id) }}
+                            className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                          {openMenuId === user.id && (
+                            <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                              {/* Role change */}
+                              {ASSIGNABLE_ROLES.filter((r) => r !== user.role).map((role) => (
                                 <button
-                                  onClick={() => { handleToggleActive(user); setOpenMenuId(null) }}
+                                  key={role}
+                                  onClick={() => { handleRoleChange(user, role); setOpenMenuId(null) }}
                                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                 >
-                                  {user.isActive ? t('users.deactivate') : t('users.reactivate')}
+                                  {t('users.editRole')}: {ROLE_LABELS[role] || role}
                                 </button>
-                                {/* Delete */}
-                                {can(Permission.USERS_DELETE) && (
-                                  <>
-                                    <hr className="my-1 border-gray-100" />
-                                    <button
-                                      onClick={() => { setUserToDelete(user); setOpenMenuId(null) }}
-                                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                    >
-                                      {t('users.delete')}
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                              ))}
+                              <hr className="my-1 border-gray-100" />
+                              {/* Toggle active */}
+                              <button
+                                onClick={() => { handleToggleActive(user); setOpenMenuId(null) }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                {user.isActive ? t('users.deactivate') : t('users.reactivate')}
+                              </button>
+                              {/* Delete */}
+                              {can(Permission.USERS_DELETE) && (
+                                <>
+                                  <hr className="my-1 border-gray-100" />
+                                  <button
+                                    onClick={() => { setUserToDelete(user); setOpenMenuId(null) }}
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                  >
+                                    {t('users.delete')}
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -343,7 +373,32 @@ export function UsersPage() {
               className="relative w-full max-w-md bg-white rounded-xl shadow-xl p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('users.createTitle')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                {profileOnly ? t('users.createProfileTitle') : t('users.createTitle')}
+              </h2>
+
+              {/* Profile / User toggle — Profile is default (switch OFF), User is switch ON */}
+              <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                <span className={`text-sm font-medium ${profileOnly ? 'text-blue-700' : 'text-gray-500'}`}>
+                  {t('users.modeProfile')}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!profileOnly}
+                  onClick={() => setProfileOnly(!profileOnly)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${!profileOnly ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${!profileOnly ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+                <span className={`text-sm font-medium ${!profileOnly ? 'text-blue-700' : 'text-gray-500'}`}>
+                  {t('users.modeUser')}
+                </span>
+              </div>
+
+              {profileOnly && (
+                <p className="text-xs text-gray-500 mb-4">{t('users.profileDescription')}</p>
+              )}
 
               {formError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-700">
@@ -375,28 +430,32 @@ export function UsersPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.email')}</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
+                {!profileOnly && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.email')}</label>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.password')}</label>
-                  <input
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                    minLength={8}
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.password')}</label>
+                      <input
+                        type="password"
+                        value={form.password}
+                        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        minLength={8}
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.selectRole')}</label>
@@ -406,7 +465,7 @@ export function UsersPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     {ASSIGNABLE_ROLES.map((role) => (
-                      <option key={role} value={role}>{role}</option>
+                      <option key={role} value={role}>{ROLE_LABELS[role] || role}</option>
                     ))}
                   </select>
                 </div>
@@ -425,7 +484,7 @@ export function UsersPage() {
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {t('users.newUser')}
+                    {profileOnly ? t('users.createProfile') : t('users.newUser')}
                   </button>
                 </div>
               </form>

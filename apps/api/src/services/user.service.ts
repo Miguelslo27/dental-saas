@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto'
 import { prisma, UserRole } from '@dental/database'
 import { hashPassword } from './auth.service.js'
 import { logger } from '../utils/logger.js'
@@ -202,6 +203,46 @@ export async function createUser(
   })
 
   logger.info({ userId: user.id, tenantId, role }, 'User created')
+
+  return toSafeUser(user)
+}
+
+/**
+ * Create a profile-only user (no email/password login).
+ * Generates a placeholder email and random password hash so the DB schema is satisfied.
+ * The user authenticates exclusively via PIN on the lock screen.
+ */
+export async function createProfile(
+  tenantId: string,
+  data: {
+    firstName: string
+    lastName: string
+    role: UserRole
+  }
+): Promise<SafeUser> {
+  const { firstName, lastName, role } = data
+
+  // Generate a unique placeholder email that won't collide
+  const randomId = randomBytes(8).toString('hex')
+  const placeholderEmail = `profile-${randomId}@noreply.internal`
+
+  // Random password hash — this user can never log in via email/password
+  const randomPassword = randomBytes(32).toString('hex')
+  const passwordHash = await hashPassword(randomPassword)
+
+  const user = await prisma.user.create({
+    data: {
+      tenantId,
+      email: placeholderEmail,
+      passwordHash,
+      firstName,
+      lastName,
+      role,
+    },
+    select: USER_SELECT,
+  })
+
+  logger.info({ userId: user.id, tenantId, role, profileOnly: true }, 'Profile created')
 
   return toSafeUser(user)
 }

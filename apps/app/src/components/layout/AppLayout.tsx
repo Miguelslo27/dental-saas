@@ -24,6 +24,14 @@ import { useInactivityTimer } from '@/hooks/useInactivityTimer'
 import { LockScreen } from '@/components/auth/LockScreen'
 import { PinSetupModal } from '@/components/auth/PinSetupModal'
 
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: 'Owner',
+  ADMIN: 'Admin',
+  CLINIC_ADMIN: 'Clinic Admin',
+  DOCTOR: 'Doctor',
+  STAFF: 'Staff',
+}
+
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/doctors', label: 'Doctores', icon: Stethoscope },
@@ -183,7 +191,7 @@ export function AppLayout() {
                 {activeUser?.firstName ?? user?.firstName} {activeUser?.lastName ?? user?.lastName}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {activeUser ? activeUser.role : user?.email}
+                {activeUser ? (ROLE_LABELS[activeUser.role] || activeUser.role) : user?.email}
               </p>
             </div>
           </div>
