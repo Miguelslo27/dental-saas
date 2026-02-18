@@ -3,6 +3,7 @@ import { z } from 'zod'
 import React from 'react'
 import { AppointmentStatus } from '@dental/database'
 import { requireMinRole } from '../middleware/auth.js'
+import { requireOwnership } from '../middleware/ownership.js'
 import {
   listAppointments,
   getAppointmentById,
@@ -316,7 +317,7 @@ appointmentsRouter.post('/', requireMinRole('CLINIC_ADMIN'), async (req, res, ne
  * Update an existing appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.put('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
+appointmentsRouter.put('/:id', requireMinRole('DOCTOR'), requireOwnership('appointment'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params
@@ -468,7 +469,7 @@ appointmentsRouter.get('/:id/pdf', requireMinRole('STAFF'), async (req, res, nex
  * Soft delete an appointment
  * Requires: ADMIN role or higher
  */
-appointmentsRouter.delete('/:id', requireMinRole('CLINIC_ADMIN'), async (req, res, next) => {
+appointmentsRouter.delete('/:id', requireMinRole('DOCTOR'), requireOwnership('appointment'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
     const { id } = req.params

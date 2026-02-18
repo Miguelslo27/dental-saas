@@ -23,6 +23,7 @@ const PATIENT_SELECT = {
   notes: true,
   teeth: true,
   isActive: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 } as const
@@ -40,6 +41,7 @@ export type SafePatient = {
   notes: Prisma.JsonValue
   teeth: Prisma.JsonValue
   isActive: boolean
+  createdBy: string | null
   createdAt: Date
   updatedAt: Date
 }

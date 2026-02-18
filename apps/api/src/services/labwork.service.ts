@@ -15,6 +15,7 @@ const LABWORK_SELECT = {
   isDelivered: true,
   doctorIds: true,
   isActive: true,
+  createdBy: true,
   createdAt: true,
   updatedAt: true,
 } as const
@@ -40,6 +41,7 @@ export type SafeLabwork = {
   isDelivered: boolean
   doctorIds: string[]
   isActive: boolean
+  createdBy: string | null
   createdAt: Date
   updatedAt: Date
   patient?: {
@@ -109,6 +111,7 @@ function transformLabwork(labwork: {
   isDelivered: boolean
   doctorIds: Prisma.JsonValue
   isActive: boolean
+  createdBy: string | null
   createdAt: Date
   updatedAt: Date
   patient?: {
