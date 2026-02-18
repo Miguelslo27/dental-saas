@@ -5,7 +5,6 @@ import { LogOut, ArrowLeft, Lock } from 'lucide-react'
 import { useLockStore } from '@/stores/lock.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { authApi } from '@/lib/api'
-import { setUserPin } from '@/lib/users-api'
 import type { ProfileUser } from '@/lib/api'
 
 const ROLE_COLORS: Record<string, string> = {
@@ -16,33 +15,32 @@ const ROLE_COLORS: Record<string, string> = {
   STAFF: 'bg-gray-100 text-gray-800',
 }
 
-type PinStep = 'enter' | 'confirm' | 'setup-enter' | 'setup-confirm'
+type PinStep = 'enter' | 'setup-enter' | 'setup-confirm'
 
 export function LockScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const profiles = useLockStore((s) => s.profiles) || []
   const pinLogin = useLockStore((s) => s.pinLogin)
+  const setupPinAction = useLockStore((s) => s.setupPin)
   const fetchProfiles = useLockStore((s) => s.fetchProfiles)
   const { user, logout, refreshToken } = useAuthStore()
 
   const [selectedProfile, setSelectedProfile] = useState<ProfileUser | null>(null)
   const [step, setStep] = useState<PinStep>('enter')
   const [pin, setPin] = useState(['', '', '', ''])
-  const [setupPin, setSetupPin] = useState('')
+  const [setupPinValue, setSetupPinValue] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [shake, setShake] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
-  const clinicSlug = user?.tenant?.slug || ''
-
   // Fetch profiles on mount if empty
   useEffect(() => {
-    if (profiles.length === 0 && clinicSlug) {
-      fetchProfiles(clinicSlug)
+    if (profiles.length === 0) {
+      fetchProfiles()
     }
-  }, [profiles.length, clinicSlug, fetchProfiles])
+  }, [profiles.length, fetchProfiles])
 
   useEffect(() => {
     if (selectedProfile) {
@@ -88,7 +86,7 @@ export function LockScreen() {
       // Existing PIN — login
       setLoading(true)
       try {
-        await pinLogin(selectedProfile.id, fullPin, clinicSlug)
+        await pinLogin(selectedProfile.id, fullPin)
       } catch {
         setError(t('lock.wrongPin'))
         setShake(true)
@@ -99,27 +97,26 @@ export function LockScreen() {
       }
     } else if (step === 'setup-enter') {
       // New PIN setup — save and move to confirm
-      setSetupPin(fullPin)
+      setSetupPinValue(fullPin)
       setStep('setup-confirm')
       setPin(['', '', '', ''])
     } else if (step === 'setup-confirm') {
       // Confirm PIN
-      if (fullPin !== setupPin) {
+      if (fullPin !== setupPinValue) {
         setError(t('pin.mismatch'))
         setShake(true)
         setTimeout(() => setShake(false), 500)
         resetPinInput()
         return
       }
-      // Save PIN then login
+      // Save PIN via setup-pin endpoint (sets PIN + returns profileToken)
       setLoading(true)
       try {
-        await setUserPin(selectedProfile.id, fullPin)
-        await pinLogin(selectedProfile.id, fullPin, clinicSlug)
+        await setupPinAction(selectedProfile.id, fullPin)
       } catch {
         setError(t('pin.saveError'))
         setStep('setup-enter')
-        setSetupPin('')
+        setSetupPinValue('')
         resetPinInput()
       } finally {
         setLoading(false)
@@ -130,7 +127,7 @@ export function LockScreen() {
   const handleBack = () => {
     setSelectedProfile(null)
     setPin(['', '', '', ''])
-    setSetupPin('')
+    setSetupPinValue('')
     setStep('enter')
     setError('')
   }
@@ -152,7 +149,7 @@ export function LockScreen() {
     setSelectedProfile(profile)
     setError('')
     setPin(['', '', '', ''])
-    setSetupPin('')
+    setSetupPinValue('')
     setStep(profile.hasPinSet ? 'enter' : 'setup-enter')
   }
 
@@ -260,7 +257,7 @@ export function LockScreen() {
               <button
                 onClick={() => {
                   setStep('setup-enter')
-                  setSetupPin('')
+                  setSetupPinValue('')
                   setPin(['', '', '', ''])
                   setError('')
                 }}

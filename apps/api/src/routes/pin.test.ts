@@ -67,12 +67,14 @@ describe('PIN Authentication Routes', () => {
   })
 
   // ==========================================
-  // GET /api/auth/profiles
+  // GET /api/auth/profiles (requires JWT)
   // ==========================================
 
   describe('GET /api/auth/profiles', () => {
-    it('should return profiles for a valid clinic slug', async () => {
-      const res = await request(app).get(`/api/auth/profiles?clinicSlug=${testSlug}`)
+    it('should return profiles when authenticated', async () => {
+      const res = await request(app)
+        .get('/api/auth/profiles')
+        .set('Authorization', `Bearer ${adminToken}`)
 
       expect(res.status).toBe(200)
       expect(res.body).toBeInstanceOf(Array)
@@ -86,18 +88,10 @@ describe('PIN Authentication Routes', () => {
       expect(res.body[0]).not.toHaveProperty('pinHash')
     })
 
-    it('should return empty array for unknown slug', async () => {
-      const res = await request(app).get('/api/auth/profiles?clinicSlug=nonexistent-clinic')
-
-      expect(res.status).toBe(200)
-      expect(res.body).toEqual([])
-    })
-
-    it('should return empty array when clinicSlug is missing', async () => {
+    it('should return 401 without JWT', async () => {
       const res = await request(app).get('/api/auth/profiles')
 
-      expect(res.status).toBe(200)
-      expect(res.body).toEqual([])
+      expect(res.status).toBe(401)
     })
 
     it('should exclude inactive users', async () => {
@@ -113,7 +107,9 @@ describe('PIN Authentication Routes', () => {
         },
       })
 
-      const res = await request(app).get(`/api/auth/profiles?clinicSlug=${testSlug}`)
+      const res = await request(app)
+        .get('/api/auth/profiles')
+        .set('Authorization', `Bearer ${adminToken}`)
 
       expect(res.status).toBe(200)
       const ids = res.body.map((p: any) => p.id)
@@ -177,7 +173,7 @@ describe('PIN Authentication Routes', () => {
   })
 
   // ==========================================
-  // POST /api/auth/pin-login
+  // POST /api/auth/pin-login (requires JWT)
   // ==========================================
 
   describe('POST /api/auth/pin-login', () => {
@@ -190,28 +186,26 @@ describe('PIN Authentication Routes', () => {
       })
     })
 
-    it('should authenticate with correct PIN', async () => {
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: adminUserId,
-        pin: '9999',
-        clinicSlug: testSlug,
-      })
+    it('should return profileToken with correct PIN', async () => {
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: adminUserId, pin: '9999' })
 
       expect(res.status).toBe(200)
-      expect(res.body).toHaveProperty('accessToken')
-      expect(res.body).toHaveProperty('refreshToken')
+      expect(res.body).toHaveProperty('profileToken')
+      expect(res.body).not.toHaveProperty('accessToken')
+      expect(res.body).not.toHaveProperty('refreshToken')
       expect(res.body.user).toHaveProperty('id', adminUserId)
       expect(res.body.user).toHaveProperty('hasPinSet', true)
-      expect(res.body.user).toHaveProperty('tenant')
       expect(res.body.user).not.toHaveProperty('pinHash')
     })
 
     it('should reject incorrect PIN', async () => {
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: adminUserId,
-        pin: '0000',
-        clinicSlug: testSlug,
-      })
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: adminUserId, pin: '0000' })
 
       expect(res.status).toBe(401)
       expect(res.body.error.code).toBe('INVALID_CREDENTIALS')
@@ -224,43 +218,89 @@ describe('PIN Authentication Routes', () => {
         data: { pinHash: null },
       })
 
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: staffUserId,
-        pin: '1234',
-        clinicSlug: testSlug,
-      })
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: staffUserId, pin: '1234' })
 
       expect(res.status).toBe(400)
       expect(res.body.error.code).toBe('PIN_NOT_SET')
     })
 
     it('should reject unknown user', async () => {
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: 'nonexistent-user',
-        pin: '1234',
-        clinicSlug: testSlug,
-      })
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: 'nonexistent-user', pin: '1234' })
 
       expect(res.status).toBe(401)
       expect(res.body.error.code).toBe('INVALID_CREDENTIALS')
     })
 
-    it('should reject unknown clinic slug', async () => {
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: adminUserId,
-        pin: '9999',
-        clinicSlug: 'nonexistent-slug',
-      })
+    it('should return 401 without JWT', async () => {
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .send({ userId: adminUserId, pin: '9999' })
 
       expect(res.status).toBe(401)
     })
 
     it('should reject invalid PIN format', async () => {
-      const res = await request(app).post('/api/auth/pin-login').send({
-        userId: adminUserId,
-        pin: '12',
-        clinicSlug: testSlug,
+      const res = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: adminUserId, pin: '12' })
+
+      expect(res.status).toBe(400)
+    })
+  })
+
+  // ==========================================
+  // POST /api/auth/setup-pin (requires JWT)
+  // ==========================================
+
+  describe('POST /api/auth/setup-pin', () => {
+    it('should set PIN and return profileToken when no PIN exists', async () => {
+      // Ensure staff has no PIN
+      await prisma.user.update({
+        where: { id: staffUserId },
+        data: { pinHash: null },
       })
+
+      const res = await request(app)
+        .post('/api/auth/setup-pin')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ userId: staffUserId, pin: '4321' })
+
+      expect(res.status).toBe(200)
+      expect(res.body).toHaveProperty('profileToken')
+      expect(res.body.user).toHaveProperty('id', staffUserId)
+      expect(res.body.user).toHaveProperty('hasPinSet', true)
+    })
+
+    it('should reject if PIN already set', async () => {
+      const res = await request(app)
+        .post('/api/auth/setup-pin')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ userId: staffUserId, pin: '1111' })
+
+      expect(res.status).toBe(409)
+      expect(res.body.error.code).toBe('PIN_ALREADY_SET')
+    })
+
+    it('should return 401 without JWT', async () => {
+      const res = await request(app)
+        .post('/api/auth/setup-pin')
+        .send({ userId: staffUserId, pin: '1234' })
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should reject invalid PIN format', async () => {
+      const res = await request(app)
+        .post('/api/auth/setup-pin')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ userId: staffUserId, pin: 'ab' })
 
       expect(res.status).toBe(400)
     })
@@ -287,6 +327,51 @@ describe('PIN Authentication Routes', () => {
 
       expect(res.status).toBe(200)
       expect(res.body).not.toHaveProperty('pinHash')
+    })
+  })
+
+  // ==========================================
+  // Profile token in middleware
+  // ==========================================
+
+  describe('X-Profile-Token middleware', () => {
+    it('should override role when valid profile token is sent', async () => {
+      // First get a profile token by PIN login
+      const loginRes = await request(app)
+        .post('/api/auth/pin-login')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: adminUserId, pin: '9999' })
+
+      expect(loginRes.status).toBe(200)
+      const { profileToken } = loginRes.body
+
+      // Use profile token on an endpoint that uses requireAuth
+      const res = await request(app)
+        .get('/api/auth/profiles')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('X-Profile-Token', profileToken)
+
+      expect(res.status).toBe(200)
+      expect(res.body).toBeInstanceOf(Array)
+    })
+
+    it('should return 403 with expired/invalid profile token', async () => {
+      const invalidToken = sign(
+        { profileUserId: adminUserId, role: 'ADMIN', tenantId, type: 'profile' },
+        JWT_SECRET,
+        { expiresIn: '1s' }
+      )
+
+      // Wait for token to expire
+      await new Promise((r) => setTimeout(r, 1500))
+
+      const res = await request(app)
+        .get('/api/auth/profiles')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('X-Profile-Token', invalidToken)
+
+      expect(res.status).toBe(403)
+      expect(res.body.error.code).toBe('PROFILE_TOKEN_EXPIRED')
     })
   })
 })
