@@ -134,6 +134,13 @@ export interface AuthResponse {
     role: Exclude<UserRole, 'SUPER_ADMIN'>
     tenantId: string
     createdAt: string
+    tenant?: {
+      id: string
+      name: string
+      slug: string
+      logo?: string
+      currency: string
+    }
   }
   accessToken: string
   refreshToken: string

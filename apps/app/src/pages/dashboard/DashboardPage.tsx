@@ -25,6 +25,7 @@ import {
 import { useStatsStore } from '@/stores/stats.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { UserRole } from '@dental/shared'
+import { formatCurrency } from '@/lib/format'
 
 // ============================================================================
 // Stat Card Component
@@ -87,6 +88,7 @@ function StatCard({ title, value, subtitle, icon, trend, linkTo, color }: StatCa
 export default function DashboardPage() {
   const { overview, appointmentStats, revenueStats, patientsGrowth, doctorPerformance, isLoading, error, fetchAllStats } = useStatsStore()
   const { user } = useAuthStore()
+  const currency = user?.tenant?.currency || 'USD'
   const isAdmin = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN || user?.role === UserRole.CLINIC_ADMIN
 
   useEffect(() => {
@@ -110,15 +112,6 @@ export default function DashboardPage() {
         </div>
       </div>
     )
-  }
-
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(value)
   }
 
   // Prepare chart data for appointments by day
@@ -175,8 +168,8 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Ingresos del Mes"
-          value={formatCurrency(overview?.monthlyRevenue || 0)}
-          subtitle={overview?.pendingPayments ? `${formatCurrency(overview.pendingPayments)} pendientes` : undefined}
+          value={formatCurrency(overview?.monthlyRevenue || 0, currency)}
+          subtitle={overview?.pendingPayments ? `${formatCurrency(overview.pendingPayments, currency)} pendientes` : undefined}
           icon={<DollarSign className="h-6 w-6" />}
           color="orange"
         />
@@ -280,7 +273,7 @@ export default function DashboardPage() {
                         {doctor.completionRate}%
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right text-gray-900 font-medium">{formatCurrency(doctor.revenue)}</td>
+                    <td className="py-3 px-4 text-right text-gray-900 font-medium">{formatCurrency(doctor.revenue, currency)}</td>
                   </tr>
                 ))}
               </tbody>

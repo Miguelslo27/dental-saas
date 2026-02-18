@@ -215,7 +215,16 @@ authRouter.post('/register', async (req, res, next) => {
     }
 
     res.status(201).json({
-      user,
+      user: {
+        ...user,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug,
+          logo: tenant.logo,
+          currency: tenant.currency,
+        },
+      },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     })
@@ -308,6 +317,13 @@ authRouter.post('/login', async (req, res, next) => {
         lastName: user.lastName,
         role: user.role,
         tenantId: user.tenantId,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug,
+          logo: tenant.logo,
+          currency: tenant.currency,
+        },
       },
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,

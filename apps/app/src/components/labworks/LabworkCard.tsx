@@ -19,6 +19,8 @@ import { Permission, AttachmentModule } from '@dental/shared'
 import type { Labwork } from '@/lib/labwork-api'
 import { getLabworkStatusBadge } from '@/lib/labwork-api'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useAuthStore } from '@/stores/auth.store'
+import { formatCurrency } from '@/lib/format'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ImageGallery } from '@/components/ui/ImageGallery'
 
@@ -41,6 +43,7 @@ export function LabworkCard({
 }: LabworkCardProps) {
   const { t } = useTranslation()
   const { can } = usePermissions()
+  const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
   const [showImages, setShowImages] = useState(false)
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const statusBadge = getLabworkStatusBadge(labwork)
@@ -52,13 +55,6 @@ export function LabworkCard({
       month: 'short',
       year: 'numeric',
     })
-  }
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price)
   }
 
   return (
@@ -113,7 +109,7 @@ export function LabworkCard({
         {/* Price */}
         <div className="flex items-center gap-2 mb-4 text-sm">
           <DollarSign className="h-4 w-4 text-gray-400" />
-          <span className="font-medium text-gray-900">{formatPrice(labwork.price)}</span>
+          <span className="font-medium text-gray-900">{formatCurrency(labwork.price, currency)}</span>
         </div>
 
         {/* Status toggles */}
