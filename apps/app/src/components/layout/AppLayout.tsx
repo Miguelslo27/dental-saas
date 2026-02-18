@@ -9,11 +9,14 @@ import {
   FlaskConical,
   Receipt,
   Settings,
+  Shield,
   LogOut,
   Menu,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Permission } from '@dental/shared'
+import { usePermissions } from '@/hooks/usePermissions'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -22,11 +25,13 @@ const navItems = [
   { path: '/appointments', label: 'Citas', icon: Calendar },
   { path: '/labworks', label: 'Laboratorio', icon: FlaskConical },
   { path: '/expenses', label: 'Gastos', icon: Receipt },
+  { path: '/users', label: 'Usuarios', icon: Shield, permission: Permission.USERS_CREATE },
   { path: '/settings', label: 'Configuración', icon: Settings },
 ]
 
 export function AppLayout() {
   const { isAuthenticated, user, logout, refreshToken } = useAuthStore()
+  const { can } = usePermissions()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -89,7 +94,7 @@ export function AppLayout() {
         {/* Navigation */}
         <nav className="mt-6 px-4">
           <ul className="space-y-1">
-            {navItems.map((item) => {
+            {navItems.filter((item) => !item.permission || can(item.permission)).map((item) => {
               const isActive =
                 item.path === '/'
                   ? location.pathname === '/'
