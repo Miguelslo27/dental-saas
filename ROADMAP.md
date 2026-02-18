@@ -26,6 +26,7 @@
 ## Backlog
 
 ### Clinic & Billing
+- [ ] Dashboard: add "Entregas recibidas este mes" stat card showing sum of patient payments received in the current month (separate from monthly revenue which only counts fully-paid items)
 - [ ] Doctor commission: doctors earn a percentage per consultation/labwork
 - [ ] Patient debt screen: dedicated view to see outstanding patient balances
 - [ ] Configurable appointment duration (different lengths per appointment type)
