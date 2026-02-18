@@ -1,7 +1,7 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
 import { prisma, UserRole } from '@dental/database'
-import { requireMinRole } from '../middleware/auth.js'
+import { requireMinRole, hasMinRole } from '../middleware/auth.js'
 import {
   listUsers,
   getUserById,
@@ -9,6 +9,7 @@ import {
   updateUser,
   updateUserRole,
   deleteUser,
+  setUserPin,
   checkRoleLimitForNewUser,
   countUsersByRole,
   getTenantPlanLimits,
@@ -320,6 +321,51 @@ usersRouter.delete('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
       message: 'User deleted successfully',
     })
   } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PUT /api/users/:id/pin
+ * Set or update a user's 4-digit PIN (self-service or ADMIN+)
+ */
+const pinSchema = z.object({
+  pin: z.string().regex(/^\d{4}$/, 'PIN must be exactly 4 digits'),
+})
+
+usersRouter.put('/:id/pin', async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const requestingUserId = req.user!.userId
+    const { id } = req.params
+
+    // Self-service or ADMIN+ can set PIN for others
+    const isSelf = id === requestingUserId
+    if (!isSelf && !hasMinRole(req.user!.role, 'ADMIN')) {
+      return res.status(403).json({
+        success: false,
+        error: { message: 'Insufficient permissions', code: 'FORBIDDEN' },
+      })
+    }
+
+    const parse = pinSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+      })
+    }
+
+    await setUserPin(tenantId, id, parse.data.pin)
+
+    res.json({ success: true, message: 'PIN set successfully' })
+  } catch (e) {
+    if (e instanceof Error && e.message === 'User not found') {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'User not found', code: 'NOT_FOUND' },
+      })
+    }
     next(e)
   }
 })
