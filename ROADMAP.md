@@ -73,9 +73,41 @@
 - [ ] Add labwork status tracking (e.g. sent, in progress, received)
 
 ### Features
+- [ ] Clinic user profiles & PIN system — see plan below
 - [ ] Onboarding flow for new tenants
-- [ ] User profile page
 - [ ] DoctorPicker component (searchable combobox)
+
+#### Plan: Clinic User Profiles & PIN System
+
+**Goal:** Allow OWNER/ADMIN to create user profiles for clinic staff, with 4-digit PIN authentication for quick switching on shared devices (kiosk mode).
+
+**How it works:**
+1. OWNER logs in with email/password (existing flow, unchanged)
+2. OWNER/ADMIN creates profiles from a dedicated "Users" management page, assigning roles (STAFF, DOCTOR, CLINIC_ADMIN, ADMIN)
+3. Each user sets a 4-digit PIN on first access (mandatory, cannot be empty)
+4. After X minutes of inactivity (configurable, default 5 min), the app auto-locks and shows the profile selector screen
+5. User selects their profile → enters PIN → backend verifies PIN and issues a **new JWT** with that user's role and permissions
+6. The app now operates with the selected user's permissions
+7. Profile creation is NOT available from the lock screen — only from the admin section
+
+**Backend tasks:**
+- [ ] Add `pinHash` field to User model (nullable — null means PIN not yet set)
+- [ ] Add `autoLockMinutes` to TenantSettings (default: 5, 0 = disabled)
+- [ ] `PUT /api/auth/pin` — set/update PIN for the current user (requires current PIN if already set)
+- [ ] `POST /api/auth/verify-pin` — verify PIN for a given userId, returns new JWT (access + refresh tokens) for that user
+- [ ] `GET /api/users/profiles` — list all active users for the profile selector (id, firstName, lastName, avatar, role, hasPinSet) — no auth required beyond tenant context
+- [ ] User management endpoints: already exist (`POST /api/users`, `PUT /api/users/:id`, etc.) — verify completeness
+
+**Frontend tasks:**
+- [ ] **User management page** (`/users`) — OWNER/ADMIN only: list users, create, edit role, deactivate
+- [ ] **Create/edit user form** — firstName, lastName, email, password, role selector
+- [ ] **PIN setup screen** — shown when `hasPinSet = false` after selecting profile or on first login; 4-digit input + confirmation
+- [ ] **Auto-lock idle timer** — detects mouse/keyboard/touch inactivity, locks app after configured timeout
+- [ ] **Profile selector screen** — grid of user cards (avatar, name, role); shown on auto-lock
+- [ ] **PIN entry screen** — 4-digit PIN input shown after selecting a profile; on success, switches JWT and redirects to dashboard
+- [ ] **Auto-lock setting** — add timeout config to settings page (OWNER/ADMIN only)
+- [ ] **Nav item** — add "Users" to sidebar navigation (visible to OWNER/ADMIN)
+- [ ] i18n keys for ES/EN/AR
 - [ ] FullCalendar integration (using custom view for now)
 - [ ] Weekly calendar view
 - [ ] Prescriptions component
