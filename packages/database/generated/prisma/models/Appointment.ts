@@ -50,6 +50,7 @@ export type AppointmentMinAggregateOutputType = {
   privateNotes: string | null
   cost: runtime.Decimal | null
   isPaid: boolean | null
+  createdBy: string | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -69,6 +70,7 @@ export type AppointmentMaxAggregateOutputType = {
   privateNotes: string | null
   cost: runtime.Decimal | null
   isPaid: boolean | null
+  createdBy: string | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -88,6 +90,7 @@ export type AppointmentCountAggregateOutputType = {
   privateNotes: number
   cost: number
   isPaid: number
+  createdBy: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -119,6 +122,7 @@ export type AppointmentMinAggregateInputType = {
   privateNotes?: true
   cost?: true
   isPaid?: true
+  createdBy?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -138,6 +142,7 @@ export type AppointmentMaxAggregateInputType = {
   privateNotes?: true
   cost?: true
   isPaid?: true
+  createdBy?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -157,6 +162,7 @@ export type AppointmentCountAggregateInputType = {
   privateNotes?: true
   cost?: true
   isPaid?: true
+  createdBy?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -263,6 +269,7 @@ export type AppointmentGroupByOutputType = {
   privateNotes: string | null
   cost: runtime.Decimal | null
   isPaid: boolean
+  createdBy: string | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -305,6 +312,7 @@ export type AppointmentWhereInput = {
   privateNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   cost?: Prisma.DecimalNullableFilter<"Appointment"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFilter<"Appointment"> | boolean
+  createdBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
   isActive?: Prisma.BoolFilter<"Appointment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
@@ -327,6 +335,7 @@ export type AppointmentOrderByWithRelationInput = {
   privateNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   cost?: Prisma.SortOrderInput | Prisma.SortOrder
   isPaid?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -352,6 +361,7 @@ export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
   privateNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   cost?: Prisma.DecimalNullableFilter<"Appointment"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFilter<"Appointment"> | boolean
+  createdBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
   isActive?: Prisma.BoolFilter<"Appointment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
@@ -374,6 +384,7 @@ export type AppointmentOrderByWithAggregationInput = {
   privateNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   cost?: Prisma.SortOrderInput | Prisma.SortOrder
   isPaid?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -401,6 +412,7 @@ export type AppointmentScalarWhereWithAggregatesInput = {
   privateNotes?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   cost?: Prisma.DecimalNullableWithAggregatesFilter<"Appointment"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
+  createdBy?: Prisma.StringNullableWithAggregatesFilter<"Appointment"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Appointment"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Appointment"> | Date | string
@@ -417,6 +429,7 @@ export type AppointmentCreateInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -439,6 +452,7 @@ export type AppointmentUncheckedCreateInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -455,6 +469,7 @@ export type AppointmentUpdateInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,6 +492,7 @@ export type AppointmentUncheckedUpdateInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -496,6 +512,7 @@ export type AppointmentCreateManyInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -512,6 +529,7 @@ export type AppointmentUpdateManyMutationInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -531,6 +549,7 @@ export type AppointmentUncheckedUpdateManyInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -560,6 +579,7 @@ export type AppointmentCountOrderByAggregateInput = {
   privateNotes?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -584,6 +604,7 @@ export type AppointmentMaxOrderByAggregateInput = {
   privateNotes?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -603,6 +624,7 @@ export type AppointmentMinOrderByAggregateInput = {
   privateNotes?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -754,6 +776,7 @@ export type AppointmentCreateWithoutTenantInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -774,6 +797,7 @@ export type AppointmentUncheckedCreateWithoutTenantInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -822,6 +846,7 @@ export type AppointmentScalarWhereInput = {
   privateNotes?: Prisma.StringNullableFilter<"Appointment"> | string | null
   cost?: Prisma.DecimalNullableFilter<"Appointment"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFilter<"Appointment"> | boolean
+  createdBy?: Prisma.StringNullableFilter<"Appointment"> | string | null
   isActive?: Prisma.BoolFilter<"Appointment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Appointment"> | Date | string
@@ -838,6 +863,7 @@ export type AppointmentCreateWithoutPatientInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -858,6 +884,7 @@ export type AppointmentUncheckedCreateWithoutPatientInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -900,6 +927,7 @@ export type AppointmentCreateWithoutDoctorInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -920,6 +948,7 @@ export type AppointmentUncheckedCreateWithoutDoctorInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -964,6 +993,7 @@ export type AppointmentCreateManyTenantInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -980,6 +1010,7 @@ export type AppointmentUpdateWithoutTenantInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1000,6 +1031,7 @@ export type AppointmentUncheckedUpdateWithoutTenantInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1018,6 +1050,7 @@ export type AppointmentUncheckedUpdateManyWithoutTenantInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1036,6 +1069,7 @@ export type AppointmentCreateManyPatientInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1052,6 +1086,7 @@ export type AppointmentUpdateWithoutPatientInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1072,6 +1107,7 @@ export type AppointmentUncheckedUpdateWithoutPatientInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1090,6 +1126,7 @@ export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1108,6 +1145,7 @@ export type AppointmentCreateManyDoctorInput = {
   privateNotes?: string | null
   cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: boolean
+  createdBy?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1124,6 +1162,7 @@ export type AppointmentUpdateWithoutDoctorInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1144,6 +1183,7 @@ export type AppointmentUncheckedUpdateWithoutDoctorInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1162,6 +1202,7 @@ export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
   privateNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1183,6 +1224,7 @@ export type AppointmentSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   privateNotes?: boolean
   cost?: boolean
   isPaid?: boolean
+  createdBy?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1205,6 +1247,7 @@ export type AppointmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   privateNotes?: boolean
   cost?: boolean
   isPaid?: boolean
+  createdBy?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1227,6 +1270,7 @@ export type AppointmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   privateNotes?: boolean
   cost?: boolean
   isPaid?: boolean
+  createdBy?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1249,12 +1293,13 @@ export type AppointmentSelectScalar = {
   privateNotes?: boolean
   cost?: boolean
   isPaid?: boolean
+  createdBy?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "patientId" | "doctorId" | "startTime" | "endTime" | "duration" | "status" | "type" | "notes" | "privateNotes" | "cost" | "isPaid" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
+export type AppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "patientId" | "doctorId" | "startTime" | "endTime" | "duration" | "status" | "type" | "notes" | "privateNotes" | "cost" | "isPaid" | "createdBy" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
 export type AppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   patient?: boolean | Prisma.PatientDefaultArgs<ExtArgs>
@@ -1316,6 +1361,10 @@ export type $AppointmentPayload<ExtArgs extends runtime.Types.Extensions.Interna
      * Whether payment has been received
      */
     isPaid: boolean
+    /**
+     * User ID who created this appointment
+     */
+    createdBy: string | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1758,6 +1807,7 @@ export interface AppointmentFieldRefs {
   readonly privateNotes: Prisma.FieldRef<"Appointment", 'String'>
   readonly cost: Prisma.FieldRef<"Appointment", 'Decimal'>
   readonly isPaid: Prisma.FieldRef<"Appointment", 'Boolean'>
+  readonly createdBy: Prisma.FieldRef<"Appointment", 'String'>
   readonly isActive: Prisma.FieldRef<"Appointment", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Appointment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Appointment", 'DateTime'>
