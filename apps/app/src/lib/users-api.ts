@@ -30,6 +30,13 @@ export interface CreateUserData {
   phone?: string
 }
 
+export interface CreateProfileData {
+  profileOnly: true
+  firstName: string
+  lastName: string
+  role: 'ADMIN' | 'CLINIC_ADMIN' | 'DOCTOR' | 'STAFF'
+}
+
 export interface UpdateUserData {
   email?: string
   firstName?: string
@@ -70,7 +77,7 @@ export async function getUserStats(): Promise<UserStats> {
   return data.data
 }
 
-export async function createUser(payload: CreateUserData): Promise<UserProfile> {
+export async function createUser(payload: CreateUserData | CreateProfileData): Promise<UserProfile> {
   const { data } = await apiClient.post('/users', payload)
   return data.data
 }

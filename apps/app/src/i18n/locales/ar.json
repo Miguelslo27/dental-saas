@@ -379,6 +379,12 @@
     "deactivated": "تم تعطيل المستخدم",
     "reactivated": "تم إعادة تفعيل المستخدم",
     "roleUpdated": "تم تحديث الدور",
-    "fetchError": "خطأ في تحميل المستخدمين"
+    "fetchError": "خطأ في تحميل المستخدمين",
+    "modeUser": "مستخدم",
+    "modeProfile": "ملف شخصي فقط",
+    "createProfileTitle": "إنشاء ملف شخصي",
+    "createProfile": "إنشاء ملف شخصي",
+    "profileDescription": "الملف الشخصي ليس لديه بريد إلكتروني أو كلمة مرور. يظهر فقط على شاشة القفل ويضبط رقم PIN الخاص به عند أول تسجيل دخول.",
+    "profileOnlyBadge": "ملف شخصي فقط"
   }
 }

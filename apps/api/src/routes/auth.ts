@@ -5,12 +5,14 @@ import {
   hashPassword,
   verifyPassword,
   generateTokens,
+  generateProfileToken,
   verifyAccessToken,
   verifyRefreshToken,
   hashToken,
   getExpiryDate,
   cleanupOldRefreshTokens,
 } from '../services/auth.service.js'
+import { requireAuth } from '../middleware/auth.js'
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../services/email.service.js'
 import { logger } from '../utils/logger.js'
 import { env } from '../config/env.js'
@@ -716,29 +718,11 @@ authRouter.post('/reset-password', async (req, res, next) => {
   }
 })
 
-// GET /api/auth/profiles - List user profiles for lock screen (no JWT required)
-const profilesQuerySchema = z.object({
-  clinicSlug: z.string().min(1),
-})
-
-authRouter.get('/profiles', async (req, res, next) => {
+// GET /api/auth/profiles - List user profiles for lock screen (requires JWT)
+authRouter.get('/profiles', requireAuth, async (req, res, next) => {
   try {
-    const parse = profilesQuerySchema.safeParse(req.query)
-    if (!parse.success) {
-      return res.json([])
-    }
-
-    const tenant = await prisma.tenant.findUnique({
-      where: { slug: parse.data.clinicSlug },
-      select: { id: true },
-    })
-
-    if (!tenant) {
-      return res.json([])
-    }
-
     const users = await prisma.user.findMany({
-      where: { tenantId: tenant.id, isActive: true, role: { not: 'SUPER_ADMIN' } },
+      where: { tenantId: req.user!.tenantId, isActive: true, role: { not: 'SUPER_ADMIN' } },
       select: {
         id: true,
         firstName: true,
@@ -761,14 +745,13 @@ authRouter.get('/profiles', async (req, res, next) => {
   }
 })
 
-// POST /api/auth/pin-login - Authenticate with PIN (no JWT required)
+// POST /api/auth/pin-login - Authenticate with PIN (requires JWT)
 const pinLoginSchema = z.object({
   userId: z.string().min(1),
   pin: z.string().regex(/^\d{4}$/, 'PIN must be exactly 4 digits'),
-  clinicSlug: z.string().min(1),
 })
 
-authRouter.post('/pin-login', async (req, res, next) => {
+authRouter.post('/pin-login', requireAuth, async (req, res, next) => {
   try {
     const parse = pinLoginSchema.safeParse(req.body)
     if (!parse.success) {
@@ -778,31 +761,16 @@ authRouter.post('/pin-login', async (req, res, next) => {
       })
     }
 
-    const { userId, pin, clinicSlug } = parse.data
-
-    const tenant = await prisma.tenant.findUnique({
-      where: { slug: clinicSlug },
-      select: { id: true, name: true, slug: true, logo: true, currency: true },
-    })
-
-    if (!tenant) {
-      return res.status(401).json({
-        success: false,
-        error: { message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' },
-      })
-    }
+    const { userId, pin } = parse.data
 
     const user = await prisma.user.findFirst({
-      where: { id: userId, tenantId: tenant.id, isActive: true },
+      where: { id: userId, tenantId: req.user!.tenantId, isActive: true },
       select: {
         id: true,
-        email: true,
         firstName: true,
         lastName: true,
         role: true,
-        tenantId: true,
         avatar: true,
-        phone: true,
         pinHash: true,
       },
     })
@@ -829,44 +797,82 @@ authRouter.post('/pin-login', async (req, res, next) => {
       })
     }
 
-    // Generate tokens
-    const tokens = generateTokens({
-      userId: user.id,
-      tenantId: user.tenantId!,
-      email: user.email,
+    const profileToken = generateProfileToken({
+      profileUserId: user.id,
       role: user.role,
-    })
-
-    // Store refresh token
-    const tokenHash = hashToken(tokens.refreshToken)
-    const expiresAt = getExpiryDate(env.JWT_REFRESH_EXPIRES_IN)
-    await prisma.refreshToken.create({
-      data: { userId: user.id, tokenHash, expiresAt },
-    })
-    await cleanupOldRefreshTokens(user.id)
-
-    // Update lastLoginAt
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
+      tenantId: req.user!.tenantId,
     })
 
     const { pinHash: _ph, ...userData } = user
 
     res.json({
-      user: {
-        ...userData,
-        hasPinSet: true,
-        tenant: {
-          id: tenant.id,
-          name: tenant.name,
-          slug: tenant.slug,
-          logo: tenant.logo,
-          currency: tenant.currency,
-        },
+      profileToken,
+      user: { ...userData, hasPinSet: true },
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+// POST /api/auth/setup-pin - Set PIN for first time (requires JWT)
+const setupPinSchema = z.object({
+  userId: z.string().min(1),
+  pin: z.string().regex(/^\d{4}$/, 'PIN must be exactly 4 digits'),
+})
+
+authRouter.post('/setup-pin', requireAuth, async (req, res, next) => {
+  try {
+    const parse = setupPinSchema.safeParse(req.body)
+    if (!parse.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+      })
+    }
+
+    const { userId, pin } = parse.data
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, tenantId: req.user!.tenantId, isActive: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        avatar: true,
+        pinHash: true,
       },
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'User not found', code: 'USER_NOT_FOUND' },
+      })
+    }
+
+    if (user.pinHash) {
+      return res.status(409).json({
+        success: false,
+        error: { message: 'PIN already set. Use the users page to change it.', code: 'PIN_ALREADY_SET' },
+      })
+    }
+
+    const pinHash = await hashPassword(pin)
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { pinHash },
+    })
+
+    const profileToken = generateProfileToken({
+      profileUserId: user.id,
+      role: user.role,
+      tenantId: req.user!.tenantId,
+    })
+
+    res.json({
+      profileToken,
+      user: { id: user.id, firstName: user.firstName, lastName: user.lastName, role: user.role, avatar: user.avatar, hasPinSet: true },
     })
   } catch (e) {
     next(e)

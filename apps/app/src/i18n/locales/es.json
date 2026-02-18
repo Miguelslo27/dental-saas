@@ -379,6 +379,12 @@
     "deactivated": "Usuario desactivado",
     "reactivated": "Usuario reactivado",
     "roleUpdated": "Rol actualizado",
-    "fetchError": "Error al cargar usuarios"
+    "fetchError": "Error al cargar usuarios",
+    "modeUser": "Usuario",
+    "modeProfile": "Solo perfil",
+    "createProfileTitle": "Crear Perfil",
+    "createProfile": "Crear Perfil",
+    "profileDescription": "Un perfil no tiene correo ni contraseña. Solo aparece en la pantalla de bloqueo y configura su PIN la primera vez que entra.",
+    "profileOnlyBadge": "Solo perfil"
   }
 }

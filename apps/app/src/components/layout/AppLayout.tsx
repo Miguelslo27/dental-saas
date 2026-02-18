@@ -24,6 +24,14 @@ import { useInactivityTimer } from '@/hooks/useInactivityTimer'
 import { LockScreen } from '@/components/auth/LockScreen'
 import { PinSetupModal } from '@/components/auth/PinSetupModal'
 
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: 'Owner',
+  ADMIN: 'Admin',
+  CLINIC_ADMIN: 'Clinic Admin',
+  DOCTOR: 'Doctor',
+  STAFF: 'Staff',
+}
+
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/doctors', label: 'Doctores', icon: Stethoscope },
@@ -45,6 +53,7 @@ export function AppLayout() {
   const setAutoLockMinutes = useLockStore((s) => s.setAutoLockMinutes)
   const autoLockMinutes = useLockStore((s) => s.autoLockMinutes)
   const fetchProfiles = useLockStore((s) => s.fetchProfiles)
+  const activeUser = useLockStore((s) => s.activeUser)
   const settings = useSettingsStore((s) => s.settings)
   const fetchSettings = useSettingsStore((s) => s.fetchSettings)
 
@@ -63,13 +72,12 @@ export function AppLayout() {
     }
   }, [settings?.autoLockMinutes, setAutoLockMinutes])
 
-  // Fetch profiles when locked or when auto-lock is enabled
+  // Fetch profiles when auto-lock is enabled
   useEffect(() => {
-    const slug = user?.tenant?.slug
-    if (slug && autoLockMinutes > 0) {
-      fetchProfiles(slug)
+    if (autoLockMinutes > 0) {
+      fetchProfiles()
     }
-  }, [user?.tenant?.slug, autoLockMinutes, fetchProfiles])
+  }, [autoLockMinutes, fetchProfiles])
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -174,15 +182,17 @@ export function AppLayout() {
           <div className="flex items-center gap-3 px-2 mb-3">
             <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
               <span className="text-sm font-medium text-white">
-                {user?.firstName?.[0]}
-                {user?.lastName?.[0]}
+                {(activeUser?.firstName ?? user?.firstName)?.[0]}
+                {(activeUser?.lastName ?? user?.lastName)?.[0]}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.firstName} {user?.lastName}
+                {activeUser?.firstName ?? user?.firstName} {activeUser?.lastName ?? user?.lastName}
               </p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              <p className="text-xs text-gray-500 truncate">
+                {activeUser ? (ROLE_LABELS[activeUser.role] || activeUser.role) : user?.email}
+              </p>
             </div>
           </div>
           {autoLockMinutes > 0 && (

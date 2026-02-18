@@ -370,6 +370,12 @@
     "deactivated": "User deactivated",
     "reactivated": "User reactivated",
     "roleUpdated": "Role updated",
-    "fetchError": "Error loading users"
+    "fetchError": "Error loading users",
+    "modeUser": "User",
+    "modeProfile": "Profile only",
+    "createProfileTitle": "Create Profile",
+    "createProfile": "Create Profile",
+    "profileDescription": "A profile has no email or password. It only appears on the lock screen and sets up its PIN on first login.",
+    "profileOnlyBadge": "Profile only"
   }
 }

@@ -6,6 +6,7 @@ import {
   listUsers,
   getUserById,
   createUser,
+  createProfile,
   updateUser,
   updateUserRole,
   deleteUser,
@@ -45,6 +46,13 @@ const createUserSchema = z.object({
   role: z.enum(['ADMIN', 'CLINIC_ADMIN', 'DOCTOR', 'STAFF']), // OWNER cannot be assigned via API, SUPER_ADMIN is forbidden
   phone: phoneSchema,
   avatar: z.string().url().optional(),
+})
+
+const createProfileSchema = z.object({
+  profileOnly: z.literal(true),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  role: z.enum(['ADMIN', 'CLINIC_ADMIN', 'DOCTOR', 'STAFF']),
 })
 
 const updateUserSchema = z.object({
@@ -147,12 +155,52 @@ usersRouter.get('/:id', requireMinRole('ADMIN'), async (req, res, next) => {
 
 /**
  * POST /api/users
- * Create a new user (ADMIN+ required)
+ * Create a new user or profile-only user (ADMIN+ required)
+ * When profileOnly=true, only firstName, lastName, and role are required.
  */
 usersRouter.post('/', requireMinRole('ADMIN'), async (req, res, next) => {
   try {
     const tenantId = req.user!.tenantId
 
+    // Check if this is a profile-only creation
+    if (req.body.profileOnly === true) {
+      const parse = createProfileSchema.safeParse(req.body)
+      if (!parse.success) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'Invalid payload', code: 'INVALID_PAYLOAD', details: parse.error.errors },
+        })
+      }
+
+      const { firstName, lastName, role } = parse.data
+
+      // Check plan limits
+      const limitCheck = await checkRoleLimitForNewUser(tenantId, role as UserRole)
+      if (!limitCheck.allowed) {
+        return res.status(403).json({
+          success: false,
+          error: {
+            message: limitCheck.message,
+            code: 'PLAN_LIMIT_EXCEEDED',
+            currentCount: limitCheck.currentCount,
+            limit: limitCheck.limit,
+          },
+        })
+      }
+
+      const user = await createProfile(tenantId, {
+        firstName,
+        lastName,
+        role: role as UserRole,
+      })
+
+      return res.status(201).json({
+        success: true,
+        data: user,
+      })
+    }
+
+    // Standard user creation with email + password
     const parse = createUserSchema.safeParse(req.body)
     if (!parse.success) {
       return res.status(400).json({
