@@ -146,6 +146,21 @@ export interface AuthResponse {
   refreshToken: string
 }
 
+export interface ProfileUser {
+  id: string
+  firstName: string
+  lastName: string
+  role: string
+  avatar: string | null
+  hasPinSet: boolean
+}
+
+export interface PinLoginPayload {
+  userId: string
+  pin: string
+  clinicSlug: string
+}
+
 export const authApi = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/login', payload)
@@ -171,6 +186,18 @@ export const authApi = {
 
   refreshToken: async (refreshToken: string) => {
     const response = await apiClient.post('/auth/refresh', { refreshToken })
+    return response.data
+  },
+
+  getProfiles: async (clinicSlug: string): Promise<ProfileUser[]> => {
+    const response = await apiClient.get<ProfileUser[]>(
+      `/auth/profiles?clinicSlug=${encodeURIComponent(clinicSlug)}`
+    )
+    return response.data
+  },
+
+  pinLogin: async (payload: PinLoginPayload): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/pin-login', payload)
     return response.data
   },
 }
