@@ -324,6 +324,23 @@
     "storageFull": "Límite de almacenamiento excedido. Mejora tu plan para más espacio.",
     "storageUsage": "Almacenamiento: {{used}} de {{limit}} usado"
   },
+  "lock": {
+    "selectProfile": "Selecciona tu perfil para continuar",
+    "enterPin": "Ingresa tu PIN de 4 dígitos",
+    "wrongPin": "PIN incorrecto. Intenta de nuevo.",
+    "pinNotConfigured": "PIN no configurado. Contacta a un administrador.",
+    "noPinShort": "Sin PIN",
+    "fullLogout": "Cerrar sesión completa"
+  },
+  "pin": {
+    "setupTitle": "Configura tu PIN",
+    "setupDescription": "Se requiere un PIN de 4 dígitos para el bloqueo automático de la sesión.",
+    "enterNew": "Ingresa un PIN de 4 dígitos",
+    "confirmPin": "Confirma tu PIN",
+    "mismatch": "Los PINs no coinciden. Intenta de nuevo.",
+    "saveError": "Error al guardar el PIN. Intenta de nuevo.",
+    "startOver": "Empezar de nuevo"
+  },
   "users": {
     "title": "Usuarios",
     "subtitle": "Gestiona los usuarios y perfiles de tu clínica",

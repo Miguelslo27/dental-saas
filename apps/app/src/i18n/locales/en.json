@@ -315,6 +315,23 @@
     "storageFull": "Storage limit exceeded. Upgrade your plan for more storage.",
     "storageUsage": "Storage: {{used}} of {{limit}} used"
   },
+  "lock": {
+    "selectProfile": "Select your profile to continue",
+    "enterPin": "Enter your 4-digit PIN",
+    "wrongPin": "Wrong PIN. Try again.",
+    "pinNotConfigured": "PIN not configured. Contact an administrator.",
+    "noPinShort": "No PIN",
+    "fullLogout": "Full logout"
+  },
+  "pin": {
+    "setupTitle": "Set up your PIN",
+    "setupDescription": "A 4-digit PIN is required for automatic session locking.",
+    "enterNew": "Enter a 4-digit PIN",
+    "confirmPin": "Confirm your PIN",
+    "mismatch": "PINs don't match. Try again.",
+    "saveError": "Error saving PIN. Try again.",
+    "startOver": "Start over"
+  },
   "users": {
     "title": "Users",
     "subtitle": "Manage your clinic users and profiles",

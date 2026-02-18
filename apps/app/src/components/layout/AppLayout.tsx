@@ -10,13 +10,19 @@ import {
   Receipt,
   Settings,
   Shield,
+  Lock,
   LogOut,
   Menu,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Permission } from '@dental/shared'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useLockStore } from '@/stores/lock.store'
+import { useSettingsStore } from '@/stores/settings.store'
+import { useInactivityTimer } from '@/hooks/useInactivityTimer'
+import { LockScreen } from '@/components/auth/LockScreen'
+import { PinSetupModal } from '@/components/auth/PinSetupModal'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,9 +41,47 @@ export function AppLayout() {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const isLocked = useLockStore((s) => s.isLocked)
+  const setAutoLockMinutes = useLockStore((s) => s.setAutoLockMinutes)
+  const autoLockMinutes = useLockStore((s) => s.autoLockMinutes)
+  const fetchProfiles = useLockStore((s) => s.fetchProfiles)
+  const settings = useSettingsStore((s) => s.settings)
+  const fetchSettings = useSettingsStore((s) => s.fetchSettings)
+
+  useInactivityTimer()
+
+  // Sync autoLockMinutes from tenant settings
+  useEffect(() => {
+    if (!settings) {
+      fetchSettings()
+    }
+  }, [settings, fetchSettings])
+
+  useEffect(() => {
+    if (settings?.autoLockMinutes !== undefined) {
+      setAutoLockMinutes(settings.autoLockMinutes)
+    }
+  }, [settings?.autoLockMinutes, setAutoLockMinutes])
+
+  // Fetch profiles when locked or when auto-lock is enabled
+  useEffect(() => {
+    const slug = user?.tenant?.slug
+    if (slug && autoLockMinutes > 0) {
+      fetchProfiles(slug)
+    }
+  }, [user?.tenant?.slug, autoLockMinutes, fetchProfiles])
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
+
+  // Show lock screen when locked
+  if (isLocked) {
+    return <LockScreen />
+  }
+
+  // Show PIN setup modal when auto-lock is enabled but user has no PIN
+  const showPinSetup = autoLockMinutes > 0 && user?.hasPinSet === false
 
   const handleLogout = async () => {
     try {
@@ -48,6 +92,13 @@ export function AppLayout() {
       // Ignore logout API errors
     } finally {
       logout()
+    }
+  }
+
+  const lockStore = useLockStore.getState()
+  const handleLock = () => {
+    if (autoLockMinutes > 0) {
+      lockStore.lock()
     }
   }
 
@@ -134,6 +185,15 @@ export function AppLayout() {
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>
+          {autoLockMinutes > 0 && (
+            <button
+              onClick={handleLock}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors"
+            >
+              <Lock className="h-4 w-4" />
+              Bloquear
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors"
@@ -171,6 +231,8 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      {showPinSetup && <PinSetupModal />}
     </div>
   )
 }
