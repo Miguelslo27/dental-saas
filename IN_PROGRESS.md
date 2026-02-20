@@ -13,3 +13,9 @@ Active tasks for the current development cycle. Add tasks here before starting w
 
 - [x] Add `defaultPatientId` prop to `AppointmentFormModal` (pre-select + disable patient selector)
 - [x] Add "Nueva Cita" button to `PatientDetailPage` (guarded by `APPOINTMENTS_CREATE` permission)
+
+## Searchable Patient Combobox — PR #157
+
+- [x] Extract shared `PatientSearchCombobox` to `components/ui/` (search from 1 char, arrow keys, Enter/click, Escape, click-outside)
+- [x] Replace plain `<select>` in `AppointmentFormModal` with combobox
+- [x] Replace inline `PatientSearch` in `LabworkFormModal` with shared combobox (~130 lines removed)
