@@ -57,7 +57,7 @@ apiClient.interceptors.response.use(
       // If no refresh token, logout
       if (!refreshToken) {
         logout()
-        window.location.href = '/login'
+        window.location.href = '/login?session=expired'
         return Promise.reject(error)
       }
 
@@ -98,7 +98,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as Error, null)
         logout()
-        window.location.href = '/login'
+        window.location.href = '/login?session=expired'
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false
