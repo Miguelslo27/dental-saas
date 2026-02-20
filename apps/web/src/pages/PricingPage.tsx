@@ -5,13 +5,13 @@ import { FAQ } from "../components/FAQ";
 const plans = [
   {
     name: "Gratis",
-    price: "$0",
+    price: "$U 0",
     period: "/mes",
     description: "Perfecto para empezar",
     features: [
       { text: "1 Administrador", included: true },
-      { text: "3 Doctores", included: true },
-      { text: "15 Pacientes", included: true },
+      { text: "2 Doctores", included: true },
+      { text: "10 Pacientes", included: true },
       { text: "100MB Almacenamiento", included: true },
       { text: "Reportes Básicos", included: true },
       { text: "Soporte Comunidad", included: true },
@@ -25,13 +25,13 @@ const plans = [
   },
   {
     name: "Básico",
-    price: "$5.99",
+    price: "$U 8.99",
     period: "/mes",
     description: "Para clínicas en crecimiento",
     features: [
       { text: "2 Administradores", included: true },
       { text: "5 Doctores", included: true },
-      { text: "25 Pacientes", included: true },
+      { text: "20 Pacientes", included: true },
       { text: "1GB Almacenamiento", included: true },
       { text: "Reportes Completos", included: true },
       { text: "Soporte Email", included: true },
@@ -45,7 +45,7 @@ const plans = [
   },
   {
     name: "Empresa",
-    price: "$11.99",
+    price: "$U 15.99",
     period: "/mes",
     description: "Para clínicas establecidas",
     features: [
@@ -172,6 +172,26 @@ export function PricingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Custom Plans CTA */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+              ¿Necesitás más pacientes o doctores?
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Si tu clínica necesita más capacidad, contactanos para armar un
+              plan a medida con paquetes adicionales de pacientes, doctores y
+              almacenamiento.
+            </p>
+            <a
+              href="mailto:contacto@alveodent.com?subject=Consulta%20por%20plan%20personalizado"
+              className="inline-block bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
+            >
+              Consultar por más capacidad
+            </a>
           </div>
         </section>
 
