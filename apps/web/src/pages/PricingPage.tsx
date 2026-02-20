@@ -11,7 +11,7 @@ const plans = [
     features: [
       { text: "1 Administrador", included: true },
       { text: "2 Doctores", included: true },
-      { text: "10 Pacientes", included: true },
+      { text: "50 Pacientes", included: true },
       { text: "100MB Almacenamiento", included: true },
       { text: "Reportes Básicos", included: true },
       { text: "Soporte Comunidad", included: true },
@@ -31,7 +31,7 @@ const plans = [
     features: [
       { text: "2 Administradores", included: true },
       { text: "5 Doctores", included: true },
-      { text: "20 Pacientes", included: true },
+      { text: "200 Pacientes", included: true },
       { text: "1GB Almacenamiento", included: true },
       { text: "Reportes Completos", included: true },
       { text: "Soporte Email", included: true },
@@ -51,7 +51,7 @@ const plans = [
     features: [
       { text: "5 Administradores", included: true },
       { text: "10 Doctores", included: true },
-      { text: "60 Pacientes", included: true },
+      { text: "500 Pacientes", included: true },
       { text: "5GB Almacenamiento", included: true },
       { text: "Reportes Personalizados", included: true },
       { text: "Soporte Prioritario", included: true },

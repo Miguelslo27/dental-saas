@@ -22,7 +22,7 @@ async function main() {
         price: 0,
         maxAdmins: 1,
         maxDoctors: 3,
-        maxPatients: 15,
+        maxPatients: 50,
         maxStorageMb: 100,
         features: [
           'Basic patient management',
@@ -40,7 +40,7 @@ async function main() {
         price: 5.99,
         maxAdmins: 2,
         maxDoctors: 5,
-        maxPatients: 25,
+        maxPatients: 200,
         maxStorageMb: 1024,
         features: [
           'Everything in Free',
@@ -59,7 +59,7 @@ async function main() {
         price: 11.99,
         maxAdmins: 5,
         maxDoctors: 10,
-        maxPatients: 60,
+        maxPatients: 500,
         maxStorageMb: 5120,
         features: [
           'Everything in Basic',
