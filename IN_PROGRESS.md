@@ -2,6 +2,17 @@
 
 Active tasks for the current development cycle. Add tasks here before starting work.
 
+## Gateway Timeout Fix — IN PROGRESS
+
+- [x] PR #152: Add `traefik.docker.network=coolify` to `api`, `web`, `app` (root cause fix)
+- [x] PR #153: Show "session expired" message on auto-logout redirect
+- [ ] Deploy and verify fix resolves the intermittent timeouts
+- [ ] If timeouts persist: implement secondary fixes (health check, eager Prisma init, graceful shutdown)
+
+## Features Page (Landing) — PENDING REVIEW
+
+- [x] PR #154: FeaturesPage with 4 categories, 14 features + updated links
+
 ## Patient Payment Tracking (Entregas) — DONE
 
 - [x] PR #137: Database model (`PatientPayment`) + permissions (`PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE`)
