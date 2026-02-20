@@ -25,7 +25,7 @@ interface PaymentSectionProps {
 }
 
 export function PaymentSection({ patientId }: PaymentSectionProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { can } = usePermissions()
   const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
 
@@ -163,7 +163,7 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
                 <div>
                   <p className="font-semibold text-gray-900">{fmtCurrency(payment.amount)}</p>
                   <p className="text-sm text-gray-500">
-                    {new Date(payment.date).toLocaleDateString(undefined, {
+                    {new Date(payment.date).toLocaleDateString(i18n.language, {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',

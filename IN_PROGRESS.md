@@ -14,8 +14,30 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [x] Add `defaultPatientId` prop to `AppointmentFormModal` (pre-select + disable patient selector)
 - [x] Add "Nueva Cita" button to `PatientDetailPage` (guarded by `APPOINTMENTS_CREATE` permission)
 
-## Searchable Patient Combobox — PR #157
+## Searchable Patient Combobox — PR #157 ✅
 
 - [x] Extract shared `PatientSearchCombobox` to `components/ui/` (search from 1 char, arrow keys, Enter/click, Escape, click-outside)
 - [x] Replace plain `<select>` in `AppointmentFormModal` with combobox
 - [x] Replace inline `PatientSearch` in `LabworkFormModal` with shared combobox (~130 lines removed)
+
+## Fix Date Locale Formatting — PR #158
+
+- [x] Fix `formatTimeRange` and `formatAppointmentDate` in `appointment-api.ts` (use `i18n.language` instead of `undefined`)
+- [x] Fix `formatDateHeader` in `AppointmentsPage.tsx`
+- [x] Fix payment date display in `PaymentSection.tsx`
+- [x] Update test mocks for `initReactI18next` and `i18n.language`
+- [x] All 922 tests passing, build succeeds
+
+## i18n Hardcoded Strings Migration (upcoming)
+
+Migrate hardcoded Spanish strings to i18n keys, split by module:
+- [ ] Appointments module
+- [ ] Patients module
+- [ ] Doctors module
+- [ ] Labworks module
+- [ ] Expenses module
+- [ ] Dashboard module
+- [ ] Settings module
+- [ ] Auth module
+- [ ] Admin module
+- [ ] Layout/Nav module
