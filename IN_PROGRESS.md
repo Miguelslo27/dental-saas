@@ -9,13 +9,9 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [ ] Deploy and verify fix resolves the intermittent timeouts
 - [ ] If timeouts persist: implement secondary fixes (health check, eager Prisma init, graceful shutdown)
 
-## Features Page + Patient Limits — PR #154
+## Appointment Auto-Payment — PR #155
 
-- [x] FeaturesPage with 4 categories, 14 features + updated Header/Footer/HomePage links
-- [x] Update patient limits: free 50, basic 200, enterprise 500 (pricing page, seed, migration, fallback)
-
-## Patient Payment Tracking (Entregas) — DONE
-
-- [x] PR #137: Database model (`PatientPayment`) + permissions (`PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE`)
-- [x] PR #138: Backend service (FIFO allocation) + REST routes + integration tests (17 tests)
-- [x] PR #140: Frontend — API client, PaymentSection, PaymentFormModal, i18n (ES/EN/AR), `/me` currency field
+- [x] Auto-create `PatientPayment` when appointment created with isPaid=true and cost > 0
+- [x] Make `isPaid` FIFO-controlled only (removed direct writes from update)
+- [x] Frontend: refetch appointment list after auto-payment to reflect FIFO changes
+- [x] 3 new integration tests
