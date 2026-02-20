@@ -7,6 +7,7 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [x] PR #152: Add `traefik.docker.network=coolify` to `api`, `web`, `app` (root cause fix)
 - [x] PR #153: Show "session expired" message on auto-logout redirect
 - [ ] Deploy and verify fix resolves the intermittent timeouts
+- [ ] If timeouts persist: implement secondary fixes (health check, eager Prisma init, graceful shutdown)
 
 ## Features Page + Patient Limits — PR #154
 
