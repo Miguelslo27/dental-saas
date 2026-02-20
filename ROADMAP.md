@@ -135,9 +135,9 @@
 
 ### Subscription Plans
 
-| Feature | Free | Basic ($U 8.99/mes) | Enterprise ($U 15.99/mes) |
+| Feature | Free | Basic ($U 399/mes) | Enterprise ($U 699/mes) |
 |---------|------|-------|------------|
-| **Price** | $U 0/mes | $U 8.99/mes | $U 15.99/mes |
+| **Price** | $U 0/mes | $U 399/mes | $U 699/mes |
 | **Administrators** | 1 | 2 | 5 |
 | **Doctors** | 2 | 5 | 10 |
 | **Patients** | 10 | 20 | 60 |

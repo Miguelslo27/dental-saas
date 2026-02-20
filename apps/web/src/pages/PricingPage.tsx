@@ -25,7 +25,7 @@ const plans = [
   },
   {
     name: "Básico",
-    price: "$U 8.99",
+    price: "$U 399",
     period: "/mes",
     description: "Para clínicas en crecimiento",
     features: [
@@ -45,7 +45,7 @@ const plans = [
   },
   {
     name: "Empresa",
-    price: "$U 15.99",
+    price: "$U 699",
     period: "/mes",
     description: "Para clínicas establecidas",
     features: [
