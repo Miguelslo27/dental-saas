@@ -7,6 +7,7 @@ import {
   Phone,
   MapPin,
   Calendar,
+  CalendarPlus,
   Edit2,
   AlertCircle,
   Loader2,
@@ -27,6 +28,8 @@ import {
 } from '@/lib/patient-api'
 import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
 import { ToothStatus, AttachmentModule, Permission, type ToothData } from '@dental/shared'
+import { AppointmentFormModal } from '@/components/appointments/AppointmentFormModal'
+import { createAppointment, type CreateAppointmentData } from '@/lib/appointment-api'
 import { usePermissions } from '@/hooks/usePermissions'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ImageGallery } from '@/components/ui/ImageGallery'
@@ -269,6 +272,8 @@ export default function PatientDetailPage() {
   const [odontogramKey, setOdontogramKey] = useState(0)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
+  const [isAppointmentFormOpen, setIsAppointmentFormOpen] = useState(false)
+  const [isCreatingAppointment, setIsCreatingAppointment] = useState(false)
 
   // Fetch patient data
   useEffect(() => {
@@ -512,6 +517,15 @@ export default function PatientDetailPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2">
+            {can(Permission.APPOINTMENTS_CREATE) && (
+              <button
+                onClick={() => setIsAppointmentFormOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <CalendarPlus className="h-4 w-4" />
+                Nueva Cita
+              </button>
+            )}
             <button
               onClick={async () => {
                 setIsDownloadingPdf(true)
@@ -770,6 +784,25 @@ export default function PatientDetailPage() {
       {can(Permission.PAYMENTS_VIEW) && id && (
         <PaymentSection patientId={id} />
       )}
+
+      {/* Appointment Form Modal */}
+      <AppointmentFormModal
+        isOpen={isAppointmentFormOpen}
+        onClose={() => setIsAppointmentFormOpen(false)}
+        onSubmit={async (data) => {
+          setIsCreatingAppointment(true)
+          try {
+            await createAppointment(data as CreateAppointmentData)
+            setIsAppointmentFormOpen(false)
+          } catch (e) {
+            setError(e instanceof Error ? e.message : 'Error al crear la cita')
+          } finally {
+            setIsCreatingAppointment(false)
+          }
+        }}
+        isLoading={isCreatingAppointment}
+        defaultPatientId={patient.id}
+      />
 
       {/* Tooth Details Modal */}
       <ToothDetailsModal

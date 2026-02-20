@@ -62,6 +62,7 @@ interface AppointmentFormModalProps {
   appointment?: Appointment | null
   isLoading?: boolean
   defaultDate?: Date
+  defaultPatientId?: string
 }
 
 export function AppointmentFormModal({
@@ -71,6 +72,7 @@ export function AppointmentFormModal({
   appointment,
   isLoading = false,
   defaultDate,
+  defaultPatientId,
 }: AppointmentFormModalProps) {
   const modalTitleId = useId()
   const isEditing = !!appointment
@@ -144,7 +146,7 @@ export function AppointmentFormModal({
       } else {
         const dateToUse = defaultDate || new Date()
         reset({
-          patientId: '',
+          patientId: defaultPatientId || '',
           doctorId: '',
           date: formatDateForInput(dateToUse),
           startTime: '09:00',
@@ -157,7 +159,7 @@ export function AppointmentFormModal({
         })
       }
     }
-  }, [appointment, isOpen, defaultDate, reset, loadingOptions])
+  }, [appointment, isOpen, defaultDate, defaultPatientId, reset, loadingOptions])
 
   // Handle Escape key
   useEffect(() => {
@@ -237,7 +239,7 @@ export function AppointmentFormModal({
                   </label>
                   <select
                     {...register('patientId')}
-                    disabled={loadingOptions}
+                    disabled={!!defaultPatientId || loadingOptions}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   >
                     <option value="">Seleccionar paciente...</option>
