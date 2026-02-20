@@ -149,6 +149,7 @@ describe('Appointments API', () => {
 
   afterAll(async () => {
     // Clean up in correct order
+    await prisma.patientPayment.deleteMany({ where: { tenantId } })
     await prisma.appointment.deleteMany({ where: { tenantId } })
     await prisma.patient.deleteMany({ where: { tenantId } })
     await prisma.doctor.deleteMany({ where: { tenantId } })
@@ -159,7 +160,8 @@ describe('Appointments API', () => {
   })
 
   beforeEach(async () => {
-    // Clean up appointments before each test
+    // Clean up appointments and auto-payments before each test
+    await prisma.patientPayment.deleteMany({ where: { tenantId } })
     await prisma.appointment.deleteMany({ where: { tenantId } })
   })
 
@@ -384,6 +386,79 @@ describe('Appointments API', () => {
       })
 
       expect(response.status).toBe(401)
+    })
+  })
+
+  // ============================================================================
+  // AUTO-PAYMENT ON CREATE TESTS
+  // ============================================================================
+
+  describe('POST /api/appointments - auto-payment', () => {
+    it('should auto-create payment when isPaid=true and cost > 0', async () => {
+      const times = getFutureTime(1)
+      const response = await request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          doctorId,
+          ...times,
+          cost: 200,
+          isPaid: true,
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.isPaid).toBe(true)
+
+      // Verify PatientPayment was created
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+      expect(payments[0].amount.toNumber()).toBe(200)
+      expect(payments[0].note).toBe('Pago en consulta')
+    })
+
+    it('should not create payment when isPaid=false', async () => {
+      const times = getFutureTime(2)
+      const response = await request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          doctorId,
+          ...times,
+          cost: 100,
+          isPaid: false,
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.isPaid).toBe(false)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(0)
+    })
+
+    it('should not create payment when isPaid=true but no cost', async () => {
+      const times = getFutureTime(3)
+      const response = await request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          doctorId,
+          ...times,
+          isPaid: true,
+        })
+
+      expect(response.status).toBe(201)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(0)
     })
   })
 

@@ -1,5 +1,6 @@
 import { prisma, Prisma, AppointmentStatus } from '@dental/database'
 import { logger } from '../utils/logger.js'
+import { createPayment } from './payment.service.js'
 
 // Fields to include in appointment responses
 const APPOINTMENT_SELECT = {
@@ -356,7 +357,7 @@ export async function createAppointment(
       notes: data.notes,
       privateNotes: data.privateNotes,
       cost: data.cost,
-      isPaid: data.isPaid ?? false,
+      isPaid: false, // Always false; FIFO payment system is the source of truth
     },
     select: {
       ...APPOINTMENT_SELECT,
@@ -364,6 +365,26 @@ export async function createAppointment(
       doctor: { select: DOCTOR_INCLUDE },
     },
   })
+
+  // Auto-create payment if marked as paid with positive cost
+  if (data.isPaid && data.cost && data.cost > 0) {
+    const paymentResult = await createPayment(tenantId, data.patientId, {
+      amount: data.cost,
+      date: data.startTime,
+      note: 'Pago en consulta',
+    })
+
+    if (paymentResult.success) {
+      // Re-fetch to get FIFO-updated isPaid
+      const updated = await getAppointmentById(tenantId, appointment.id)
+      if (updated) {
+        logger.info(`Appointment created with auto-payment: ${appointment.id} for tenant ${tenantId}`)
+        return { appointment: updated }
+      }
+    } else {
+      logger.warn({ appointmentId: appointment.id, code: paymentResult.code }, 'Auto-payment failed for appointment marked as paid')
+    }
+  }
 
   logger.info(`Appointment created: ${appointment.id} for tenant ${tenantId}`)
   return { appointment: appointment as SafeAppointment }
@@ -443,7 +464,7 @@ export async function updateAppointment(
   if (data.notes !== undefined) updateData.notes = data.notes
   if (data.privateNotes !== undefined) updateData.privateNotes = data.privateNotes
   if (data.cost !== undefined) updateData.cost = data.cost
-  if (data.isPaid !== undefined) updateData.isPaid = data.isPaid
+  // isPaid is FIFO-controlled via PatientPayment records; not directly writable
 
   // Recalculate duration if time changed
   if ((data.startTime || data.endTime) && data.duration === undefined) {
