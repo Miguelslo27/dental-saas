@@ -1,5 +1,6 @@
 import { apiClient } from './api'
 import { formatCurrency } from './format'
+import i18n from '@/i18n'
 
 // ============================================================================
 // Types
@@ -326,7 +327,7 @@ export function formatTimeRange(startTime: string, endTime: string): string {
 
   const timeFormat: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' }
 
-  return `${start.toLocaleTimeString(undefined, timeFormat)} - ${end.toLocaleTimeString(undefined, timeFormat)}`
+  return `${start.toLocaleTimeString(i18n.language, timeFormat)} - ${end.toLocaleTimeString(i18n.language, timeFormat)}`
 }
 
 /**
@@ -334,7 +335,7 @@ export function formatTimeRange(startTime: string, endTime: string): string {
  */
 export function formatAppointmentDate(startTime: string): string {
   const date = new Date(startTime)
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(i18n.language, {
     weekday: 'short',
     year: 'numeric',
     month: 'short',

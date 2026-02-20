@@ -19,7 +19,7 @@ const STATUS_OPTIONS: AppointmentStatus[] = [
 ]
 
 export function AppointmentsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const {
     appointments,
     stats,
@@ -220,7 +220,7 @@ export function AppointmentsPage() {
     if (date.toDateString() === tomorrow.toDateString()) {
       return t('dates.tomorrow')
     }
-    return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+    return date.toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })
   }
 
   return (
