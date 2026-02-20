@@ -140,8 +140,8 @@
 |---------|------|-------|------------|
 | **Price** | $U 0/mes | $U 399/mes | $U 699/mes |
 | **Administrators** | 1 | 2 | 5 |
-| **Doctors** | 2 | 5 | 10 |
-| **Patients** | 10 | 20 | 60 |
+| **Doctors** | 3 | 5 | 10 |
+| **Patients** | 50 | 200 | 500 |
 | **Storage** | 100MB | 1GB | 5GB |
 | **Support** | Community | Email | Priority |
 | **Backups** | Manual | Daily | Daily + Export |
