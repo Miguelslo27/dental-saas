@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Testimonials } from "../components/Testimonials";
@@ -30,12 +31,12 @@ export function HomePage() {
                 >
                   Comenzar Prueba Gratis
                 </a>
-                <a
-                  href="#caracteristicas"
+                <Link
+                  to="/caracteristicas"
                   className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-semibold text-lg transition-colors"
                 >
                   Ver Características
-                </a>
+                </Link>
               </div>
               <p className="text-sm text-gray-500 mt-4">
                 14 días gratis • Sin tarjeta de crédito

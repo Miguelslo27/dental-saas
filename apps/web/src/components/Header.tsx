@@ -53,12 +53,12 @@ export function Header() {
             >
               Precios
             </Link>
-            <a
-              href="#caracteristicas"
+            <Link
+              to="/caracteristicas"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Características
-            </a>
+            </Link>
           </div>
 
           {/* Desktop CTA Buttons */}
@@ -142,13 +142,13 @@ export function Header() {
             >
               Precios
             </Link>
-            <a
-              href="#caracteristicas"
+            <Link
+              to="/caracteristicas"
               onClick={() => setMobileMenuOpen(false)}
               className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               Características
-            </a>
+            </Link>
             <div className="pt-4 space-y-2 border-t border-gray-100">
               <a
                 href={`${appUrl}/login`}
