@@ -5,7 +5,8 @@
 ### Production Bugs
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
 - [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)
-- [ ] Fix gateway timeout after deploy: eager Prisma init, DB-verified health check, graceful shutdown, connection timeout — see [docs/GATEWAY-TIMEOUT-FIX.md](docs/GATEWAY-TIMEOUT-FIX.md)
+- [x] Fix gateway timeout: add `traefik.docker.network=coolify` label to prevent Traefik from routing via wrong network (PR #152)
+- [ ] Harden API startup: eager Prisma init, DB-verified health check, graceful shutdown, connection timeout — see [docs/GATEWAY-TIMEOUT-FIX.md](docs/GATEWAY-TIMEOUT-FIX.md)
 
 ## Medium Priority
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link, Navigate, useParams } from 'react-router'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/auth.store'
 import { AxiosError } from 'axios'
@@ -17,6 +17,8 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const { clinicSlug: urlClinicSlug } = useParams<{ clinicSlug?: string }>()
+  const [searchParams] = useSearchParams()
+  const sessionExpired = searchParams.get('session') === 'expired'
   const { login, isLoading, error, clearError } = useAuth()
   const { isAuthenticated } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
@@ -73,6 +75,14 @@ export function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {sessionExpired && !error && (
+            <div className="rounded-md bg-yellow-50 border border-yellow-200 p-4">
+              <p className="text-sm text-yellow-800">
+                Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.
+              </p>
+            </div>
+          )}
+
           {error && (
             <div className="rounded-md bg-red-50 p-4">
               <div className="flex">
