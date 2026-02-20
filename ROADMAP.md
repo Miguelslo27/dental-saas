@@ -5,6 +5,7 @@
 ### Production Bugs
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
 - [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)
+- [ ] Fix gateway timeout after deploy: eager Prisma init, DB-verified health check, graceful shutdown, connection timeout — see [docs/GATEWAY-TIMEOUT-FIX.md](docs/GATEWAY-TIMEOUT-FIX.md)
 
 ## Medium Priority
 
@@ -134,15 +135,19 @@
 
 ### Subscription Plans
 
-| Feature | Free | Basic | Enterprise |
+| Feature | Free | Basic ($U 399/mes) | Enterprise ($U 699/mes) |
 |---------|------|-------|------------|
-| **Price** | $0/month | $5.99/month | $11.99/month |
+| **Price** | $U 0/mes | $U 399/mes | $U 699/mes |
 | **Administrators** | 1 | 2 | 5 |
-| **Doctors** | 3 | 5 | 10 |
-| **Patients** | 15 | 25 | 60 |
+| **Doctors** | 2 | 5 | 10 |
+| **Patients** | 10 | 20 | 60 |
 | **Storage** | 100MB | 1GB | 5GB |
 | **Support** | Community | Email | Priority |
 | **Backups** | Manual | Daily | Daily + Export |
+
+### Future: Pricing & Plans
+- [ ] 4th plan or add-on packages for clinics needing more patients, doctors, or storage beyond Enterprise limits
+- [ ] Internationalization of prices by country (currency conversion, inflation adjustments per region)
 
 ---
 
