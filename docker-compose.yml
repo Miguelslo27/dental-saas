@@ -101,6 +101,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    labels:
+      # Tell Traefik which network to use for routing.
+      # Without this, Traefik randomly picks between dental-network and coolify,
+      # and fails when it picks dental-network (which Traefik is NOT connected to).
+      - "traefik.docker.network=coolify"
     # NOTE: Do NOT add custom traefik.http.services.* labels here.
     # Coolify auto-generates Traefik routing labels and custom ones create
     # conflicting service definitions that cause gateway timeouts.
@@ -114,6 +119,8 @@ services:
         VITE_APP_URL: ${VITE_APP_URL:-}
     restart: unless-stopped
     stop_grace_period: 30s
+    labels:
+      - "traefik.docker.network=coolify"
     depends_on:
       - api
     networks:
@@ -137,6 +144,8 @@ services:
     networks:
       - dental-network
       - coolify
+    labels:
+      - "traefik.docker.network=coolify"
     # NOTE: Do NOT add custom traefik.http.services.* labels here.
     # Coolify auto-generates Traefik routing labels and custom ones create
     # conflicting service definitions that cause gateway timeouts.
