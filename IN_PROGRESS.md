@@ -9,9 +9,7 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [ ] Deploy and verify fix resolves the intermittent timeouts
 - [ ] If timeouts persist: implement secondary fixes (health check, eager Prisma init, graceful shutdown)
 
-## Appointment Auto-Payment — PR #155
+## Create Appointments from Patient Detail — PR #156
 
-- [x] Auto-create `PatientPayment` when appointment created with isPaid=true and cost > 0
-- [x] Make `isPaid` FIFO-controlled only (removed direct writes from update)
-- [x] Frontend: refetch appointment list after auto-payment to reflect FIFO changes
-- [x] 3 new integration tests
+- [x] Add `defaultPatientId` prop to `AppointmentFormModal` (pre-select + disable patient selector)
+- [x] Add "Nueva Cita" button to `PatientDetailPage` (guarded by `APPOINTMENTS_CREATE` permission)
