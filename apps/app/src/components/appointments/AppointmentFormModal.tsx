@@ -7,6 +7,7 @@ import type { Appointment, CreateAppointmentData, UpdateAppointmentData, Appoint
 import { getStatusLabel } from '../../lib/appointment-api'
 import * as patientApi from '../../lib/patient-api'
 import * as doctorApi from '../../lib/doctor-api'
+import { PatientSearchCombobox, type PatientOption } from '../ui/PatientSearchCombobox'
 
 const APPOINTMENT_STATUSES: AppointmentStatus[] = [
   'SCHEDULED',
@@ -42,12 +43,6 @@ const appointmentFormSchemaInput = z.object({
 
 type FormData = z.input<typeof appointmentFormSchemaInput>
 
-interface PatientOption {
-  id: string
-  firstName: string
-  lastName: string
-}
-
 interface DoctorOption {
   id: string
   firstName: string
@@ -76,16 +71,19 @@ export function AppointmentFormModal({
 }: AppointmentFormModalProps) {
   const modalTitleId = useId()
   const isEditing = !!appointment
-  
-  // State for patient/doctor options
-  const [patients, setPatients] = useState<PatientOption[]>([])
+
+  // State for doctor options
   const [doctors, setDoctors] = useState<DoctorOption[]>([])
   const [loadingOptions, setLoadingOptions] = useState(false)
+
+  // Selected patient state for the combobox
+  const [selectedPatient, setSelectedPatient] = useState<PatientOption | null>(null)
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(appointmentFormSchemaInput),
@@ -103,7 +101,7 @@ export function AppointmentFormModal({
     },
   })
 
-  // Fetch patients and doctors when modal opens
+  // Fetch doctors (and resolve patient name if needed) when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchOptions()
@@ -113,10 +111,18 @@ export function AppointmentFormModal({
   const fetchOptions = async () => {
     setLoadingOptions(true)
     try {
-      const patientsRes = await patientApi.getPatients({ limit: 100 })
       const doctorsRes = await doctorApi.getDoctors({ limit: 100 })
-      setPatients(patientsRes as unknown as PatientOption[])
       setDoctors(doctorsRes as unknown as DoctorOption[])
+
+      // Resolve patient name for defaultPatientId or editing
+      if (defaultPatientId || appointment?.patientId) {
+        const patientIdToResolve = defaultPatientId || appointment?.patientId
+        const patientsRes = await patientApi.getPatients({ limit: 100 })
+        const found = (patientsRes as unknown as PatientOption[]).find(p => p.id === patientIdToResolve)
+        if (found) {
+          setSelectedPatient(found)
+        }
+      }
     } catch (error) {
       console.error('Error fetching options:', error)
     } finally {
@@ -161,6 +167,13 @@ export function AppointmentFormModal({
     }
   }, [appointment, isOpen, defaultDate, defaultPatientId, reset, loadingOptions])
 
+  // Clear selected patient when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedPatient(null)
+    }
+  }, [isOpen])
+
   // Handle Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -192,6 +205,16 @@ export function AppointmentFormModal({
     }
 
     await onSubmit(appointmentData)
+  }
+
+  const handlePatientSelect = (patient: PatientOption) => {
+    setSelectedPatient(patient)
+    setValue('patientId', patient.id, { shouldValidate: true })
+  }
+
+  const handlePatientClear = () => {
+    setSelectedPatient(null)
+    setValue('patientId', '', { shouldValidate: true })
   }
 
   return (
@@ -237,21 +260,14 @@ export function AppointmentFormModal({
                     <User className="h-4 w-4" />
                     Paciente *
                   </label>
-                  <select
-                    {...register('patientId')}
-                    disabled={!!defaultPatientId || loadingOptions}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                  >
-                    <option value="">Seleccionar paciente...</option>
-                    {patients.map((patient) => (
-                      <option key={patient.id} value={patient.id}>
-                        {patient.firstName} {patient.lastName}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.patientId && (
-                    <p className="mt-1 text-sm text-red-600">{errors.patientId.message}</p>
-                  )}
+                  <PatientSearchCombobox
+                    selectedPatient={selectedPatient}
+                    onSelect={handlePatientSelect}
+                    onClear={handlePatientClear}
+                    disabled={!!defaultPatientId}
+                    error={errors.patientId?.message}
+                  />
+                  <input type="hidden" {...register('patientId')} />
                 </div>
 
                 <div>
