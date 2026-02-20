@@ -26,12 +26,12 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">Producto</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#caracteristicas"
+                <Link
+                  to="/caracteristicas"
                   className="hover:text-white transition-colors"
                 >
                   Características
-                </a>
+                </Link>
               </li>
               <li>
                 <Link to="/precios" className="hover:text-white transition-colors">

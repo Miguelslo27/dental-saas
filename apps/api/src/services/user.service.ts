@@ -49,7 +49,7 @@ export async function getTenantPlanLimits(tenantId: string) {
     return {
       maxAdmins: 1,
       maxDoctors: 3,
-      maxPatients: 15,
+      maxPatients: 50,
     }
   }
 
