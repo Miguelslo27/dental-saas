@@ -100,14 +100,14 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">{t('payments.title')}</h2>
         {can(Permission.PAYMENTS_CREATE) && balance && balance.outstanding > 0 && (
           <button
             onClick={() => setIsFormOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             {t('payments.newPayment')}
@@ -125,18 +125,18 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
 
       {/* Balance Summary */}
       {balance && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">{t('payments.totalDebt')}</p>
-            <p className="text-xl font-bold text-gray-900">{fmtCurrency(balance.totalDebt)}</p>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="bg-gray-50 px-3 py-2 rounded-lg">
+            <p className="text-xs text-gray-500">{t('payments.totalDebt')}</p>
+            <p className="text-sm font-bold text-gray-900 truncate">{fmtCurrency(balance.totalDebt)}</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">{t('payments.totalPaid')}</p>
-            <p className="text-xl font-bold text-green-600">{fmtCurrency(balance.totalPaid)}</p>
+          <div className="bg-gray-50 px-3 py-2 rounded-lg">
+            <p className="text-xs text-gray-500">{t('payments.totalPaid')}</p>
+            <p className="text-sm font-bold text-green-600 truncate">{fmtCurrency(balance.totalPaid)}</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">{t('payments.outstanding')}</p>
-            <p className={`text-xl font-bold ${balance.outstanding > 0 ? 'text-amber-600' : 'text-green-600'}`}>
+          <div className="bg-gray-50 px-3 py-2 rounded-lg">
+            <p className="text-xs text-gray-500">{t('payments.outstanding')}</p>
+            <p className={`text-sm font-bold truncate ${balance.outstanding > 0 ? 'text-amber-600' : 'text-green-600'}`}>
               {fmtCurrency(balance.outstanding)}
             </p>
           </div>
@@ -145,24 +145,24 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
 
       {/* Payments List */}
       {payments.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-6 text-gray-500">
           <DollarSign className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-          <p>{t('payments.noPayments')}</p>
+          <p className="text-sm">{t('payments.noPayments')}</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {payments.map((payment) => (
             <div
               key={payment.id}
-              className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
-                  <DollarSign className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 shrink-0">
+                  <DollarSign className="h-4 w-4 text-green-600" />
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-900">{fmtCurrency(payment.amount)}</p>
-                  <p className="text-sm text-gray-500">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{fmtCurrency(payment.amount)}</p>
+                  <p className="text-xs text-gray-500">
                     {new Date(payment.date).toLocaleDateString(i18n.language, {
                       year: 'numeric',
                       month: 'short',
@@ -170,7 +170,7 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
                     })}
                   </p>
                   {payment.note && (
-                    <p className="text-sm text-gray-400 mt-0.5">{payment.note}</p>
+                    <p className="text-xs text-gray-400 truncate">{payment.note}</p>
                   )}
                 </div>
               </div>
@@ -178,7 +178,7 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
                 <button
                   onClick={() => handleDeletePayment(payment.id)}
                   disabled={deletingId === payment.id}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 shrink-0"
                   title={t('common.delete')}
                 >
                   {deletingId === payment.id ? (
