@@ -125,18 +125,18 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
 
       {/* Balance Summary */}
       {balance && (
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="bg-gray-50 px-3 py-2 rounded-lg">
-            <p className="text-xs text-gray-500">{t('payments.totalDebt')}</p>
-            <p className="text-sm font-bold text-gray-900 truncate">{fmtCurrency(balance.totalDebt)}</p>
+        <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+          <div className="bg-gray-50 px-2 py-3 rounded-lg">
+            <p className="text-xs text-gray-500 mb-1">{t('payments.totalDebt')}</p>
+            <p className="text-base font-bold text-gray-900 leading-tight">{fmtCurrency(balance.totalDebt)}</p>
           </div>
-          <div className="bg-gray-50 px-3 py-2 rounded-lg">
-            <p className="text-xs text-gray-500">{t('payments.totalPaid')}</p>
-            <p className="text-sm font-bold text-green-600 truncate">{fmtCurrency(balance.totalPaid)}</p>
+          <div className="bg-gray-50 px-2 py-3 rounded-lg">
+            <p className="text-xs text-gray-500 mb-1">{t('payments.totalPaid')}</p>
+            <p className="text-base font-bold text-green-600 leading-tight">{fmtCurrency(balance.totalPaid)}</p>
           </div>
-          <div className="bg-gray-50 px-3 py-2 rounded-lg">
-            <p className="text-xs text-gray-500">{t('payments.outstanding')}</p>
-            <p className={`text-sm font-bold truncate ${balance.outstanding > 0 ? 'text-amber-600' : 'text-green-600'}`}>
+          <div className="bg-gray-50 px-2 py-3 rounded-lg">
+            <p className="text-xs text-gray-500 mb-1">{t('payments.outstanding')}</p>
+            <p className={`text-base font-bold leading-tight ${balance.outstanding > 0 ? 'text-amber-600' : 'text-green-600'}`}>
               {fmtCurrency(balance.outstanding)}
             </p>
           </div>
