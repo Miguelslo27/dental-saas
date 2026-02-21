@@ -672,7 +672,6 @@ export default function PatientDetailPage() {
               {showPrimaryTeeth && (
                 <div
                   className="odontogram-primary absolute inset-0 flex items-center justify-center pointer-events-none [&_.Odontogram_g]:pointer-events-auto"
-                  style={{ transform: 'scale(0.65)' }}
                 >
                   <Odontogram
                     key={`primary-${odontogramKey}`}
@@ -682,7 +681,7 @@ export default function PatientDetailPage() {
                     notation="FDI"
                     maxTeeth={5}
                     showTooltip={true}
-                    tooltip={{ placement: 'bottom', margin: 4, content: renderToothTooltip }}
+                    tooltip={{ placement: 'bottom', margin: 8, content: renderToothTooltip }}
                   />
                 </div>
               )}
