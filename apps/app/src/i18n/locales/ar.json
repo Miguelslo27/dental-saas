@@ -125,6 +125,8 @@
     "withNotes": "مع ملاحظات",
     "missingExtracted": "مفقود/مخلوع",
     "characters": "حرف",
+    "collapseSidebar": "إخفاء اللوحة",
+    "expandSidebar": "إظهار اللوحة",
     "saving": "جاري الحفظ...",
     "status": {
       "healthy": "سليم",

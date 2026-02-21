@@ -125,6 +125,8 @@
     "withNotes": "Con notas",
     "missingExtracted": "Ausente/Extraído",
     "characters": "caracteres",
+    "collapseSidebar": "Ocultar panel",
+    "expandSidebar": "Mostrar panel",
     "saving": "Guardando...",
     "status": {
       "healthy": "Saludable",

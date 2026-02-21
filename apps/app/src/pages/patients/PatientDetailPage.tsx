@@ -14,6 +14,7 @@ import {
   ChevronRight,
   X,
   FileText,
+  PanelLeftOpen,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Odontogram } from 'react-odontogram'
@@ -27,13 +28,11 @@ import {
   getPatientInitials,
 } from '@/lib/patient-api'
 import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
-import { ToothStatus, AttachmentModule, Permission, type ToothData } from '@dental/shared'
+import { ToothStatus, Permission, type ToothData } from '@dental/shared'
 import { AppointmentFormModal } from '@/components/appointments/AppointmentFormModal'
 import { createAppointment, type CreateAppointmentData } from '@/lib/appointment-api'
 import { usePermissions } from '@/hooks/usePermissions'
-import { ImageUpload } from '@/components/ui/ImageUpload'
-import { ImageGallery } from '@/components/ui/ImageGallery'
-import { PaymentSection } from '@/components/payments/PaymentSection'
+import { PatientSidebar } from './PatientSidebar'
 
 // ============================================================================
 // Types
@@ -274,6 +273,21 @@ export default function PatientDetailPage() {
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const [isAppointmentFormOpen, setIsAppointmentFormOpen] = useState(false)
   const [isCreatingAppointment, setIsCreatingAppointment] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('patient-sidebar-collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => {
+      const next = !prev
+      try { localStorage.setItem('patient-sidebar-collapsed', String(next)) } catch {}
+      return next
+    })
+  }
 
   // Fetch patient data
   useEffect(() => {
@@ -603,10 +617,33 @@ export default function PatientDetailPage() {
         </div>
       </div>
 
-      {/* Dental Chart Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      {/* Two-column layout: Sidebar (Images + Payments) | Odontogram */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar */}
+        <PatientSidebar
+          patientId={patient.id}
+          isCollapsed={isSidebarCollapsed}
+          onToggle={toggleSidebar}
+          imageRefreshKey={imageRefreshKey}
+          onImageUploadComplete={() => setImageRefreshKey((k) => k + 1)}
+        />
+
+        {/* Dental Chart Section */}
+        <div className="flex-1 min-w-0 order-1 lg:order-2">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
+          <div className="flex items-center gap-2">
+            {isSidebarCollapsed && (
+              <button
+                onClick={toggleSidebar}
+                className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title={t('patients.expandSidebar')}
+              >
+                <PanelLeftOpen className="h-4 w-4 rtl:scale-x-[-1]" />
+              </button>
+            )}
+            <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
+          </div>
           <label className="flex items-center gap-2 text-sm text-gray-600">
             <input
               type="checkbox"
@@ -762,28 +799,8 @@ export default function PatientDetailPage() {
           )}
         </div>
       </div>
-
-      {/* Images Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('attachments.title')}</h2>
-        <ImageUpload
-          module={AttachmentModule.PATIENTS}
-          entityId={patient.id}
-          onUploadComplete={() => setImageRefreshKey((k) => k + 1)}
-        />
-        <div className="mt-4">
-          <ImageGallery
-            module={AttachmentModule.PATIENTS}
-            entityId={patient.id}
-            refreshKey={imageRefreshKey}
-          />
-        </div>
       </div>
-
-      {/* Payments Section */}
-      {can(Permission.PAYMENTS_VIEW) && id && (
-        <PaymentSection patientId={id} />
-      )}
+      </div>
 
       {/* Appointment Form Modal */}
       <AppointmentFormModal
