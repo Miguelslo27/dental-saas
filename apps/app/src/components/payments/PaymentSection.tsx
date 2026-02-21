@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, Loader2, DollarSign, AlertCircle } from 'lucide-react'
+import { Plus, Trash2, Loader2, DollarSign, AlertCircle, PanelLeftClose } from 'lucide-react'
 import { Permission } from '@dental/shared'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
@@ -22,9 +22,10 @@ import { PaymentFormModal } from './PaymentFormModal'
 
 interface PaymentSectionProps {
   patientId: string
+  onCollapse?: () => void
 }
 
-export function PaymentSection({ patientId }: PaymentSectionProps) {
+export function PaymentSection({ patientId, onCollapse }: PaymentSectionProps) {
   const { t, i18n } = useTranslation()
   const { can } = usePermissions()
   const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
@@ -104,15 +105,26 @@ export function PaymentSection({ patientId }: PaymentSectionProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">{t('payments.title')}</h2>
-        {can(Permission.PAYMENTS_CREATE) && balance && balance.outstanding > 0 && (
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            {t('payments.newPayment')}
-          </button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {can(Permission.PAYMENTS_CREATE) && balance && balance.outstanding > 0 && (
+            <button
+              onClick={() => setIsFormOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              {t('payments.newPayment')}
+            </button>
+          )}
+          {onCollapse && (
+            <button
+              onClick={onCollapse}
+              className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title={t('patients.collapseSidebar')}
+            >
+              <PanelLeftClose className="h-4 w-4 rtl:scale-x-[-1]" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Error */}

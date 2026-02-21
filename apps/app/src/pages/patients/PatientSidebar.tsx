@@ -43,13 +43,6 @@ export function PatientSidebar({
             <PanelLeftOpen className="h-5 w-5 rtl:scale-x-[-1]" />
           </button>
           <div className="w-6 border-t border-gray-200" />
-          <button
-            onClick={onToggle}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title={t('attachments.title')}
-          >
-            <Image className="h-5 w-5" />
-          </button>
           {can(Permission.PAYMENTS_VIEW) && (
             <button
               onClick={onToggle}
@@ -59,23 +52,37 @@ export function PatientSidebar({
               <DollarSign className="h-5 w-5" />
             </button>
           )}
+          <button
+            onClick={onToggle}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            title={t('attachments.title')}
+          >
+            <Image className="h-5 w-5" />
+          </button>
         </div>
       )}
 
       {/* Expanded sidebar content */}
       {!isCollapsed && (
         <div className="space-y-6 lg:w-95">
+          {/* Payments Card */}
+          {can(Permission.PAYMENTS_VIEW) && (
+            <PaymentSection patientId={patientId} onCollapse={onToggle} />
+          )}
+
           {/* Images Card */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">{t('attachments.title')}</h2>
-              <button
-                onClick={onToggle}
-                className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title={t('patients.collapseSidebar')}
-              >
-                <PanelLeftClose className="h-4 w-4 rtl:scale-x-[-1]" />
-              </button>
+              {!can(Permission.PAYMENTS_VIEW) && (
+                <button
+                  onClick={onToggle}
+                  className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={t('patients.collapseSidebar')}
+                >
+                  <PanelLeftClose className="h-4 w-4 rtl:scale-x-[-1]" />
+                </button>
+              )}
             </div>
             <ImageUpload
               module={AttachmentModule.PATIENTS}
@@ -90,11 +97,6 @@ export function PatientSidebar({
               />
             </div>
           </div>
-
-          {/* Payments Card */}
-          {can(Permission.PAYMENTS_VIEW) && (
-            <PaymentSection patientId={patientId} />
-          )}
         </div>
       )}
     </aside>
