@@ -14,7 +14,6 @@ import {
   ChevronRight,
   X,
   FileText,
-  PanelLeftOpen,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Odontogram } from 'react-odontogram'
@@ -632,18 +631,7 @@ export default function PatientDetailPage() {
         <div className="flex-1 min-w-0 order-1 lg:order-2">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            {isSidebarCollapsed && (
-              <button
-                onClick={toggleSidebar}
-                className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title={t('patients.expandSidebar')}
-              >
-                <PanelLeftOpen className="h-4 w-4 rtl:scale-x-[-1]" />
-              </button>
-            )}
-            <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
-          </div>
+          <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
           <label className="flex items-center gap-2 text-sm text-gray-600">
             <input
               type="checkbox"
