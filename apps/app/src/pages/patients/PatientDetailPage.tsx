@@ -649,7 +649,7 @@ export default function PatientDetailPage() {
         )}
 
         {/* Two-column layout: Odontogram left, teeth cards right */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col xl:flex-row gap-4">
           {/* Left column - Odontogram + Legend */}
           <div className="flex-1 min-w-0">
             {/* Combined Dental Chart - Permanent with Primary overlaid */}
@@ -691,11 +691,11 @@ export default function PatientDetailPage() {
 
           {/* Right column - Teeth data summary (chips) */}
           {Object.keys(teeth).length > 0 && (
-            <div className="lg:w-56 xl:w-64 lg:shrink-0">
+            <div className="xl:w-64 xl:shrink-0">
               <h3 className="text-xs font-medium text-gray-500 mb-2">
                 {t('patients.registeredTeeth')} ({Object.keys(teeth).length})
               </h3>
-              <div className="flex flex-wrap gap-1.5 lg:max-h-[400px] lg:overflow-y-auto lg:pr-1">
+              <div className="flex flex-wrap gap-1.5 xl:max-h-[400px] xl:overflow-y-auto xl:pr-1">
                 {Object.entries(teeth).map(([toothNumber, toothData]) => (
                   <div
                     key={toothNumber}
