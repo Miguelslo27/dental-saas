@@ -571,7 +571,7 @@ export default function PatientDetailPage() {
         </div>
 
         {/* Contact info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-[1180px]:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
           {patient.email && (
             <div className="flex items-center gap-3 text-gray-600">
               <Mail className="h-5 w-5 text-gray-400" />
@@ -617,7 +617,7 @@ export default function PatientDetailPage() {
       </div>
 
       {/* Two-column layout: Sidebar (Images + Payments) | Odontogram */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col min-[1180px]:flex-row gap-6">
         {/* Sidebar */}
         <PatientSidebar
           patientId={patient.id}
@@ -628,7 +628,7 @@ export default function PatientDetailPage() {
         />
 
         {/* Dental Chart Section */}
-        <div className="flex-1 min-w-0 order-1 lg:order-2">
+        <div className="flex-1 min-w-0 order-1 min-[1180px]:order-2">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
