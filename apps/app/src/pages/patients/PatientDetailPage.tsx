@@ -687,44 +687,6 @@ export default function PatientDetailPage() {
               )}
             </div>
 
-            {/* Status Color Legend */}
-            <div className="mt-4 pt-3 border-t border-gray-100">
-              <h3 className="text-xs font-medium text-gray-500 mb-2">{t('patients.statusLegend')}</h3>
-              <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#ef4444' }} />
-                  <span className="text-gray-600">{t('patients.status.caries')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#3b82f6' }} />
-                  <span className="text-gray-600">{t('patients.status.filled')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#06b6d4' }} />
-                  <span className="text-gray-600">{t('patients.status.crown')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#6366f1' }} />
-                  <span className="text-gray-600">{t('patients.status.root_canal')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#9ca3af' }} />
-                  <span className="text-gray-600">{t('patients.missingExtracted')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#8b5cf6' }} />
-                  <span className="text-gray-600">{t('patients.status.implant')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#ec4899' }} />
-                  <span className="text-gray-600">{t('patients.status.bridge')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#f59e0b' }} />
-                  <span className="text-gray-600">{t('patients.withNotes')}</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Right column - Teeth data summary (chips) */}
@@ -782,6 +744,45 @@ export default function PatientDetailPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Status Color Legend - full width */}
+        <div className="mt-4 pt-3 border-t border-gray-100">
+          <h3 className="text-xs font-medium text-gray-500 mb-2">{t('patients.statusLegend')}</h3>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#ef4444' }} />
+              <span className="text-gray-600">{t('patients.status.caries')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#3b82f6' }} />
+              <span className="text-gray-600">{t('patients.status.filled')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#06b6d4' }} />
+              <span className="text-gray-600">{t('patients.status.crown')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#6366f1' }} />
+              <span className="text-gray-600">{t('patients.status.root_canal')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#9ca3af' }} />
+              <span className="text-gray-600">{t('patients.missingExtracted')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#8b5cf6' }} />
+              <span className="text-gray-600">{t('patients.status.implant')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#ec4899' }} />
+              <span className="text-gray-600">{t('patients.status.bridge')}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#f59e0b' }} />
+              <span className="text-gray-600">{t('patients.withNotes')}</span>
+            </div>
+          </div>
         </div>
       </div>
       </div>
