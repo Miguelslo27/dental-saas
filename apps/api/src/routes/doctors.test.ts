@@ -343,7 +343,7 @@ describe('Doctors API', () => {
       expect(response.status).toBe(200)
       // Should find Alice (active with Orthodontics)
       expect(response.body.data.length).toBeGreaterThanOrEqual(1)
-      expect(response.body.data.some((d: any) => d.firstName === 'Alice')).toBe(true)
+      expect(response.body.data.some((d: Record<string, unknown>) => d.firstName === 'Alice')).toBe(true)
     })
 
     it('should paginate results', async () => {

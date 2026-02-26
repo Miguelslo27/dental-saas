@@ -61,6 +61,7 @@ export function PreferencesForm({ settings, canEdit }: PreferencesFormProps) {
   // Sync form data and i18n language when settings load
   useEffect(() => {
     if (settings) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         language: settings.language,
         dateFormat: settings.dateFormat,

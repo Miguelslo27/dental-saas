@@ -31,7 +31,7 @@ export function BusinessHoursForm({ settings, canEdit }: BusinessHoursFormProps)
   // Sync form data when settings load
   useEffect(() => {
     if (settings) {
-      setWorkingDays(settings.workingDays || [1, 2, 3, 4, 5])
+      setWorkingDays(settings.workingDays || [1, 2, 3, 4, 5]) // eslint-disable-line react-hooks/set-state-in-effect
       setBusinessHours(settings.businessHours || {})
     }
   }, [settings])

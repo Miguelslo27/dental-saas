@@ -65,7 +65,7 @@ export function verifyAccessToken(token: string): TokenPayload {
   // Make sure it's not a refresh token
   if (decoded.type === 'refresh') {
     const error = new Error('Invalid token type: expected access token, got refresh token')
-    ;(error as any).code = 'INVALID_TOKEN_TYPE'
+    ;(error as Error & { code?: string }).code = 'INVALID_TOKEN_TYPE'
     throw error
   }
   
@@ -81,7 +81,7 @@ export function verifyRefreshToken(token: string): { userId: string } {
   
   if (decoded.type !== 'refresh') {
     const error = new Error('Invalid token type: expected refresh token')
-    ;(error as any).code = 'INVALID_TOKEN_TYPE'
+    ;(error as Error & { code?: string }).code = 'INVALID_TOKEN_TYPE'
     throw error
   }
   

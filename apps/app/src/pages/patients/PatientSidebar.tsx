@@ -27,14 +27,14 @@ export function PatientSidebar({
   return (
     <aside
       className={`
-        order-2 lg:order-1 lg:shrink-0
-        lg:transition-[width] lg:duration-200 lg:ease-in-out
-        ${isCollapsed ? 'lg:w-12' : 'lg:w-95'}
+        order-2 min-[1180px]:order-1 min-[1180px]:shrink-0
+        min-[1180px]:transition-[width] min-[1180px]:duration-200 min-[1180px]:ease-in-out
+        ${isCollapsed ? 'min-[1180px]:w-12' : 'min-[1180px]:w-95'}
       `}
     >
       {/* Collapsed icon strip — desktop only */}
       {isCollapsed && (
-        <div className="hidden lg:flex flex-col items-center gap-2 py-3 bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="hidden min-[1180px]:flex flex-col items-center gap-2 py-3 bg-white rounded-xl shadow-sm border border-gray-100">
           <button
             onClick={onToggle}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -64,7 +64,7 @@ export function PatientSidebar({
 
       {/* Expanded sidebar content */}
       {!isCollapsed && (
-        <div className="space-y-6 lg:w-95">
+        <div className="space-y-6 min-[1180px]:w-95">
           {/* Payments Card */}
           {can(Permission.PAYMENTS_VIEW) && (
             <PaymentSection patientId={patientId} onCollapse={onToggle} />
@@ -77,7 +77,7 @@ export function PatientSidebar({
               {!can(Permission.PAYMENTS_VIEW) && (
                 <button
                   onClick={onToggle}
-                  className="hidden lg:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="hidden min-[1180px]:inline-flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                   title={t('patients.collapseSidebar')}
                 >
                   <PanelLeftClose className="h-4 w-4 rtl:scale-x-[-1]" />

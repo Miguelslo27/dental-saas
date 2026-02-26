@@ -32,19 +32,19 @@ export function DoctorsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Fetch doctors on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchDoctors()
     fetchStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Debounced search
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchDoctors()
     }, 300)
     return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, showInactive])
 
   // Clear success message after 3 seconds

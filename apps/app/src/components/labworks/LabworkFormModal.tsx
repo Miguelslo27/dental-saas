@@ -77,7 +77,7 @@ export function LabworkFormModal({
           notes: labwork.note || '',
         })
         if (labwork.patient && labwork.patientId) {
-          setSelectedPatient({
+          setSelectedPatient({ // eslint-disable-line react-hooks/set-state-in-effect
             id: labwork.patientId,
             firstName: labwork.patient.firstName,
             lastName: labwork.patient.lastName,

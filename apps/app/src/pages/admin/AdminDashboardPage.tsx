@@ -65,7 +65,7 @@ export function AdminDashboardPage() {
         setStats(statsData)
         setTopTenants(tenantsData)
         setRecentActivity(activityData)
-      } catch (_err) {
+      } catch {
         setError('Error al cargar los datos del dashboard')
       } finally {
         setIsLoading(false)

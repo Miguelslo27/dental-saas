@@ -33,7 +33,7 @@ export function AdminUserDetailPage() {
         const data = await adminUsersApi.get(id)
         setUser(data)
         setError(null)
-      } catch (_err) {
+      } catch {
         setError('Error al cargar los detalles del usuario')
       } finally {
         setIsLoading(false)

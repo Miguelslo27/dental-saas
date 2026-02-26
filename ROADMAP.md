@@ -2,6 +2,18 @@
 
 ## High Priority
 
+### Odontogram
+- [ ] Invert quadrants 3 and 4 (lower arch) so numbering matches standard dental convention
+
+### Patient Budgets (Presupuestos)
+- [ ] Allow creating a budget per patient with planned treatments and costs
+- [ ] Share budget with patient (PDF or link)
+- [ ] When creating an appointment, allow selecting budgeted treatments to execute
+
+### Labwork Improvements
+- [ ] Save laboratory name when creating a labwork (autocomplete from previously used labs, or create new)
+- [ ] Add labwork list/section to patient detail page
+
 ### Production Bugs
 - [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
 - [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)

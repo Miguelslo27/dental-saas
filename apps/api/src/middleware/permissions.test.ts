@@ -8,6 +8,7 @@ import {
   hasAnyPermission,
   hasAllPermissions,
 } from '@dental/shared';
+import type { TokenPayload } from '../services/auth.service.js';
 import {
   requirePermission,
   requireAnyPermission,
@@ -214,7 +215,7 @@ describe('Permissions System', () => {
     });
 
     it('should return 403 if user does not have required permission', () => {
-      mockReq.user = { role: UserRole.STAFF } as any;
+      mockReq.user = { role: UserRole.STAFF } as TokenPayload;
       const middleware = requirePermission(Permission.PATIENTS_CREATE);
 
       middleware(mockReq as Request, mockRes as Response, mockNext);
@@ -228,7 +229,7 @@ describe('Permissions System', () => {
     });
 
     it('should call next() if user has required permission', () => {
-      mockReq.user = { role: UserRole.ADMIN } as any;
+      mockReq.user = { role: UserRole.ADMIN } as TokenPayload;
       const middleware = requirePermission(Permission.PATIENTS_CREATE);
 
       middleware(mockReq as Request, mockRes as Response, mockNext);
@@ -238,7 +239,7 @@ describe('Permissions System', () => {
     });
 
     it('should allow OWNER to perform OWNER-exclusive operations', () => {
-      mockReq.user = { role: UserRole.OWNER } as any;
+      mockReq.user = { role: UserRole.OWNER } as TokenPayload;
       const middleware = requirePermission(Permission.TENANT_DELETE);
 
       middleware(mockReq as Request, mockRes as Response, mockNext);
@@ -247,7 +248,7 @@ describe('Permissions System', () => {
     });
 
     it('should deny ADMIN from OWNER-exclusive operations', () => {
-      mockReq.user = { role: UserRole.ADMIN } as any;
+      mockReq.user = { role: UserRole.ADMIN } as TokenPayload;
       const middleware = requirePermission(Permission.TENANT_DELETE);
 
       middleware(mockReq as Request, mockRes as Response, mockNext);
@@ -284,7 +285,7 @@ describe('Permissions System', () => {
     });
 
     it('should return 403 if user has none of the required permissions', () => {
-      mockReq.user = { role: UserRole.STAFF } as any;
+      mockReq.user = { role: UserRole.STAFF } as TokenPayload;
       const permissions = [Permission.PATIENTS_CREATE, Permission.PATIENTS_DELETE];
       const middleware = requireAnyPermission(permissions);
 
@@ -295,7 +296,7 @@ describe('Permissions System', () => {
     });
 
     it('should call next() if user has at least one required permission', () => {
-      mockReq.user = { role: UserRole.STAFF } as any;
+      mockReq.user = { role: UserRole.STAFF } as TokenPayload;
       const permissions = [Permission.PATIENTS_CREATE, Permission.PATIENTS_VIEW];
       const middleware = requireAnyPermission(permissions);
 
@@ -333,7 +334,7 @@ describe('Permissions System', () => {
     });
 
     it('should return 403 if user is missing any required permission', () => {
-      mockReq.user = { role: UserRole.STAFF } as any;
+      mockReq.user = { role: UserRole.STAFF } as TokenPayload;
       const permissions = [Permission.PATIENTS_VIEW, Permission.PATIENTS_CREATE];
       const middleware = requireAllPermissions(permissions);
 
@@ -344,7 +345,7 @@ describe('Permissions System', () => {
     });
 
     it('should call next() if user has all required permissions', () => {
-      mockReq.user = { role: UserRole.ADMIN } as any;
+      mockReq.user = { role: UserRole.ADMIN } as TokenPayload;
       const permissions = [Permission.PATIENTS_VIEW, Permission.PATIENTS_CREATE];
       const middleware = requireAllPermissions(permissions);
 

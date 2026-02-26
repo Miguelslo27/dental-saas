@@ -76,7 +76,7 @@ describe('user.service', () => {
           maxDoctors: 5,
           maxPatients: 25,
         },
-      } as any)
+      } as never)
 
       const limits = await userService.getTenantPlanLimits('tenant-1')
 
@@ -94,7 +94,7 @@ describe('user.service', () => {
         { role: 'OWNER', _count: { id: 1 } },
         { role: 'ADMIN', _count: { id: 2 } },
         { role: 'DOCTOR', _count: { id: 3 } },
-      ] as any)
+      ] as never)
 
       const counts = await userService.countUsersByRole('tenant-1')
 
@@ -113,7 +113,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null)
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'STAFF', _count: { id: 100 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'STAFF')
 
@@ -124,7 +124,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 1 admin
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'OWNER', _count: { id: 1 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'ADMIN')
 
@@ -136,7 +136,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 3 doctors
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'DOCTOR', _count: { id: 3 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'DOCTOR')
 
@@ -148,7 +148,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 1 admin
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'OWNER', _count: { id: 1 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'CLINIC_ADMIN')
 
@@ -160,7 +160,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null) // free plan: 1 admin
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'CLINIC_ADMIN', _count: { id: 1 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'ADMIN')
 
@@ -172,7 +172,7 @@ describe('user.service', () => {
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null)
       vi.mocked(prisma.user.groupBy).mockResolvedValue([
         { role: 'DOCTOR', _count: { id: 2 } },
-      ] as any)
+      ] as never)
 
       const result = await userService.checkRoleLimitForNewUser('tenant-1', 'DOCTOR')
 
@@ -186,7 +186,7 @@ describe('user.service', () => {
         { id: 'user-1', email: 'user1@test.com', firstName: 'User', lastName: 'One' },
         { id: 'user-2', email: 'user2@test.com', firstName: 'User', lastName: 'Two' },
       ]
-      vi.mocked(prisma.user.findMany).mockResolvedValue(mockUsers as any)
+      vi.mocked(prisma.user.findMany).mockResolvedValue(mockUsers as never)
 
       const users = await userService.listUsers('tenant-1')
 
@@ -214,7 +214,7 @@ describe('user.service', () => {
   describe('getUserById', () => {
     it('should return user when found in tenant', async () => {
       const mockUser = { id: 'user-1', email: 'user1@test.com', tenantId: 'tenant-1' }
-      vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as never)
 
       const user = await userService.getUserById('tenant-1', 'user-1')
 
@@ -249,8 +249,8 @@ describe('user.service', () => {
   describe('updateUser', () => {
     it('should update user when found in tenant', async () => {
       const mockUser = { id: 'user-1', email: 'updated@test.com', firstName: 'Updated' }
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1' } as any)
-      vi.mocked(prisma.user.update).mockResolvedValue(mockUser as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1' } as never)
+      vi.mocked(prisma.user.update).mockResolvedValue(mockUser as never)
 
       const user = await userService.updateUser('tenant-1', 'user-1', {
         email: 'updated@test.com',
@@ -300,7 +300,7 @@ describe('user.service', () => {
         lastName: 'User',
         role: 'STAFF',
       }
-      vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any)
+      vi.mocked(prisma.user.create).mockResolvedValue(mockUser as never)
 
       const user = await userService.createUser('tenant-1', {
         email: 'new@test.com',
@@ -326,7 +326,7 @@ describe('user.service', () => {
 
   describe('updateUserRole', () => {
     it('should prevent non-owners from promoting to OWNER', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as never)
 
       const result = await userService.updateUserRole('tenant-1', 'user-1', 'OWNER', 'ADMIN')
 
@@ -335,7 +335,7 @@ describe('user.service', () => {
     })
 
     it('should prevent changing role to SUPER_ADMIN', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as never)
 
       const result = await userService.updateUserRole('tenant-1', 'user-1', 'SUPER_ADMIN', 'OWNER')
 
@@ -344,10 +344,10 @@ describe('user.service', () => {
     })
 
     it('should allow owner to promote user to OWNER', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'ADMIN' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'ADMIN' } as never)
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null)
-      vi.mocked(prisma.user.groupBy).mockResolvedValue([{ role: 'OWNER', _count: { id: 0 } }] as any)
-      vi.mocked(prisma.user.update).mockResolvedValue({ id: 'user-1', role: 'OWNER' } as any)
+      vi.mocked(prisma.user.groupBy).mockResolvedValue([{ role: 'OWNER', _count: { id: 0 } }] as never)
+      vi.mocked(prisma.user.update).mockResolvedValue({ id: 'user-1', role: 'OWNER' } as never)
 
       const result = await userService.updateUserRole('tenant-1', 'user-1', 'OWNER', 'OWNER')
 
@@ -355,8 +355,8 @@ describe('user.service', () => {
     })
 
     it('should skip limit check when role is not changing', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as any)
-      vi.mocked(prisma.user.update).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as never)
+      vi.mocked(prisma.user.update).mockResolvedValue({ id: 'user-1', role: 'DOCTOR' } as never)
 
       const result = await userService.updateUserRole('tenant-1', 'user-1', 'DOCTOR', 'ADMIN')
 
@@ -369,7 +369,7 @@ describe('user.service', () => {
 
   describe('deleteUser', () => {
     it('should prevent self-deletion', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'ADMIN' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'ADMIN' } as never)
 
       const result = await userService.deleteUser('tenant-1', 'user-1', 'user-1')
 
@@ -378,7 +378,7 @@ describe('user.service', () => {
     })
 
     it('should prevent deleting owners', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'OWNER' } as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'OWNER' } as never)
 
       const result = await userService.deleteUser('tenant-1', 'user-1', 'user-2')
 
@@ -387,8 +387,8 @@ describe('user.service', () => {
     })
 
     it('should soft delete user and invalidate tokens', async () => {
-      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as any)
-      vi.mocked(prisma.user.update).mockResolvedValue({} as any)
+      vi.mocked(prisma.user.findFirst).mockResolvedValue({ id: 'user-1', role: 'STAFF' } as never)
+      vi.mocked(prisma.user.update).mockResolvedValue({} as never)
       vi.mocked(prisma.refreshToken.deleteMany).mockResolvedValue({ count: 1 })
 
       const result = await userService.deleteUser('tenant-1', 'user-1', 'admin-1')
