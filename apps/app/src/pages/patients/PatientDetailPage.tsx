@@ -283,7 +283,7 @@ export default function PatientDetailPage() {
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => {
       const next = !prev
-      try { localStorage.setItem('patient-sidebar-collapsed', String(next)) } catch {}
+      try { localStorage.setItem('patient-sidebar-collapsed', String(next)) } catch { /* ignore */ }
       return next
     })
   }
