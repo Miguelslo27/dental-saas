@@ -106,6 +106,7 @@ export function AppointmentFormModal({
     if (isOpen) {
       fetchOptions()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   const fetchOptions = async () => {

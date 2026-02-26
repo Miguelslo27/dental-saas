@@ -86,6 +86,7 @@ export function DoctorFormModal({
     },
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchedWorkingDays = watch('workingDays') || []
 
   // Reset form when doctor changes or modal opens

@@ -57,7 +57,7 @@ export function ClinicProfileForm({ profile, canEdit }: ClinicProfileFormProps) 
   // Sync form data when profile loads
   useEffect(() => {
     if (profile) {
-      setFormData({
+      setFormData({ // eslint-disable-line react-hooks/set-state-in-effect
         name: profile.name,
         email: profile.email,
         phone: profile.phone || '',

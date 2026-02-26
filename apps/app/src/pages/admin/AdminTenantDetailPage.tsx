@@ -37,7 +37,7 @@ export function AdminTenantDetailPage() {
         const data = await adminTenantsApi.get(id)
         setTenant(data)
         setError(null)
-      } catch (_err) {
+      } catch {
         setError('Error al cargar los detalles de la clínica')
       } finally {
         setIsLoading(false)

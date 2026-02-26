@@ -160,7 +160,7 @@ export function AppointmentsPage() {
         // Error is handled by store
       }
     },
-    [selectedAppointment, addAppointment, editAppointment]
+    [selectedAppointment, addAppointment, editAppointment, t]
   )
 
   const handleConfirmDelete = async () => {

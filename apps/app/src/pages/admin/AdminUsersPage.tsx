@@ -45,7 +45,7 @@ export function AdminUsersPage() {
       })
       setData(response)
       setError(null)
-    } catch (_err) {
+    } catch {
       setError('Error al cargar los usuarios')
     } finally {
       setIsLoading(false)
@@ -71,7 +71,7 @@ export function AdminUsersPage() {
         await adminUsersApi.activate(user.id)
       }
       fetchUsers()
-    } catch (_err) {
+    } catch {
       setError('Error al cambiar el estado del usuario')
     } finally {
       setActionLoading(null)
@@ -89,7 +89,7 @@ export function AdminUsersPage() {
     try {
       await adminUsersApi.delete(user.id)
       fetchUsers()
-    } catch (_err) {
+    } catch {
       setError('Error al eliminar el usuario')
     } finally {
       setActionLoading(null)
@@ -107,7 +107,7 @@ export function AdminUsersPage() {
       setResetPasswordModal(null)
       setNewPassword('')
       setPasswordError(null)
-    } catch (_err) {
+    } catch {
       setPasswordError('Error al resetear la contraseña')
     } finally {
       setActionLoading(null)

@@ -38,7 +38,7 @@ export function AdminTenantsPage() {
       })
       setData(response)
       setError(null)
-    } catch (_err) {
+    } catch {
       setError('Error al cargar las clínicas')
     } finally {
       setIsLoading(false)
@@ -64,7 +64,7 @@ export function AdminTenantsPage() {
         await adminTenantsApi.activate(tenant.id)
       }
       fetchTenants()
-    } catch (_err) {
+    } catch {
       setError('Error al cambiar el estado de la clínica')
     } finally {
       setActionLoading(null)
@@ -82,7 +82,7 @@ export function AdminTenantsPage() {
     try {
       await adminTenantsApi.delete(tenant.id)
       fetchTenants()
-    } catch (_err) {
+    } catch {
       setError('Error al eliminar la clínica')
     } finally {
       setActionLoading(null)
