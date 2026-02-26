@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  react-odontogram@0.4.1:
+    hash: 299286a380031327318b935a1ac8dc21c57aef0edc635f716abba11a3e7a7c2d
+    path: patches/react-odontogram@0.4.1.patch
+
 importers:
 
   .:
@@ -152,7 +157,7 @@ importers:
         version: 16.5.3(i18next@25.7.4(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
       react-odontogram:
         specifier: ^0.4.1
-        version: 0.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 0.4.1(patch_hash=299286a380031327318b935a1ac8dc21c57aef0edc635f716abba11a3e7a7c2d)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-router:
         specifier: ^7.6.1
         version: 7.11.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -7034,7 +7039,7 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react-odontogram@0.4.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  react-odontogram@0.4.1(patch_hash=299286a380031327318b935a1ac8dc21c57aef0edc635f716abba11a3e7a7c2d)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
