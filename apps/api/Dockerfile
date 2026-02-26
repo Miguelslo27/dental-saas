@@ -8,6 +8,7 @@ WORKDIR /app
 # ============================================
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches/ ./patches/
 COPY apps/api/package.json ./apps/api/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
@@ -64,6 +65,7 @@ COPY --from=2 /app/packages/shared/package.json ./packages/shared/
 COPY --from=2 /app/package.json ./
 COPY --from=2 /app/pnpm-workspace.yaml ./
 COPY --from=2 /app/pnpm-lock.yaml ./
+COPY --from=2 /app/patches ./patches
 
 # Install production dependencies only
 # NOTE: In pnpm monorepos, --prod can fail to resolve internal dependencies.
