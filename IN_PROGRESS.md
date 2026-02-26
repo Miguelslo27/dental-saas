@@ -118,7 +118,8 @@ Active tasks for the current development cycle. Add tasks here before starting w
 ### Tareas
 - [x] PR #160: Layout 2 columnas con sidebar colapsable
 - [x] PR #161: Fix tooltip en dientes temporales (transform en SVG, no en wrapper)
-- [x] Compactar la sección del odontograma (leyenda compacta, dientes registrados como chips, breakpoint lg)
+- [x] PR #162: Compactar la sección del odontograma (leyenda compacta, dientes registrados como chips, breakpoint 1180px)
+- [x] PR #163: Invertir cuadrantes 3 y 4 del odontograma (pnpm patch react-odontogram)
 - [ ] Probar en desktop, tablet y mobile
 
 ---
