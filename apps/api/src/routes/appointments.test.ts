@@ -507,7 +507,7 @@ describe('Appointments API', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.every((a: any) => a.doctorId === doctorId)).toBe(true)
+      expect(response.body.data.every((a: Record<string, unknown>) => a.doctorId === doctorId)).toBe(true)
     })
 
     it('should filter by patient', async () => {
@@ -516,7 +516,7 @@ describe('Appointments API', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.every((a: any) => a.patientId === patientId)).toBe(true)
+      expect(response.body.data.every((a: Record<string, unknown>) => a.patientId === patientId)).toBe(true)
     })
 
     it('should filter by status', async () => {
@@ -525,7 +525,7 @@ describe('Appointments API', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.every((a: any) => a.status === 'COMPLETED')).toBe(true)
+      expect(response.body.data.every((a: Record<string, unknown>) => a.status === 'COMPLETED')).toBe(true)
     })
 
     it('should return 401 without auth token', async () => {
@@ -991,7 +991,7 @@ describe('Appointments API', () => {
         .set('Authorization', `Bearer ${staffToken}`)
 
       expect(response.status).toBe(200)
-      expect(response.body.data.every((a: any) => a.doctorId === doctorId)).toBe(true)
+      expect(response.body.data.every((a: Record<string, unknown>) => a.doctorId === doctorId)).toBe(true)
     })
 
     it('should return 400 without date range', async () => {

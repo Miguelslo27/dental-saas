@@ -1,6 +1,6 @@
 import { Router, type IRouter } from 'express'
 import { z } from 'zod'
-import { prisma } from '@dental/database'
+import { prisma, type UserRole } from '@dental/database'
 import { hashPassword } from '../../services/auth.service.js'
 
 const usersRouter: IRouter = Router()
@@ -28,7 +28,7 @@ usersRouter.get('/', async (req, res, next) => {
       }),
       ...(status === 'active' && { isActive: true }),
       ...(status === 'inactive' && { isActive: false }),
-      ...(role && { role: role as any }),
+      ...(role && { role: role as UserRole }),
       ...(tenantId && { tenantId }),
     }
 
