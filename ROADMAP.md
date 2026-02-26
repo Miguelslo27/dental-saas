@@ -3,7 +3,7 @@
 ## High Priority
 
 ### Odontogram
-- [ ] Invert quadrants 3 and 4 (lower arch) so numbering matches standard dental convention
+- [x] Invert quadrants 3 and 4 (lower arch) so numbering matches standard dental convention (pnpm patch)
 
 ### Patient Budgets (Presupuestos)
 - [ ] Allow creating a budget per patient with planned treatments and costs

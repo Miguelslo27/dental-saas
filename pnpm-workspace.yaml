@@ -7,3 +7,6 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - esbuild
   - prisma
+
+patchedDependencies:
+  react-odontogram@0.4.1: patches/react-odontogram@0.4.1.patch
