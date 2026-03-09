@@ -325,34 +325,14 @@ describe('PatientAppointmentsSection', () => {
       ])
     })
 
-    it('shows filters button only when expanded', async () => {
-      localStorage.removeItem('patient-appointments-collapsed')
+    it('shows filter options when expanded', async () => {
       renderSection()
 
       await waitFor(() => {
-        expect(mockGetAppointmentsByPatient).toHaveBeenCalled()
+        expect(screen.getByText('patients.appointments.upcoming')).toBeInTheDocument()
+        expect(screen.getByText('patients.appointments.past')).toBeInTheDocument()
+        expect(screen.getByText('patients.appointments.all')).toBeInTheDocument()
       })
-
-      // Collapsed — no filters button
-      expect(screen.queryByText('patients.appointments.filters')).not.toBeInTheDocument()
-
-      // Expand
-      fireEvent.click(screen.getByText('patients.appointments.sectionTitle'))
-      expect(screen.getByText('patients.appointments.filters')).toBeInTheDocument()
-    })
-
-    it('toggles filter panel visibility', async () => {
-      renderSection()
-
-      await waitFor(() => {
-        expect(screen.getByText('patients.appointments.filters')).toBeInTheDocument()
-      })
-
-      // Open filters
-      fireEvent.click(screen.getByText('patients.appointments.filters'))
-      expect(screen.getByText('patients.appointments.upcoming')).toBeInTheDocument()
-      expect(screen.getByText('patients.appointments.past')).toBeInTheDocument()
-      expect(screen.getByText('patients.appointments.all')).toBeInTheDocument()
     })
 
     it('switches to past view and shows past appointments', async () => {
@@ -361,9 +341,6 @@ describe('PatientAppointmentsSection', () => {
       await waitFor(() => {
         expect(screen.getByText('Limpieza')).toBeInTheDocument()
       })
-
-      // Open filters
-      fireEvent.click(screen.getByText('patients.appointments.filters'))
 
       // Switch to past
       fireEvent.click(screen.getByText('patients.appointments.past'))
@@ -381,7 +358,6 @@ describe('PatientAppointmentsSection', () => {
         expect(screen.getAllByText('Limpieza').length).toBeGreaterThan(0)
       })
 
-      fireEvent.click(screen.getByText('patients.appointments.filters'))
       fireEvent.click(screen.getByText('patients.appointments.all'))
 
       await waitFor(() => {
@@ -394,10 +370,9 @@ describe('PatientAppointmentsSection', () => {
       renderSection()
 
       await waitFor(() => {
-        expect(screen.getByText('patients.appointments.filters')).toBeInTheDocument()
+        expect(screen.getByText('patients.appointments.upcoming')).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByText('patients.appointments.filters'))
       // Default is 'upcoming', so clearFilters should not be shown initially
       // Switch to 'past' to activate a filter
       fireEvent.click(screen.getByText('patients.appointments.past'))

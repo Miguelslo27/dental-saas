@@ -6,7 +6,6 @@ import {
   CalendarPlus,
   ChevronDown,
   ChevronUp,
-  Filter,
   Clock,
   Stethoscope,
   MoreVertical,
@@ -255,8 +254,7 @@ export function PatientAppointmentsSection({
   const [error, setError] = useState<string | null>(null)
 
   // Filter state
-  const [showFilters, setShowFilters] = useState(false)
-  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
+const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
   const [filterStatus, setFilterStatus] = useState<AppointmentStatus | ''>('')
   const [filterFrom, setFilterFrom] = useState('')
   const [filterTo, setFilterTo] = useState('')
@@ -391,21 +389,6 @@ export function PatientAppointmentsSection({
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Filters button - only when expanded */}
-          {!isCollapsed && (
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                showFilters || hasActiveFilters
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              <Filter className="h-4 w-4" />
-              {t('patients.appointments.filters')}
-            </button>
-          )}
-
           {/* New appointment button - always visible */}
           {can(Permission.APPOINTMENTS_CREATE) && (
             <button
@@ -422,9 +405,8 @@ export function PatientAppointmentsSection({
       {/* Collapsible content */}
       {!isCollapsed && (
         <div className="px-6 pb-4">
-          {/* Filters panel */}
-          {showFilters && (
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg flex flex-wrap items-center gap-3">
+          {/* Filters panel - always visible */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg flex flex-wrap items-center gap-3">
               {/* Period toggle */}
               <div className="inline-flex rounded-lg border border-gray-200 bg-white">
                 {(['upcoming', 'past', 'all'] as FilterPeriod[]).map(period => (
@@ -485,8 +467,7 @@ export function PatientAppointmentsSection({
                   {t('patients.appointments.clearFilters')}
                 </button>
               )}
-            </div>
-          )}
+          </div>
 
           {/* Loading */}
           {isLoading && (
