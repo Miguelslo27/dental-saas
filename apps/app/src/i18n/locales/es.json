@@ -128,6 +128,19 @@
     "collapseSidebar": "Ocultar panel",
     "expandSidebar": "Mostrar panel",
     "saving": "Guardando...",
+    "appointments": {
+      "sectionTitle": "Citas",
+      "upcoming": "Próximas",
+      "past": "Pasadas",
+      "all": "Todas",
+      "noUpcoming": "No hay citas próximas",
+      "noPast": "No hay citas pasadas",
+      "filters": "Filtros",
+      "dateFrom": "Desde",
+      "dateTo": "Hasta",
+      "clearFilters": "Limpiar filtros",
+      "confirmComplete": "¿Estás seguro de que deseas marcar esta cita como completada?"
+    },
     "status": {
       "healthy": "Saludable",
       "caries": "Caries",

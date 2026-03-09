@@ -128,6 +128,19 @@
     "collapseSidebar": "Hide panel",
     "expandSidebar": "Show panel",
     "saving": "Saving...",
+    "appointments": {
+      "sectionTitle": "Appointments",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "all": "All",
+      "noUpcoming": "No upcoming appointments",
+      "noPast": "No past appointments",
+      "filters": "Filters",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "clearFilters": "Clear filters",
+      "confirmComplete": "Are you sure you want to mark this appointment as completed?"
+    },
     "status": {
       "healthy": "Healthy",
       "caries": "Caries",
