@@ -7,7 +7,6 @@ import {
   Phone,
   MapPin,
   Calendar,
-  CalendarPlus,
   Edit2,
   AlertCircle,
   Loader2,
@@ -27,11 +26,17 @@ import {
   getPatientInitials,
 } from '@/lib/patient-api'
 import { downloadPatientHistoryPdf } from '@/lib/pdf-api'
-import { ToothStatus, Permission, type ToothData } from '@dental/shared'
+import { ToothStatus, type ToothData } from '@dental/shared'
 import { AppointmentFormModal } from '@/components/appointments/AppointmentFormModal'
-import { createAppointment, type CreateAppointmentData } from '@/lib/appointment-api'
-import { usePermissions } from '@/hooks/usePermissions'
+import {
+  createAppointment,
+  updateAppointment,
+  type CreateAppointmentData,
+  type UpdateAppointmentData,
+  type Appointment,
+} from '@/lib/appointment-api'
 import { PatientSidebar } from './PatientSidebar'
+import { PatientAppointmentsSection } from './PatientAppointmentsSection'
 
 // ============================================================================
 // Types
@@ -255,8 +260,6 @@ export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { can } = usePermissions()
-
   const [patient, setPatient] = useState<Patient | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -272,6 +275,8 @@ export default function PatientDetailPage() {
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
   const [isAppointmentFormOpen, setIsAppointmentFormOpen] = useState(false)
   const [isCreatingAppointment, setIsCreatingAppointment] = useState(false)
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
+  const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem('patient-sidebar-collapsed') === 'true'
@@ -530,15 +535,6 @@ export default function PatientDetailPage() {
 
           {/* Action buttons */}
           <div className="flex items-center gap-2">
-            {can(Permission.APPOINTMENTS_CREATE) && (
-              <button
-                onClick={() => setIsAppointmentFormOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <CalendarPlus className="h-4 w-4" />
-                Nueva Cita
-              </button>
-            )}
             <button
               onClick={async () => {
                 setIsDownloadingPdf(true)
@@ -615,6 +611,20 @@ export default function PatientDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Appointments Section */}
+      <PatientAppointmentsSection
+        patientId={patient.id}
+        onNewAppointment={() => {
+          setEditingAppointment(null)
+          setIsAppointmentFormOpen(true)
+        }}
+        onEditAppointment={(appointment) => {
+          setEditingAppointment(appointment)
+          setIsAppointmentFormOpen(true)
+        }}
+        refreshKey={appointmentsRefreshKey}
+      />
 
       {/* Two-column layout: Sidebar (Images + Payments) | Odontogram */}
       <div className="flex flex-col min-[1180px]:flex-row gap-6">
@@ -791,18 +801,28 @@ export default function PatientDetailPage() {
       {/* Appointment Form Modal */}
       <AppointmentFormModal
         isOpen={isAppointmentFormOpen}
-        onClose={() => setIsAppointmentFormOpen(false)}
+        onClose={() => {
+          setIsAppointmentFormOpen(false)
+          setEditingAppointment(null)
+        }}
         onSubmit={async (data) => {
           setIsCreatingAppointment(true)
           try {
-            await createAppointment(data as CreateAppointmentData)
+            if (editingAppointment) {
+              await updateAppointment(editingAppointment.id, data as UpdateAppointmentData)
+            } else {
+              await createAppointment(data as CreateAppointmentData)
+            }
             setIsAppointmentFormOpen(false)
+            setEditingAppointment(null)
+            setAppointmentsRefreshKey(k => k + 1)
           } catch (e) {
             setError(e instanceof Error ? e.message : 'Error al crear la cita')
           } finally {
             setIsCreatingAppointment(false)
           }
         }}
+        appointment={editingAppointment}
         isLoading={isCreatingAppointment}
         defaultPatientId={patient.id}
       />
