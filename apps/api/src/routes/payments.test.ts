@@ -404,4 +404,192 @@ describe('Patient Payments Routes', () => {
       expect(balanceRes.body.data.outstanding).toBe(90)
     })
   })
+
+  describe('Labwork linked to appointment (price included)', () => {
+    let linkedPatientId: string
+    let appointmentId: string
+
+    beforeAll(async () => {
+      const patient = await prisma.patient.create({
+        data: { tenantId, firstName: 'Linked', lastName: 'Test' },
+      })
+      linkedPatientId = patient.id
+
+      // Create appointment with cost $200
+      const appointment = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId: linkedPatientId,
+          doctorId,
+          startTime: new Date('2025-06-01T10:00:00Z'),
+          endTime: new Date('2025-06-01T10:30:00Z'),
+          cost: 200,
+          status: 'COMPLETED',
+        },
+      })
+      appointmentId = appointment.id
+    })
+
+    it('should NOT count labwork price in debt when priceIncludedInAppointment is true', async () => {
+      // Create labwork linked to appointment with price included
+      const res = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: linkedPatientId,
+          appointmentId,
+          priceIncludedInAppointment: true,
+          lab: 'Linked Lab',
+          date: '2025-06-01',
+          price: 80,
+        })
+
+      expect(res.status).toBe(201)
+      expect(res.body.data.appointmentId).toBe(appointmentId)
+      expect(res.body.data.priceIncludedInAppointment).toBe(true)
+      expect(res.body.data.isPaid).toBe(true)
+
+      // Balance should only include appointment cost, not labwork
+      const balanceRes = await request(app)
+        .get(`/api/patients/${linkedPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(balanceRes.body.data.totalDebt).toBe(200) // only appointment
+      expect(balanceRes.body.data.outstanding).toBe(200)
+    })
+
+    it('should count labwork price in debt when linked but priceIncludedInAppointment is false', async () => {
+      // Create another labwork linked but NOT included in price
+      await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: linkedPatientId,
+          appointmentId,
+          priceIncludedInAppointment: false,
+          lab: 'Separate Lab',
+          date: '2025-06-02',
+          price: 50,
+        })
+
+      const balanceRes = await request(app)
+        .get(`/api/patients/${linkedPatientId}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      // $200 (appointment) + $50 (non-included labwork) = $250
+      expect(balanceRes.body.data.totalDebt).toBe(250)
+    })
+
+    it('should reject labwork with appointmentId from different patient', async () => {
+      const otherPatient = await prisma.patient.create({
+        data: { tenantId, firstName: 'Other', lastName: 'Patient' },
+      })
+
+      const res = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: otherPatient.id,
+          appointmentId,
+          priceIncludedInAppointment: true,
+          lab: 'Invalid Lab',
+          date: '2025-06-03',
+          price: 100,
+        })
+
+      expect(res.status).toBe(400)
+      expect(res.body.error).toContain('Appointment')
+    })
+
+    it('should ignore priceIncludedInAppointment when no appointmentId is provided', async () => {
+      const res = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: linkedPatientId,
+          priceIncludedInAppointment: true, // should be ignored
+          lab: 'Standalone Lab',
+          date: '2025-06-04',
+          price: 30,
+        })
+
+      expect(res.status).toBe(201)
+      expect(res.body.data.priceIncludedInAppointment).toBe(false)
+    })
+
+    it('should not allocate FIFO payments to labworks with price included in appointment', async () => {
+      // Create fresh patient for clean FIFO test
+      const p = await prisma.patient.create({
+        data: { tenantId, firstName: 'FIFOLinked', lastName: 'Test' },
+      })
+
+      // Appointment $100
+      const apt = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId: p.id,
+          doctorId,
+          startTime: new Date('2025-07-01T10:00:00Z'),
+          endTime: new Date('2025-07-01T10:30:00Z'),
+          cost: 100,
+          status: 'COMPLETED',
+        },
+      })
+
+      // Labwork $50 included in appointment (should not consume payments)
+      await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: p.id,
+          appointmentId: apt.id,
+          priceIncludedInAppointment: true,
+          lab: 'FIFO Lab',
+          date: '2025-07-01',
+          price: 50,
+        })
+
+      // Labwork $60 standalone
+      await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId: p.id,
+          lab: 'Standalone FIFO Lab',
+          date: '2025-07-02',
+          price: 60,
+        })
+
+      // Total debt should be $100 (apt) + $60 (standalone labwork) = $160
+      const balanceRes = await request(app)
+        .get(`/api/patients/${p.id}/balance`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      expect(balanceRes.body.data.totalDebt).toBe(160)
+
+      // Pay $100 — appointment should be paid, standalone labwork not
+      await request(app)
+        .post(`/api/patients/${p.id}/payments`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ amount: 100, date: '2025-07-15' })
+
+      const appointments = await prisma.appointment.findMany({
+        where: { tenantId, patientId: p.id },
+      })
+      expect(appointments[0].isPaid).toBe(true)
+
+      const labworks = await prisma.labwork.findMany({
+        where: { tenantId, patientId: p.id },
+        orderBy: { date: 'asc' },
+      })
+
+      // Included labwork should be auto-paid
+      const includedLw = labworks.find((l) => l.priceIncludedInAppointment)
+      expect(includedLw?.isPaid).toBe(true)
+
+      // Standalone labwork: $100 paid - $100 appointment = $0 remaining < $60
+      const standaloneLw = labworks.find((l) => !l.priceIncludedInAppointment)
+      expect(standaloneLw?.isPaid).toBe(false)
+    })
+  })
 })

@@ -354,9 +354,10 @@ model Appointment {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  labworks    Labwork[]
 
   @@index([tenantId])
   @@index([patientId])
@@ -397,7 +398,12 @@ model Labwork {
   
   /// Optional reference to the patient this labwork is for
   patientId   String?
-  
+
+  /// Optional reference to the appointment this labwork is linked to
+  appointmentId String?
+  /// Whether the labwork price is already included in the linked appointment cost
+  priceIncludedInAppointment Boolean @default(false)
+
   /// Name of the laboratory
   lab         String
   /// Contact phone for the laboratory
@@ -423,11 +429,13 @@ model Labwork {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  patient Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient     Patient?     @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
 
   @@index([tenantId])
   @@index([patientId])
+  @@index([appointmentId])
   @@index([date])
   @@index([isPaid])
   @@index([isDelivered])

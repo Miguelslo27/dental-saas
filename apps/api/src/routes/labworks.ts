@@ -16,6 +16,8 @@ const labworksRouter: IRouter = Router()
 // Zod schemas for validation
 const createLabworkSchema = z.object({
   patientId: z.string().optional(),
+  appointmentId: z.string().optional(),
+  priceIncludedInAppointment: z.boolean().optional(),
   lab: z.string().min(1, 'Laboratory name is required'),
   phoneNumber: z.string().optional(),
   date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
@@ -28,6 +30,8 @@ const createLabworkSchema = z.object({
 
 const updateLabworkSchema = z.object({
   patientId: z.string().nullable().optional(),
+  appointmentId: z.string().nullable().optional(),
+  priceIncludedInAppointment: z.boolean().optional(),
   lab: z.string().min(1).optional(),
   phoneNumber: z.string().nullable().optional(),
   date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).optional(),
@@ -44,6 +48,7 @@ const errorStatusMap: Record<string, number> = {
   ALREADY_INACTIVE: 400,
   ALREADY_ACTIVE: 400,
   INVALID_PATIENT: 400,
+  INVALID_APPOINTMENT: 400,
 }
 
 // Error code to message mapping
@@ -52,6 +57,7 @@ const errorMessageMap: Record<string, string> = {
   ALREADY_INACTIVE: 'Labwork is already deleted',
   ALREADY_ACTIVE: 'Labwork is already active',
   INVALID_PATIENT: 'Patient not found or does not belong to this clinic',
+  INVALID_APPOINTMENT: 'Appointment not found or does not belong to this patient',
 }
 
 /**

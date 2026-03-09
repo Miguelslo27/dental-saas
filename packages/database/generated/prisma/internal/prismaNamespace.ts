@@ -1750,6 +1750,8 @@ export const LabworkScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
   patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  priceIncludedInAppointment: 'priceIncludedInAppointment',
   lab: 'lab',
   phoneNumber: 'phoneNumber',
   date: 'date',

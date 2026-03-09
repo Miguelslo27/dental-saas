@@ -6,6 +6,8 @@ const LABWORK_SELECT = {
   id: true,
   tenantId: true,
   patientId: true,
+  appointmentId: true,
+  priceIncludedInAppointment: true,
   lab: true,
   phoneNumber: true,
   date: true,
@@ -31,6 +33,8 @@ export type SafeLabwork = {
   id: string
   tenantId: string
   patientId: string | null
+  appointmentId: string | null
+  priceIncludedInAppointment: boolean
   lab: string
   phoneNumber: string | null
   date: Date
@@ -56,9 +60,12 @@ export type LabworkErrorCode =
   | 'ALREADY_INACTIVE'
   | 'ALREADY_ACTIVE'
   | 'INVALID_PATIENT'
+  | 'INVALID_APPOINTMENT'
 
 export interface CreateLabworkInput {
   patientId?: string
+  appointmentId?: string
+  priceIncludedInAppointment?: boolean
   lab: string
   phoneNumber?: string
   date: Date
@@ -71,6 +78,8 @@ export interface CreateLabworkInput {
 
 export interface UpdateLabworkInput {
   patientId?: string | null
+  appointmentId?: string | null
+  priceIncludedInAppointment?: boolean
   lab?: string
   phoneNumber?: string | null
   date?: Date
@@ -99,6 +108,8 @@ function transformLabwork(labwork: {
   id: string
   tenantId: string
   patientId: string | null
+  appointmentId: string | null
+  priceIncludedInAppointment: boolean
   lab: string
   phoneNumber: string | null
   date: Date
@@ -163,6 +174,26 @@ async function verifyPatient(
 }
 
 /**
+ * Verify appointment belongs to tenant and same patient
+ */
+async function verifyAppointment(
+  appointmentId: string,
+  tenantId: string,
+  patientId: string | undefined
+): Promise<{ success: true } | { success: false; code: LabworkErrorCode }> {
+  const appointment = await prisma.appointment.findFirst({
+    where: { id: appointmentId, tenantId, isActive: true },
+    select: { id: true, patientId: true },
+  })
+
+  if (!appointment || (patientId && appointment.patientId !== patientId)) {
+    return { success: false, code: 'INVALID_APPOINTMENT' }
+  }
+
+  return { success: true }
+}
+
+/**
  * Create a new labwork
  */
 export async function createLabwork(
@@ -177,16 +208,29 @@ export async function createLabwork(
     }
   }
 
+  // Validate appointment if provided
+  if (input.appointmentId) {
+    const appointmentCheck = await verifyAppointment(input.appointmentId, tenantId, input.patientId)
+    if (!appointmentCheck.success) {
+      return appointmentCheck
+    }
+  }
+
+  // priceIncludedInAppointment requires appointmentId
+  const priceIncluded = input.appointmentId ? (input.priceIncludedInAppointment || false) : false
+
   const labwork = await prisma.labwork.create({
     data: {
       tenantId,
       patientId: input.patientId || null,
+      appointmentId: input.appointmentId || null,
+      priceIncludedInAppointment: priceIncluded,
       lab: input.lab,
       phoneNumber: input.phoneNumber || null,
       date: input.date,
       note: input.note || null,
       price: input.price || 0,
-      isPaid: input.isPaid || false,
+      isPaid: priceIncluded ? true : (input.isPaid || false),
       isDelivered: input.isDelivered || false,
       doctorIds: input.doctorIds || [],
     },
@@ -271,7 +315,7 @@ export async function updateLabwork(
   // Check labwork exists
   const existing = await prisma.labwork.findFirst({
     where: { id: labworkId, tenantId },
-    select: { id: true },
+    select: { id: true, patientId: true, appointmentId: true },
   })
 
   if (!existing) {
@@ -286,10 +330,29 @@ export async function updateLabwork(
     }
   }
 
+  // Validate appointment if being updated
+  const effectivePatientId = input.patientId !== undefined ? input.patientId : existing.patientId
+  if (input.appointmentId) {
+    const appointmentCheck = await verifyAppointment(input.appointmentId, tenantId, effectivePatientId || undefined)
+    if (!appointmentCheck.success) {
+      return appointmentCheck
+    }
+  }
+
+  // Determine effective appointmentId for priceIncluded logic
+  const effectiveAppointmentId = input.appointmentId !== undefined ? input.appointmentId : existing.appointmentId
+  const priceIncluded = effectiveAppointmentId
+    ? (input.priceIncludedInAppointment ?? false)
+    : false
+
   const labwork = await prisma.labwork.update({
     where: { id: labworkId },
     data: {
       ...(input.patientId !== undefined && { patientId: input.patientId }),
+      ...(input.appointmentId !== undefined && { appointmentId: input.appointmentId }),
+      ...(input.priceIncludedInAppointment !== undefined || input.appointmentId !== undefined
+        ? { priceIncludedInAppointment: priceIncluded }
+        : {}),
       ...(input.lab && { lab: input.lab }),
       ...(input.phoneNumber !== undefined && { phoneNumber: input.phoneNumber }),
       ...(input.date && { date: input.date }),
