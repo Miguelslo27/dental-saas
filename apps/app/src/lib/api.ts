@@ -50,8 +50,12 @@ apiClient.interceptors.response.use(
       _retry?: boolean
     }
 
+    // Skip token refresh logic for auth endpoints — their 401s are
+    // credential errors (wrong password, etc.), not expired sessions.
+    const isAuthRequest = originalRequest.url?.startsWith('/auth/')
+
     // If error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
       const { refreshToken, logout, setTokens } = useAuthStore.getState()
 
       // If no refresh token, logout

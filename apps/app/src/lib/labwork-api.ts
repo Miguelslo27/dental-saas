@@ -8,6 +8,8 @@ export interface Labwork {
   id: string
   tenantId: string
   patientId: string | null
+  appointmentId: string | null
+  priceIncludedInAppointment: boolean
   lab: string
   phoneNumber: string | null
   date: string
@@ -42,6 +44,8 @@ export interface LabworkStats {
 
 export interface CreateLabworkData {
   patientId?: string
+  appointmentId?: string
+  priceIncludedInAppointment?: boolean
   lab: string
   phoneNumber?: string
   date: string
@@ -54,6 +58,8 @@ export interface CreateLabworkData {
 
 export interface UpdateLabworkData {
   patientId?: string | null
+  appointmentId?: string | null
+  priceIncludedInAppointment?: boolean
   lab?: string
   phoneNumber?: string | null
   date?: string
