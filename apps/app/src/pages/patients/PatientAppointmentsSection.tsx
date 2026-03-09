@@ -219,7 +219,7 @@ function PatientAppointmentCard({
             {formatCurrency(appointment.cost!, currency)}
           </span>
           <span className={`ml-1 ${appointment.isPaid ? 'text-green-500' : 'text-amber-500'}`}>
-            {appointment.isPaid ? `(${t('common.paid')})` : `(${t('common.pending')})`}
+            {appointment.isPaid ? `(${t('payment.paid')})` : `(${t('payment.pending')})`}
           </span>
         </div>
       )}

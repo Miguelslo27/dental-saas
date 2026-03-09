@@ -252,7 +252,7 @@ describe('PatientAppointmentsSection', () => {
 
       await waitFor(() => {
         expect(screen.getByText('$100')).toBeInTheDocument()
-        expect(screen.getByText('(common.pending)')).toBeInTheDocument()
+        expect(screen.getByText('(payment.pending)')).toBeInTheDocument()
       })
     })
 
