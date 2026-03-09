@@ -2,9 +2,6 @@
 
 ## High Priority
 
-### Odontogram
-- [x] Invert quadrants 3 and 4 (lower arch) so numbering matches standard dental convention (pnpm patch)
-
 ### Patient Budgets (Presupuestos)
 - [ ] Allow creating a budget per patient with planned treatments and costs
 - [ ] Share budget with patient (PDF or link)
@@ -14,10 +11,7 @@
 - [ ] Save laboratory name when creating a labwork (autocomplete from previously used labs, or create new)
 - [ ] Add labwork list/section to patient detail page
 
-### Production Bugs
-- [x] Fix broken images in production: replaced blob URLs with direct `<img src>` URLs using `?token=` query param auth
-- [x] Fix hardcoded currency: unified all formatters into shared `formatCurrency()`, include tenant data in login/register responses, sync currency to auth store on settings update (PR #139)
-- [x] Fix gateway timeout: add `traefik.docker.network=coolify` label to prevent Traefik from routing via wrong network (PR #152)
+### Production Hardening
 - [ ] Harden API startup: eager Prisma init, DB-verified health check, graceful shutdown, connection timeout — see [docs/GATEWAY-TIMEOUT-FIX.md](docs/GATEWAY-TIMEOUT-FIX.md)
 
 ## Medium Priority
@@ -31,8 +25,6 @@
 - [ ] Country dropdown for phone number area code
 
 ### UX Improvements
-- [x] Smart login form: hide clinic ID field when slug is in URL
-- [x] Auto-generate clinic slug from clinic name in registration form
 - [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
 - [ ] Improve date/time picker UI (investigate user-friendly packages, replace browser defaults)
 - [ ] Phone placeholder based on user's location
@@ -64,23 +56,8 @@
 - Patient pays $100 → cumulative $210 ≥ $200 → Work B marked as "Paid"
 - Patient pays $90 → cumulative $300 ≥ $300 → Work C marked as "Paid", balance = $0
 
-**Backend tasks:**
-- [x] Create `PatientPayment` model in Prisma (PR #137)
-- [x] Add `isPaid` field to appointments and labworks for FIFO tracking (PR #137)
-- [x] Create payment service with FIFO allocation logic (PR #138)
-- [x] Validation: reject payments > outstanding balance (PR #138)
-- [x] API endpoints: balance, list, create, delete (PR #138)
-- [x] Add permissions: `PAYMENTS_VIEW`, `PAYMENTS_CREATE`, `PAYMENTS_DELETE` (PR #137)
-- [x] Integration tests for payment routes — 17 tests (PR #138)
-
-**Frontend tasks:**
-- [x] Payment history tab/section in patient detail page (PR #140)
-- [x] "Register Payment" button + modal (amount input, optional notes, date) (PR #140)
-- [x] Show current balance (total debt - total payments) prominently (PR #140)
+**Remaining tasks:**
 - [ ] Visual indicator on each work showing paid/unpaid status
-- [x] Validation: max amount = current balance, min amount > 0 (PR #140)
-- [x] i18n keys for ES/EN/AR (PR #140)
-- [x] Frontend tests for payment components — 7 tests (PR #140)
 
 ### Labworks
 - [ ] Add doctor name to labwork records
