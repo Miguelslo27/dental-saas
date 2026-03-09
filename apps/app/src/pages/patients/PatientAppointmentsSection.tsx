@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   CalendarDays,
@@ -66,11 +67,16 @@ function PatientAppointmentCard({
   const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
   const [showMenu, setShowMenu] = useState(false)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
+  const [menuPos, setMenuPos] = useState<CSSProperties>({})
   const menuRef = useRef<HTMLDivElement>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current && !menuRef.current.contains(event.target as Node) &&
+        btnRef.current && !btnRef.current.contains(event.target as Node)
+      ) {
         setShowMenu(false)
       }
     }
@@ -101,16 +107,31 @@ function PatientAppointmentCard({
     >
       {/* Actions menu */}
       {!isInactive && (
-        <div className="absolute top-2 right-2" ref={menuRef}>
+        <div className="absolute top-2 right-2">
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            ref={btnRef}
+            onClick={() => {
+              if (!showMenu && btnRef.current) {
+                const rect = btnRef.current.getBoundingClientRect()
+                setMenuPos({
+                  position: 'fixed',
+                  top: rect.bottom + 4,
+                  right: window.innerWidth - rect.right,
+                })
+              }
+              setShowMenu(!showMenu)
+            }}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
             aria-label={t('common.options')}
           >
             <MoreVertical className="h-4 w-4 text-gray-400" />
           </button>
-          {showMenu && (
-            <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1">
+          {showMenu && createPortal(
+            <div
+              ref={menuRef}
+              style={menuPos}
+              className="w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1"
+            >
               <button
                 onClick={() => { onEdit(appointment); setShowMenu(false) }}
                 className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
@@ -152,7 +173,8 @@ function PatientAppointmentCard({
                 <Trash2 className="h-3.5 w-3.5" />
                 {t('appointments.cancelAppointment')}
               </button>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       )}
