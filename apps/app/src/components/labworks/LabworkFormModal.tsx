@@ -2,8 +2,13 @@ import { useEffect, useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Loader2 } from 'lucide-react'
+import { X, Loader2, Info } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Labwork, CreateLabworkData } from '@/lib/labwork-api'
+import type { Appointment } from '@/lib/appointment-api'
+import { getAppointmentsByPatient } from '@/lib/appointment-api'
+import { useAuthStore } from '@/stores/auth.store'
+import { formatCurrency } from '@/lib/format'
 import { PatientSearchCombobox, type PatientOption } from '@/components/ui/PatientSearchCombobox'
 
 // ============================================================================
@@ -12,6 +17,8 @@ import { PatientSearchCombobox, type PatientOption } from '@/components/ui/Patie
 
 const labworkFormSchema = z.object({
   patientId: z.string().min(1, 'El paciente es requerido'),
+  appointmentId: z.string().optional(),
+  priceIncludedInAppointment: z.boolean().optional(),
   lab: z.string().min(1, 'El nombre del laboratorio es requerido'),
   date: z.string().min(1, 'La fecha es requerida'),
   price: z.coerce.number().min(0, 'El precio debe ser 0 o mayor'),
@@ -41,19 +48,26 @@ export function LabworkFormModal({
   labwork,
   isLoading = false,
 }: LabworkFormModalProps) {
+  const { t } = useTranslation()
+  const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
   const isEditing = !!labwork
   const [selectedPatient, setSelectedPatient] = useState<PatientOption | null>(null)
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [loadingAppointments, setLoadingAppointments] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<LabworkFormData>({
     resolver: zodResolver(labworkFormSchema),
     defaultValues: {
       patientId: '',
+      appointmentId: '',
+      priceIncludedInAppointment: false,
       lab: '',
       date: new Date().toISOString().split('T')[0],
       price: 0,
@@ -63,12 +77,16 @@ export function LabworkFormModal({
     },
   })
 
+  const watchedAppointmentId = watch('appointmentId')
+
   // Reset form when labwork changes or modal opens
   useEffect(() => {
     if (isOpen) {
       if (labwork) {
         reset({
           patientId: labwork.patientId || '',
+          appointmentId: labwork.appointmentId || '',
+          priceIncludedInAppointment: labwork.priceIncludedInAppointment,
           lab: labwork.lab,
           date: labwork.date.split('T')[0],
           price: labwork.price,
@@ -87,6 +105,8 @@ export function LabworkFormModal({
       } else {
         reset({
           patientId: '',
+          appointmentId: '',
+          priceIncludedInAppointment: false,
           lab: '',
           date: new Date().toISOString().split('T')[0],
           price: 0,
@@ -95,9 +115,31 @@ export function LabworkFormModal({
           notes: '',
         })
         setSelectedPatient(null)
+        setAppointments([])
       }
     }
   }, [isOpen, labwork, reset])
+
+  // Fetch appointments when patient changes
+  useEffect(() => {
+    if (!selectedPatient) {
+      setAppointments([])
+      return
+    }
+    let cancelled = false
+    setLoadingAppointments(true)
+    getAppointmentsByPatient(selectedPatient.id, { limit: 100 })
+      .then((data) => {
+        if (!cancelled) setAppointments(data)
+      })
+      .catch(() => {
+        if (!cancelled) setAppointments([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingAppointments(false)
+      })
+    return () => { cancelled = true }
+  }, [selectedPatient])
 
   const handleFormSubmit = async (data: LabworkFormData) => {
     const submitData: CreateLabworkData = {
@@ -108,6 +150,8 @@ export function LabworkFormModal({
       isPaid: data.isPaid ?? false,
       isDelivered: data.isDelivered ?? false,
       ...(data.notes && { notes: data.notes }),
+      ...(data.appointmentId && { appointmentId: data.appointmentId }),
+      priceIncludedInAppointment: data.appointmentId ? (data.priceIncludedInAppointment ?? false) : false,
     }
 
     await onSubmit(submitData)
@@ -184,10 +228,69 @@ export function LabworkFormModal({
                   onClear={() => {
                     setSelectedPatient(null)
                     setValue('patientId', '', { shouldValidate: true })
+                    setValue('appointmentId', '')
+                    setValue('priceIncludedInAppointment', false)
                   }}
                   error={errors.patientId?.message}
                 />
               </div>
+
+              {/* Linked Appointment */}
+              {selectedPatient && (
+                <div>
+                  <label htmlFor="appointmentId" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('labworks.linkedAppointment')}
+                  </label>
+                  <select
+                    {...register('appointmentId')}
+                    id="appointmentId"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    disabled={loadingAppointments}
+                  >
+                    <option value="">{t('labworks.selectAppointment')}</option>
+                    {appointments.map((apt) => {
+                      const date = new Date(apt.startTime).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                      const doctorName = apt.doctor
+                        ? `${apt.doctor.firstName} ${apt.doctor.lastName}`
+                        : ''
+                      const costStr = apt.cost != null ? ` - ${formatCurrency(apt.cost, currency)}` : ''
+                      return (
+                        <option key={apt.id} value={apt.id}>
+                          {date} {apt.type ? `(${apt.type})` : ''} {doctorName}{costStr}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  {!loadingAppointments && appointments.length === 0 && (
+                    <p className="mt-1 text-xs text-gray-400">{t('labworks.noAppointments')}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Price Included in Appointment */}
+              {watchedAppointmentId && (
+                <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <input
+                    {...register('priceIncludedInAppointment')}
+                    type="checkbox"
+                    id="priceIncludedInAppointment"
+                    className="h-5 w-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div>
+                    <label htmlFor="priceIncludedInAppointment" className="text-sm font-medium text-gray-700 cursor-pointer">
+                      {t('labworks.priceIncludedInAppointment')}
+                    </label>
+                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                      <Info className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+                      {t('labworks.priceIncludedHint')}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Lab name */}
               <div>

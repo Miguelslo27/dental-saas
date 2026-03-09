@@ -204,7 +204,13 @@
       "inProgress": "In Progress",
       "completed": "Completed",
       "delivered": "Delivered"
-    }
+    },
+    "linkedAppointment": "Linked appointment",
+    "selectAppointment": "Select appointment (optional)",
+    "noAppointments": "No appointments for this patient",
+    "priceIncludedInAppointment": "Price included in appointment",
+    "priceIncludedHint": "The price of this work will not be added to the patient's debt",
+    "includedInAppointment": "Included in appointment"
   },
   "expenses": {
     "title": "Expenses",

@@ -204,7 +204,13 @@
       "inProgress": "قيد التنفيذ",
       "completed": "مكتمل",
       "delivered": "تم التسليم"
-    }
+    },
+    "linkedAppointment": "الموعد المرتبط",
+    "selectAppointment": "اختر موعدًا (اختياري)",
+    "noAppointments": "لا توجد مواعيد لهذا المريض",
+    "priceIncludedInAppointment": "السعر مشمول في الموعد",
+    "priceIncludedHint": "لن يُضاف سعر هذا العمل إلى ديون المريض",
+    "includedInAppointment": "مشمول في الموعد"
   },
   "expenses": {
     "title": "المصروفات",
