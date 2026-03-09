@@ -233,4 +233,96 @@ describe('Labworks Routes - Permission Tests', () => {
       expect(Array.isArray(response.body.data)).toBe(true)
     })
   })
+
+  describe('Appointment linking', () => {
+    let patientId: string
+    let appointmentId: string
+    let doctorId: string
+
+    beforeAll(async () => {
+      const patient = await prisma.patient.create({
+        data: { tenantId, firstName: 'Link', lastName: 'Patient' },
+      })
+      patientId = patient.id
+
+      const doctor = await prisma.doctor.create({
+        data: { tenantId, firstName: 'Dr', lastName: 'Link' },
+      })
+      doctorId = doctor.id
+
+      const appointment = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date('2025-08-01T10:00:00Z'),
+          endTime: new Date('2025-08-01T10:30:00Z'),
+          cost: 300,
+          status: 'COMPLETED',
+        },
+      })
+      appointmentId = appointment.id
+    })
+
+    it('should create labwork linked to appointment', async () => {
+      const res = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          appointmentId,
+          priceIncludedInAppointment: true,
+          lab: 'Linked Lab',
+          date: '2025-08-01',
+          price: 100,
+        })
+
+      expect(res.status).toBe(201)
+      expect(res.body.data.appointmentId).toBe(appointmentId)
+      expect(res.body.data.priceIncludedInAppointment).toBe(true)
+    })
+
+    it('should update labwork to unlink appointment', async () => {
+      // Create linked labwork
+      const createRes = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          appointmentId,
+          lab: 'To Unlink',
+          date: '2025-08-02',
+          price: 50,
+        })
+
+      const labworkId = createRes.body.data.id
+
+      // Unlink
+      const updateRes = await request(app)
+        .put(`/api/labworks/${labworkId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ appointmentId: null })
+
+      expect(updateRes.status).toBe(200)
+      expect(updateRes.body.data.appointmentId).toBeNull()
+      expect(updateRes.body.data.priceIncludedInAppointment).toBe(false)
+    })
+
+    it('should return new fields in labwork response', async () => {
+      const res = await request(app)
+        .post('/api/labworks')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          lab: 'No Link Lab',
+          date: '2025-08-03',
+          price: 25,
+        })
+
+      expect(res.status).toBe(201)
+      expect(res.body.data).toHaveProperty('appointmentId')
+      expect(res.body.data).toHaveProperty('priceIncludedInAppointment')
+      expect(res.body.data.appointmentId).toBeNull()
+      expect(res.body.data.priceIncludedInAppointment).toBe(false)
+    })
+  })
 })

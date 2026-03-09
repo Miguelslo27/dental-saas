@@ -68,7 +68,7 @@ async function getBillableItems(tenantId: string, patientId: string): Promise<Bi
       orderBy: { startTime: 'asc' },
     }),
     prisma.labwork.findMany({
-      where: { tenantId, patientId, isActive: true, price: { gt: 0 } },
+      where: { tenantId, patientId, isActive: true, price: { gt: 0 }, priceIncludedInAppointment: false },
       select: { id: true, price: true, date: true, isPaid: true },
       orderBy: { date: 'asc' },
     }),
@@ -143,6 +143,15 @@ export async function recalculatePaidStatus(tenantId: string, patientId: string)
     updates.push(prisma.labwork.update({ where: { id: u.id }, data: { isPaid: u.isPaid } }))
   }
 
+  // Auto-mark labworks with price included in appointment as paid
+  const includedLabworks = await prisma.labwork.findMany({
+    where: { tenantId, patientId, isActive: true, priceIncludedInAppointment: true, isPaid: false },
+    select: { id: true },
+  })
+  for (const l of includedLabworks) {
+    updates.push(prisma.labwork.update({ where: { id: l.id }, data: { isPaid: true } }))
+  }
+
   if (updates.length > 0) {
     await prisma.$transaction(updates)
     logger.info(
@@ -177,7 +186,7 @@ export async function getPatientBalance(
       _sum: { cost: true },
     }),
     prisma.labwork.aggregate({
-      where: { tenantId, patientId, isActive: true, price: { gt: 0 } },
+      where: { tenantId, patientId, isActive: true, price: { gt: 0 }, priceIncludedInAppointment: false },
       _sum: { price: true },
     }),
     prisma.patientPayment.aggregate({
