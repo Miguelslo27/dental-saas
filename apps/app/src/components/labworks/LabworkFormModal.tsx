@@ -141,6 +141,13 @@ export function LabworkFormModal({
     return () => { cancelled = true }
   }, [selectedPatient])
 
+  // Once appointments are rendered in the DOM, re-apply the saved appointmentId
+  useEffect(() => {
+    if (labwork?.appointmentId && appointments.length > 0) {
+      setValue('appointmentId', labwork.appointmentId)
+    }
+  }, [appointments, labwork, setValue])
+
   const handleFormSubmit = async (data: LabworkFormData) => {
     const submitData: CreateLabworkData = {
       patientId: data.patientId,
