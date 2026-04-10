@@ -95,6 +95,13 @@
       "notes": "Notas",
       "cost": "Costo",
       "isPaid": "Pagado"
+    },
+    "errors": {
+      "timeConflict": "El doctor ya tiene una cita en este horario. Por favor, selecciona otro horario o doctor.",
+      "invalidPatient": "El paciente seleccionado no es válido.",
+      "invalidDoctor": "El doctor seleccionado no es válido.",
+      "invalidTimeRange": "La hora de fin debe ser posterior a la hora de inicio.",
+      "unexpected": "Ocurrió un error inesperado. Intenta nuevamente."
     }
   },
   "patients": {

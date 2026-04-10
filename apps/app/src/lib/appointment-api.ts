@@ -410,28 +410,26 @@ export function isAppointmentApiError(error: unknown): error is { response: { da
 }
 
 export function getAppointmentApiErrorMessage(error: unknown): string {
+  const t = i18n.t.bind(i18n)
+
   if (isAppointmentApiError(error)) {
     const code = error.response.data.error?.code
-    const message = error.response.data.error?.message
 
-    // Custom messages for specific error codes
-    if (code === 'TIME_CONFLICT') {
-      return 'This time slot conflicts with an existing appointment'
-    }
-    if (code === 'INVALID_PATIENT') {
-      return 'The selected patient is not valid'
-    }
-    if (code === 'INVALID_DOCTOR') {
-      return 'The selected doctor is not valid'
-    }
-    if (code === 'INVALID_TIME_RANGE') {
-      return 'The end time must be after the start time'
+    const errorKeyMap: Record<string, string> = {
+      TIME_CONFLICT: 'appointments.errors.timeConflict',
+      INVALID_PATIENT: 'appointments.errors.invalidPatient',
+      INVALID_DOCTOR: 'appointments.errors.invalidDoctor',
+      INVALID_TIME_RANGE: 'appointments.errors.invalidTimeRange',
     }
 
-    return message || 'An unexpected error occurred'
+    if (code && errorKeyMap[code]) {
+      return t(errorKeyMap[code])
+    }
+
+    return error.response.data.error?.message || t('appointments.errors.unexpected')
   }
   if (error instanceof Error) {
     return error.message
   }
-  return 'An unexpected error occurred'
+  return t('appointments.errors.unexpected')
 }

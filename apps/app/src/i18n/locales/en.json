@@ -95,6 +95,13 @@
       "notes": "Notes",
       "cost": "Cost",
       "isPaid": "Paid"
+    },
+    "errors": {
+      "timeConflict": "This doctor already has an appointment at this time. Please select a different time or doctor.",
+      "invalidPatient": "The selected patient is not valid.",
+      "invalidDoctor": "The selected doctor is not valid.",
+      "invalidTimeRange": "The end time must be after the start time.",
+      "unexpected": "An unexpected error occurred. Please try again."
     }
   },
   "patients": {
