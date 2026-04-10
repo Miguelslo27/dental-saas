@@ -694,6 +694,39 @@ describe('Appointments API', () => {
       expect(response.body.error.code).toBe('TIME_CONFLICT')
     })
 
+    it('should not conflict with itself when updating same time slot', async () => {
+      // Get the current appointment's times
+      const getRes = await request(app)
+        .get(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+
+      const { startTime, endTime } = getRes.body.data
+
+      // Re-send the exact same startTime and endTime (as the frontend does)
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ startTime, endTime, notes: 'Updated without time change' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.notes).toBe('Updated without time change')
+    })
+
+    it('should allow updating to a free time slot', async () => {
+      const freeTimes = getFutureTime(8, 16)
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          startTime: freeTimes.startTime,
+          endTime: freeTimes.endTime,
+        })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+    })
+
     it('should return 403 for STAFF role', async () => {
       const response = await request(app)
         .put(`/api/appointments/${appointmentId}`)
