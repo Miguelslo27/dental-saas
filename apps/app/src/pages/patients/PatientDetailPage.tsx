@@ -31,6 +31,7 @@ import { AppointmentFormModal } from '@/components/appointments/AppointmentFormM
 import {
   createAppointment,
   updateAppointment,
+  getAppointmentApiErrorMessage,
   type CreateAppointmentData,
   type UpdateAppointmentData,
   type Appointment,
@@ -822,7 +823,7 @@ export default function PatientDetailPage() {
             setEditingAppointment(null)
             setAppointmentsRefreshKey(k => k + 1)
           } catch (e) {
-            setAppointmentFormError(e instanceof Error ? e.message : 'Error al guardar la cita')
+            setAppointmentFormError(getAppointmentApiErrorMessage(e))
           } finally {
             setIsCreatingAppointment(false)
           }

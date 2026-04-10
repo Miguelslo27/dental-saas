@@ -409,27 +409,35 @@ export function isAppointmentApiError(error: unknown): error is { response: { da
   )
 }
 
+const APPOINTMENT_ERROR_KEY_MAP: Record<string, string> = {
+  TIME_CONFLICT: 'appointments.errors.timeConflict',
+  INVALID_PATIENT: 'appointments.errors.invalidPatient',
+  INVALID_DOCTOR: 'appointments.errors.invalidDoctor',
+  INVALID_TIME_RANGE: 'appointments.errors.invalidTimeRange',
+}
+
+function getUserLanguage(): string {
+  try {
+    return localStorage.getItem('language') || 'es'
+  } catch {
+    return 'es'
+  }
+}
+
 export function getAppointmentApiErrorMessage(error: unknown): string {
-  const t = i18n.t.bind(i18n)
+  const lng = getUserLanguage()
 
   if (isAppointmentApiError(error)) {
     const code = error.response.data.error?.code
 
-    const errorKeyMap: Record<string, string> = {
-      TIME_CONFLICT: 'appointments.errors.timeConflict',
-      INVALID_PATIENT: 'appointments.errors.invalidPatient',
-      INVALID_DOCTOR: 'appointments.errors.invalidDoctor',
-      INVALID_TIME_RANGE: 'appointments.errors.invalidTimeRange',
+    if (code && APPOINTMENT_ERROR_KEY_MAP[code]) {
+      return i18n.t(APPOINTMENT_ERROR_KEY_MAP[code], { lng })
     }
 
-    if (code && errorKeyMap[code]) {
-      return t(errorKeyMap[code])
-    }
-
-    return error.response.data.error?.message || t('appointments.errors.unexpected')
+    return error.response.data.error?.message || i18n.t('appointments.errors.unexpected', { lng })
   }
   if (error instanceof Error) {
     return error.message
   }
-  return t('appointments.errors.unexpected')
+  return i18n.t('appointments.errors.unexpected', { lng })
 }

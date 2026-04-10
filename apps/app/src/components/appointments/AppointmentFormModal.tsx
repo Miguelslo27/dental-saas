@@ -253,6 +253,14 @@ export function AppointmentFormModal({
             </button>
           </div>
 
+          {/* Error */}
+          {externalError && (
+            <div className="mx-6 mt-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{externalError}</p>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <div className="px-6 py-4 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -420,14 +428,6 @@ export function AppointmentFormModal({
                 />
               </div>
             </div>
-
-            {/* Error */}
-            {externalError && (
-              <div className="mx-6 mb-2 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{externalError}</p>
-              </div>
-            )}
 
             {/* Footer */}
             <div className="px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-200 flex justify-end gap-3">
