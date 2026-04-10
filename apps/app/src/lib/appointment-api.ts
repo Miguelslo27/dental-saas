@@ -409,29 +409,35 @@ export function isAppointmentApiError(error: unknown): error is { response: { da
   )
 }
 
+const APPOINTMENT_ERROR_KEY_MAP: Record<string, string> = {
+  TIME_CONFLICT: 'appointments.errors.timeConflict',
+  INVALID_PATIENT: 'appointments.errors.invalidPatient',
+  INVALID_DOCTOR: 'appointments.errors.invalidDoctor',
+  INVALID_TIME_RANGE: 'appointments.errors.invalidTimeRange',
+}
+
+function getUserLanguage(): string {
+  try {
+    return localStorage.getItem('language') || 'es'
+  } catch {
+    return 'es'
+  }
+}
+
 export function getAppointmentApiErrorMessage(error: unknown): string {
+  const lng = getUserLanguage()
+
   if (isAppointmentApiError(error)) {
     const code = error.response.data.error?.code
-    const message = error.response.data.error?.message
 
-    // Custom messages for specific error codes
-    if (code === 'TIME_CONFLICT') {
-      return 'This time slot conflicts with an existing appointment'
-    }
-    if (code === 'INVALID_PATIENT') {
-      return 'The selected patient is not valid'
-    }
-    if (code === 'INVALID_DOCTOR') {
-      return 'The selected doctor is not valid'
-    }
-    if (code === 'INVALID_TIME_RANGE') {
-      return 'The end time must be after the start time'
+    if (code && APPOINTMENT_ERROR_KEY_MAP[code]) {
+      return i18n.t(APPOINTMENT_ERROR_KEY_MAP[code], { lng })
     }
 
-    return message || 'An unexpected error occurred'
+    return error.response.data.error?.message || i18n.t('appointments.errors.unexpected', { lng })
   }
   if (error instanceof Error) {
     return error.message
   }
-  return 'An unexpected error occurred'
+  return i18n.t('appointments.errors.unexpected', { lng })
 }

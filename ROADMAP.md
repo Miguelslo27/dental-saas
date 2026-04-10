@@ -17,6 +17,7 @@
 ## Medium Priority
 
 ### Language & Regional Settings
+- [ ] Fix `i18next-browser-languagedetector` priority: app preference (localStorage) should override browser language for non-React code (utility functions, stores)
 - [ ] Language selector in web landing page and registration form
 - [ ] Save language preference on registration
 - [ ] Allow language change in settings (post-registration)

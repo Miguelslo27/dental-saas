@@ -114,11 +114,13 @@ export function AppointmentsPage() {
 
   const handleOpenCreate = () => {
     setSelectedAppointment(null)
+    clearError()
     setIsFormOpen(true)
   }
 
   const handleEdit = (appointment: Appointment) => {
     setSelectedAppointment(appointment)
+    clearError()
     setIsFormOpen(true)
   }
 
@@ -431,10 +433,12 @@ export function AppointmentsPage() {
         onClose={() => {
           setIsFormOpen(false)
           setSelectedAppointment(null)
+          clearError()
         }}
         onSubmit={handleFormSubmit}
         appointment={selectedAppointment}
         isLoading={isLoading}
+        error={error}
       />
 
       {/* Delete Confirmation */}

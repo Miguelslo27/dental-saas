@@ -38,6 +38,13 @@ vi.mock('./api', () => ({
   },
 }))
 
+vi.mock('@/i18n', () => ({
+  default: {
+    t: (key: string) => key,
+    language: 'es',
+  },
+}))
+
 const mockAppointment: Appointment = {
   id: 'apt-123',
   tenantId: 'tenant-456',
@@ -658,7 +665,7 @@ describe('appointment-api', () => {
         expect(getAppointmentApiErrorMessage(error)).toBe('Appointment not found')
       })
 
-      it('should return custom message for TIME_CONFLICT code', () => {
+      it('should return i18n message for TIME_CONFLICT code', () => {
         const error = {
           response: {
             data: {
@@ -668,12 +675,10 @@ describe('appointment-api', () => {
           },
         }
 
-        expect(getAppointmentApiErrorMessage(error)).toBe(
-          'This time slot conflicts with an existing appointment'
-        )
+        expect(getAppointmentApiErrorMessage(error)).toBe('appointments.errors.timeConflict')
       })
 
-      it('should return custom message for INVALID_PATIENT code', () => {
+      it('should return i18n message for INVALID_PATIENT code', () => {
         const error = {
           response: {
             data: {
@@ -683,10 +688,10 @@ describe('appointment-api', () => {
           },
         }
 
-        expect(getAppointmentApiErrorMessage(error)).toBe('The selected patient is not valid')
+        expect(getAppointmentApiErrorMessage(error)).toBe('appointments.errors.invalidPatient')
       })
 
-      it('should return custom message for INVALID_DOCTOR code', () => {
+      it('should return i18n message for INVALID_DOCTOR code', () => {
         const error = {
           response: {
             data: {
@@ -696,10 +701,10 @@ describe('appointment-api', () => {
           },
         }
 
-        expect(getAppointmentApiErrorMessage(error)).toBe('The selected doctor is not valid')
+        expect(getAppointmentApiErrorMessage(error)).toBe('appointments.errors.invalidDoctor')
       })
 
-      it('should return custom message for INVALID_TIME_RANGE code', () => {
+      it('should return i18n message for INVALID_TIME_RANGE code', () => {
         const error = {
           response: {
             data: {
@@ -709,12 +714,10 @@ describe('appointment-api', () => {
           },
         }
 
-        expect(getAppointmentApiErrorMessage(error)).toBe(
-          'The end time must be after the start time'
-        )
+        expect(getAppointmentApiErrorMessage(error)).toBe('appointments.errors.invalidTimeRange')
       })
 
-      it('should return default message for API error without message', () => {
+      it('should return default i18n message for API error without message', () => {
         const error = {
           response: {
             data: {
@@ -724,7 +727,7 @@ describe('appointment-api', () => {
           },
         }
 
-        expect(getAppointmentApiErrorMessage(error)).toBe('An unexpected error occurred')
+        expect(getAppointmentApiErrorMessage(error)).toBe('appointments.errors.unexpected')
       })
 
       it('should return Error message for regular Error', () => {
@@ -732,10 +735,10 @@ describe('appointment-api', () => {
         expect(getAppointmentApiErrorMessage(error)).toBe('Something went wrong')
       })
 
-      it('should return default message for unknown error types', () => {
-        expect(getAppointmentApiErrorMessage('string error')).toBe('An unexpected error occurred')
-        expect(getAppointmentApiErrorMessage(123)).toBe('An unexpected error occurred')
-        expect(getAppointmentApiErrorMessage(null)).toBe('An unexpected error occurred')
+      it('should return default i18n message for unknown error types', () => {
+        expect(getAppointmentApiErrorMessage('string error')).toBe('appointments.errors.unexpected')
+        expect(getAppointmentApiErrorMessage(123)).toBe('appointments.errors.unexpected')
+        expect(getAppointmentApiErrorMessage(null)).toBe('appointments.errors.unexpected')
       })
     })
   })

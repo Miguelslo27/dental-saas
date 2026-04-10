@@ -113,11 +113,12 @@ vi.mock('@/components/appointments/AppointmentCard', () => ({
 
 // Mock AppointmentFormModal component
 vi.mock('@/components/appointments/AppointmentFormModal', () => ({
-  AppointmentFormModal: ({ isOpen, onClose, onSubmit, appointment }: any) => {
+  AppointmentFormModal: ({ isOpen, onClose, onSubmit, appointment, error }: any) => {
     if (!isOpen) return null
     return (
       <div data-testid="appointment-form-modal" role="dialog">
         <h2>{appointment ? 'Editar Cita' : 'Nueva Cita'}</h2>
+        {error && <div data-testid="modal-error">{error}</div>}
         <button onClick={onClose}>Cerrar</button>
         <button onClick={async () => {
           await onSubmit({
@@ -648,6 +649,30 @@ describe('AppointmentsPage', () => {
 
       const closeButton = screen.getByRole('button', { name: /cerrar/i })
       fireEvent.click(closeButton)
+
+      expect(mockClearError).toHaveBeenCalled()
+    })
+
+    it('should display error inside modal when form submission fails', async () => {
+      mockAddAppointment.mockRejectedValueOnce(new Error('Conflict'))
+      mockAppointmentsState.error = 'El doctor ya tiene una cita en este horario'
+      renderAppointmentsPage()
+
+      // Open modal
+      fireEvent.click(screen.getByRole('button', { name: /nueva cita/i }))
+
+      // Error should be visible inside the modal
+      const modal = screen.getByTestId('appointment-form-modal')
+      expect(modal).toBeInTheDocument()
+      const modalError = screen.getByTestId('modal-error')
+      expect(modalError).toHaveTextContent('El doctor ya tiene una cita en este horario')
+    })
+
+    it('should clear error when opening the form', () => {
+      mockAppointmentsState.error = 'Some error'
+      renderAppointmentsPage()
+
+      fireEvent.click(screen.getByRole('button', { name: /nueva cita/i }))
 
       expect(mockClearError).toHaveBeenCalled()
     })

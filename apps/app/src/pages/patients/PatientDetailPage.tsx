@@ -31,6 +31,7 @@ import { AppointmentFormModal } from '@/components/appointments/AppointmentFormM
 import {
   createAppointment,
   updateAppointment,
+  getAppointmentApiErrorMessage,
   type CreateAppointmentData,
   type UpdateAppointmentData,
   type Appointment,
@@ -276,6 +277,7 @@ export default function PatientDetailPage() {
   const [isAppointmentFormOpen, setIsAppointmentFormOpen] = useState(false)
   const [isCreatingAppointment, setIsCreatingAppointment] = useState(false)
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
+  const [appointmentFormError, setAppointmentFormError] = useState<string | null>(null)
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     try {
@@ -617,10 +619,12 @@ export default function PatientDetailPage() {
         patientId={patient.id}
         onNewAppointment={() => {
           setEditingAppointment(null)
+          setAppointmentFormError(null)
           setIsAppointmentFormOpen(true)
         }}
         onEditAppointment={(appointment) => {
           setEditingAppointment(appointment)
+          setAppointmentFormError(null)
           setIsAppointmentFormOpen(true)
         }}
         refreshKey={appointmentsRefreshKey}
@@ -804,9 +808,11 @@ export default function PatientDetailPage() {
         onClose={() => {
           setIsAppointmentFormOpen(false)
           setEditingAppointment(null)
+          setAppointmentFormError(null)
         }}
         onSubmit={async (data) => {
           setIsCreatingAppointment(true)
+          setAppointmentFormError(null)
           try {
             if (editingAppointment) {
               await updateAppointment(editingAppointment.id, data as UpdateAppointmentData)
@@ -817,7 +823,7 @@ export default function PatientDetailPage() {
             setEditingAppointment(null)
             setAppointmentsRefreshKey(k => k + 1)
           } catch (e) {
-            setError(e instanceof Error ? e.message : 'Error al crear la cita')
+            setAppointmentFormError(getAppointmentApiErrorMessage(e))
           } finally {
             setIsCreatingAppointment(false)
           }
@@ -825,6 +831,7 @@ export default function PatientDetailPage() {
         appointment={editingAppointment}
         isLoading={isCreatingAppointment}
         defaultPatientId={patient.id}
+        error={appointmentFormError}
       />
 
       {/* Tooth Details Modal */}

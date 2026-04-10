@@ -162,10 +162,25 @@ Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
 
 ---
 
+## Hotfix: Appointment Conflict Error Handling
+
+- [x] Backend verified: `excludeAppointmentId` works correctly on update (no self-conflict bug)
+- [x] Added backend tests: edit appointment without time change, edit to free time slot
+- [x] Error banner displayed inside the modal (above form, below header)
+- [x] PatientDetailPage: use `getAppointmentApiErrorMessage()` instead of raw axios message
+- [x] AppointmentsPage: pass store error to modal, clear on open/close
+- [x] Error messages use i18n keys with `getUserLanguage()` fallback to `'es'` (workaround for `LanguageDetector` using browser language instead of app preference)
+- [x] i18n error keys added to ES, EN, AR (`appointments.errors.*`)
+- [x] Frontend + backend tests updated
+
+**Hallazgo:** `i18next-browser-languagedetector` detects browser language (`en-US`) instead of app preference. Workaround: `getUserLanguage()` reads `localStorage('language')` directly. Root fix tracked in i18n migration below.
+
+---
+
 ## i18n Hardcoded Strings Migration (upcoming)
 
 Migrate hardcoded Spanish strings to i18n keys, split by module:
-- [ ] Appointments module
+- [ ] Appointments module (error messages done, form labels pending)
 - [ ] Patients module
 - [ ] Doctors module
 - [ ] Labworks module

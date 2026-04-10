@@ -24,11 +24,13 @@ adminApiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Response interceptor - handle 401 errors
+// Response interceptor - handle 401 errors (skip auth endpoints to let login form show its own errors)
 adminApiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || ''
+    const isAuthRoute = url.startsWith('/auth/')
+    if (error.response?.status === 401 && !isAuthRoute) {
       const { logout } = useAdminStore.getState()
       logout()
       window.location.href = '/admin/login'
