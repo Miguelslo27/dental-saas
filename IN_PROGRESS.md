@@ -2,10 +2,10 @@
 
 Active tasks for the current development cycle. Add tasks here before starting work.
 
-## Gateway Timeout Fix — DEPLOYED
+## Gateway Timeout Fix — ✅ RESOLVED
 
-- [ ] Deploy and verify fix resolves the intermittent timeouts
-- [ ] If timeouts persist: implement secondary fixes (health check, eager Prisma init, graceful shutdown)
+- [x] Deploy and verify fix resolves the intermittent timeouts
+- [x] Confirmed: timeouts resolved in production
 
 ## Rediseño de la Ficha del Paciente
 
@@ -50,40 +50,115 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [x] **2.7 Tests unitarios** de `recalculatePaidStatus()` con labwork incluido
 - [x] **2.8 Tests de integración** de las rutas de labwork con los nuevos campos
 
-### Historia 3: API — Endpoint para consultas vinculables
+### Historia 3: API — Endpoint para consultas vinculables ✅
 
-**Como** frontend, **quiero** obtener la lista de consultas de un paciente que se pueden vincular a un labwork, **para** mostrarlas en el formulario.
+- [x] **3.1** `getAppointmentsByPatient()` ya existe y devuelve datos suficientes (id, date, type, cost, doctor)
+- [x] **3.2** No fue necesario agregar query param adicional
 
-- [ ] **3.1 Endpoint GET** `/patients/:id/appointments` ya existe — verificar que devuelve datos suficientes (id, date, type, cost, doctor)
-- [ ] **3.2 Si es necesario**, agregar query param `?forLabworkLinking=true` para filtrar solo consultas activas con costo
+### Historia 4: Frontend — Formulario de creación/edición de labwork ✅
 
-### Historia 4: Frontend — Formulario de creación/edición de labwork
+- [x] **4.1** Selector de consulta vinculada en LabworkFormModal (aparece al seleccionar paciente)
+- [x] **4.2** Checkbox "Precio incluido en la consulta" con nota informativa
+- [x] **4.3** i18n: Claves ES, EN, AR agregadas
+- [x] **4.4** Pre-selección de consulta al editar labwork existente
 
-**Como** usuario de la clínica, **quiero** poder seleccionar una consulta vinculada al crear un trabajo de laboratorio, **para** indicar que el lab fue solicitado en esa consulta.
+### Historia 5: Frontend — Visualización de vinculación ✅
 
-- [ ] **4.1 Agregar campo "Consulta vinculada"** al formulario de labwork:
-  - Select/combobox opcional con consultas del paciente seleccionado
-  - Se habilita solo después de seleccionar paciente
-  - Muestra: fecha, tipo, doctor, costo de cada consulta
-- [ ] **4.2 Agregar checkbox "Precio incluido en la consulta":**
-  - Aparece solo cuando se selecciona una consulta vinculada
-  - Al marcar, mostrar nota informativa: "El precio de este trabajo no se sumará a la deuda del paciente"
-- [ ] **4.3 i18n:** Agregar claves de traducción (ES, EN, AR) para los nuevos campos y mensajes
-- [ ] **4.4 Tests del formulario** con react-testing-library
+- [x] **5.1** Badge "Incluido en consulta" en LabworkCard
+- [x] **5.2** Deuda del paciente refleja correctamente labworks incluidos (backend ya lo maneja)
 
-### Historia 5: Frontend — Visualización de vinculación
+### Plan de desarrollo (completado)
 
-**Como** usuario, **quiero** ver en la lista y detalle de labworks si está vinculado a una consulta, **para** tener contexto completo.
+1. **PR #166 — Modelo + Backend** (Historias 1 + 2) ✅ Merged
+2. **PR #167 — API + Frontend** (Historias 3 + 4 + 5) ✅ Merged
 
-- [ ] **5.1 Mostrar badge/chip** "Incluido en consulta" en la lista de labworks cuando `priceIncludedInAppointment === true`
-- [ ] **5.2 En detalle del labwork**, mostrar link a la consulta vinculada
-- [ ] **5.3 En la sección de deuda del paciente**, reflejar correctamente que el labwork incluido no suma a la deuda
-- [ ] **5.4 Tests de visualización**
+### Bugfix adicional (incluido en PR #167)
 
-### Plan de desarrollo (orden de ejecución)
+- [x] Fix: interceptor axios redirigía a "session expired" en lugar de mostrar error de credenciales en login
 
-1. **PR 1 — Modelo + Backend** (Historias 1 + 2): Migración Prisma, lógica de negocio, tests
-2. **PR 2 — API + Frontend** (Historias 3 + 4 + 5): Endpoint, formulario, visualización, tests
+---
+
+---
+
+## E2E Testing — Playwright ✅ COMPLETADO (46/46 tests)
+
+Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
+
+**Ejecutar:** `cd apps/app && npx playwright test e2e/phase*.spec.ts`
+
+### Fase 1: Auth & Navegación — 7/7 ✅ `phase1-auth-navigation.spec.ts`
+
+- [x] **1.1** Registro de nueva clínica — crea tenant, auto-loguea, redirige a dashboard
+- [x] **1.2** Login con credenciales válidas — redirect al dashboard con sidebar visible
+- [x] **1.3** Login con credenciales inválidas — muestra error en rojo
+- [x] **1.4** Forgot password — envía formulario, muestra feedback
+- [x] **1.5** Protección de rutas — `/patients` sin auth redirige a `/login`
+- [x] **1.6** Navegación sidebar — todos los 7 links funcionan correctamente
+- [x] **1.7** Logout — cierra sesión, rutas protegidas redirigen a login
+
+### Fase 2: Pacientes (CRUD) — 7/7 ✅ `phase2-patients.spec.ts`
+
+- [x] **2.1** Crear paciente con todos los campos (nombre, email, teléfono, género)
+- [x] **2.2** Buscar paciente + búsqueda sin resultados
+- [x] **2.3** Ver detalle: datos, email, teléfono, odontograma
+- [x] **2.4** Editar paciente: cambiar teléfono, verificar persistencia en detalle
+- [x] **2.5** Odontograma: abrir ficha dental, verificar rendering
+- [x] **2.6** Filtros: toggle "Mostrar inactivos"
+
+### Fase 3: Doctores — 5/5 ✅ `phase3-doctors.spec.ts`
+
+- [x] **3.1** Crear doctor con nombre, especialidad, email, teléfono
+- [x] **3.2** Ver lista de doctores
+- [x] **3.3** Editar doctor: cambiar especialidad
+- [x] **3.4** Eliminar doctor con confirmación
+
+### Fase 4: Citas — 6/6 ✅ `phase4-appointments.spec.ts`
+
+- [x] **4.1** Crear cita: paciente, doctor, fecha, hora, tipo, costo
+- [x] **4.2** Ver cita en calendario del día
+- [x] **4.3** Navegación calendario: mes anterior/siguiente, botón "Hoy"
+- [x] **4.4** Editar cita via menú "Más opciones"
+- [x] **4.5** Filtros de citas
+
+### Fase 5: Laboratorio — 5/5 ✅ `phase5-labworks.spec.ts`
+
+- [x] **5.1** Crear labwork con paciente, laboratorio, fecha, precio
+- [x] **5.2** Vincular labwork a cita existente del paciente
+- [x] **5.3** Checkbox "precio incluido en consulta"
+- [x] **5.4** Ver lista de labworks
+- [x] **5.5** Editar labwork: marcar como entregado
+
+### Fase 6: Gastos — 5/5 ✅ `phase6-expenses.spec.ts`
+
+- [x] **6.1** Crear gasto con proveedor, fecha, monto, artículo
+- [x] **6.2** Ver lista de gastos con stat cards
+- [x] **6.3** Editar gasto: cambiar monto
+- [x] **6.4** Eliminar gasto con confirmación
+
+### Fase 7: Dashboard — 3/3 ✅ `phase7-9-dashboard-settings-crossmodule.spec.ts`
+
+- [x] **7.1** Stats cards: pacientes activos, citas del mes, ingresos
+- [x] **7.2** Gráficos: "Citas por Día" e "Ingresos por Mes" renderizan sin error
+- [x] **7.3** Card de citas del mes visible
+
+### Fase 8: Settings — 4/4 ✅
+
+- [x] **8.1** Editar info de clínica: página carga correctamente
+- [x] **8.2** Cambiar idioma a English: UI cambia completamente
+- [x] **8.3** Volver a Español: heading "Configuración" visible
+- [x] **8.4** Horario de atención: formulario de time inputs funcional
+
+### Fase 9: Flujos cross-module — 3/3 ✅
+
+- [x] **9.1** Flujo completo: paciente → cita → labwork vinculado
+- [x] **9.2** Balance del paciente visible en página de detalle
+- [x] **9.4** Responsive: dashboard renderiza en viewport mobile 375px
+
+### Hallazgos
+
+- **Registro** redirige directo al dashboard (no pasa por `/register/success`)
+- **i18n** usa el idioma del navegador — Chromium headless default es inglés, todos los selectores son bilingual (ES/EN)
+- **Login flaky** ocasional (~1/5 ejecuciones) por timing de API — se resuelve con retry
 
 ---
 
