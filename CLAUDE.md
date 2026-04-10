@@ -131,7 +131,7 @@ dental-saas/
 - **Framework:** Vitest
 - **Backend:** Unit tests for services, integration tests for routes
 - **Frontend:** React Testing Library + jsdom
-- **Current count:** 420 backend + 892 frontend = 1,312 tests passing
+- **Current count:** 452 backend + 947 frontend = 1,399 tests passing
 
 ```bash
 # Run specific test file
@@ -212,7 +212,7 @@ All core features completed (15 phases):
 - Welcome email for new tenants
 - CI/CD pipeline & production deployment
 
-**Test Coverage:** 1,312 passing tests (420 backend + 892 frontend)
+**Test Coverage:** 1,399 passing tests (452 backend + 947 frontend)
 
 ## Security Notes
 
