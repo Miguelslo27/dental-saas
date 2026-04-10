@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Loader2, Calendar, Clock, User, Stethoscope } from 'lucide-react'
+import { X, Loader2, Calendar, Clock, User, Stethoscope, AlertCircle } from 'lucide-react'
 import type { Appointment, CreateAppointmentData, UpdateAppointmentData, AppointmentStatus } from '../../lib/appointment-api'
 import { getStatusLabel } from '../../lib/appointment-api'
 import * as patientApi from '../../lib/patient-api'
@@ -58,6 +58,7 @@ interface AppointmentFormModalProps {
   isLoading?: boolean
   defaultDate?: Date
   defaultPatientId?: string
+  error?: string | null
 }
 
 export function AppointmentFormModal({
@@ -68,6 +69,7 @@ export function AppointmentFormModal({
   isLoading = false,
   defaultDate,
   defaultPatientId,
+  error: externalError,
 }: AppointmentFormModalProps) {
   const modalTitleId = useId()
   const isEditing = !!appointment
@@ -418,6 +420,14 @@ export function AppointmentFormModal({
                 />
               </div>
             </div>
+
+            {/* Error */}
+            {externalError && (
+              <div className="mx-6 mb-2 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{externalError}</p>
+              </div>
+            )}
 
             {/* Footer */}
             <div className="px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-200 flex justify-end gap-3">
