@@ -7,6 +7,7 @@ import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@pages/auth/ResetPasswordPage'
 import DashboardPage from '@pages/dashboard/DashboardPage'
 import DoctorsPage from '@pages/doctors/DoctorsPage'
+import DoctorDetailPage from '@pages/doctors/DoctorDetailPage'
 import PatientsPage from '@pages/patients/PatientsPage'
 import PatientDetailPage from '@pages/patients/PatientDetailPage'
 import AppointmentsPage from '@pages/appointments/AppointmentsPage'
@@ -53,6 +54,7 @@ function App() {
       >
         <Route path="/" element={<DashboardPage />} />
         <Route path="/doctors" element={<DoctorsPage />} />
+        <Route path="/doctors/:id" element={<DoctorDetailPage />} />
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/patients/:id" element={<PatientDetailPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
