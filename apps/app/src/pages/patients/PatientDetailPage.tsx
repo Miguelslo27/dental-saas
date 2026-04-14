@@ -38,6 +38,7 @@ import {
 } from '@/lib/appointment-api'
 import { PatientSidebar } from './PatientSidebar'
 import { PatientAppointmentsSection } from './PatientAppointmentsSection'
+import { remapPrimaryFdi } from './odontogram-utils'
 
 // ============================================================================
 // Types
@@ -337,6 +338,18 @@ export default function PatientDetailPage() {
     }
   }, [])
 
+  // Primary (deciduous) teeth variant: remap quadrants 1-4 → 5-8 before saving.
+  const handlePrimaryOdontogramChange = useCallback((selected: ToothDetail[]) => {
+    if (selected.length > 0) {
+      const lastTooth = selected[selected.length - 1]
+      const fdiNumber = remapPrimaryFdi(lastTooth.notations.fdi)
+      setSelectedTooth(fdiNumber)
+      setSelectedToothType(lastTooth.type)
+      setIsToothModalOpen(true)
+      setOdontogramKey(k => k + 1)
+    }
+  }, [])
+
   // Handle save tooth data
   const handleSaveToothData = useCallback(async (data: ToothData) => {
     if (!patient || !selectedTooth) return
@@ -435,53 +448,67 @@ export default function PatientDetailPage() {
     }
   }
 
-  // Generate dynamic CSS to color individual teeth in the SVG
+  // Generate dynamic CSS to color individual teeth in the SVG.
   // The library renders each tooth as <g class="teeth-{quadrant}{toothIndex}">
-  // where quadrant is 1-4 and toothIndex is 1-8 (position within quadrant)
-  // FDI notation: tooth "11" = quadrant 1, tooth 1 → class "teeth-11"
+  // using only quadrants 1-4. Primary teeth are stored with FDI quadrants 5-8
+  // but the library still renders them under quadrants 1-4 inside the
+  // .odontogram-primary wrapper, so we scope the CSS rule per chart and map
+  // the stored FDI back to the rendered class name for primary teeth.
   const teethStyleRules: string[] = []
   for (const [toothNumber, toothData] of Object.entries(teeth)) {
     const color = getToothColor(toothData.status, !!toothData.note)
     if (!color) continue
+    if (toothNumber.length !== 2) continue
+    const quadrant = Number(toothNumber[0])
+    const isPrimary = quadrant >= 5 && quadrant <= 8
+    const scope = isPrimary ? '.odontogram-primary' : '.odontogram-permanent'
+    const libClass = isPrimary
+      ? `teeth-${quadrant - 4}${toothNumber[1]}`
+      : `teeth-${toothNumber}`
     const isMissing = toothData.status === ToothStatus.MISSING || toothData.status === ToothStatus.EXTRACTED
-    // Set tooth outline + fill color via CSS, scoped to permanent teeth only
     if (isMissing) {
       teethStyleRules.push(
-        `.odontogram-permanent g.teeth-${toothNumber}{color:${color};opacity:0.25}`,
+        `${scope} g.${libClass}{color:${color};opacity:0.25}`,
       )
     } else {
       teethStyleRules.push(
-        `.odontogram-permanent g.teeth-${toothNumber}{color:${color}}`,
-        `.odontogram-permanent g.teeth-${toothNumber} path:nth-of-type(2){fill:${color};opacity:0.3}`,
+        `${scope} g.${libClass}{color:${color}}`,
+        `${scope} g.${libClass} path:nth-of-type(2){fill:${color};opacity:0.3}`,
       )
     }
   }
 
-  // Custom tooltip content for the odontogram
-  const renderToothTooltip = (payload?: ToothDetail) => {
-    if (!payload) return null
-    const fdi = payload.notations.fdi
-    const toothData = teeth[fdi]
-    const statusKey = toothData?.status || ToothStatus.HEALTHY
-    const note = toothData?.note || ''
-    const truncatedNote = note.length > 80 ? note.slice(0, 80) + '...' : note
+  // Renders the tooth tooltip. `remapFdi` is used by the primary chart to
+  // convert the raw FDI reported by the library (quadrants 1-4) into the
+  // actual primary tooth FDI (quadrants 5-8) before looking up tooth data.
+  const buildToothTooltipRenderer = (remapFdi: (raw: string) => string) =>
+    (payload?: ToothDetail) => {
+      if (!payload) return null
+      const fdi = remapFdi(payload.notations.fdi)
+      const toothData = teeth[fdi]
+      const statusKey = toothData?.status || ToothStatus.HEALTHY
+      const note = toothData?.note || ''
+      const truncatedNote = note.length > 80 ? note.slice(0, 80) + '...' : note
 
-    return (
-      <div style={{ maxWidth: 250 }}>
-        <div style={{ fontWeight: 600 }}>
-          {t('patients.tooth')} {fdi} — {t(`patients.toothType.${payload.type}`, payload.type)}
-        </div>
-        <div style={{ marginTop: 2 }}>
-          {t('patients.toothStatus')}: {t(`patients.status.${statusKey}`)}
-        </div>
-        {note && (
-          <div style={{ marginTop: 4, opacity: 0.85, fontStyle: 'italic' }}>
-            {truncatedNote}
+      return (
+        <div style={{ maxWidth: 250 }}>
+          <div style={{ fontWeight: 600 }}>
+            {t('patients.tooth')} {fdi} — {t(`patients.toothType.${payload.type}`, payload.type)}
           </div>
-        )}
-      </div>
-    )
-  }
+          <div style={{ marginTop: 2 }}>
+            {t('patients.toothStatus')}: {t(`patients.status.${statusKey}`)}
+          </div>
+          {note && (
+            <div style={{ marginTop: 4, opacity: 0.85, fontStyle: 'italic' }}>
+              {truncatedNote}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+  const renderToothTooltip = buildToothTooltipRenderer((fdi) => fdi)
+  const renderPrimaryToothTooltip = buildToothTooltipRenderer(remapPrimaryFdi)
 
   return (
     <div className="p-6 space-y-6">
@@ -689,13 +716,13 @@ export default function PatientDetailPage() {
                 >
                   <Odontogram
                     key={`primary-${odontogramKey}`}
-                    onChange={handleOdontogramChange}
+                    onChange={handlePrimaryOdontogramChange}
                     theme="light"
                     colors={{}}
                     notation="FDI"
                     maxTeeth={5}
                     showTooltip={true}
-                    tooltip={{ placement: 'bottom', margin: 8, content: renderToothTooltip }}
+                    tooltip={{ placement: 'bottom', margin: 8, content: renderPrimaryToothTooltip }}
                   />
                 </div>
               )}
