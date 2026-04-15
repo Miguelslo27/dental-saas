@@ -8,7 +8,7 @@ import type { Labwork, CreateLabworkData } from '@/lib/labwork-api'
 import type { Appointment } from '@/lib/appointment-api'
 import { getAppointmentsByPatient } from '@/lib/appointment-api'
 import { useAuthStore } from '@/stores/auth.store'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, formatDateForInput } from '@/lib/format'
 import { PatientSearchCombobox, type PatientOption } from '@/components/ui/PatientSearchCombobox'
 
 // ============================================================================
@@ -69,7 +69,7 @@ export function LabworkFormModal({
       appointmentId: '',
       priceIncludedInAppointment: false,
       lab: '',
-      date: new Date().toISOString().split('T')[0],
+      date: formatDateForInput(new Date()),
       price: 0,
       isPaid: false,
       isDelivered: false,
@@ -108,7 +108,7 @@ export function LabworkFormModal({
           appointmentId: '',
           priceIncludedInAppointment: false,
           lab: '',
-          date: new Date().toISOString().split('T')[0],
+          date: formatDateForInput(new Date()),
           price: 0,
           isPaid: false,
           isDelivered: false,
