@@ -176,13 +176,14 @@ export async function getAppointmentById(id: string): Promise<Appointment> {
  */
 export async function getAppointmentsByDoctor(
   doctorId: string,
-  params?: { from?: string; to?: string; limit?: number }
+  params?: { from?: string; to?: string; limit?: number; includeInactive?: boolean }
 ): Promise<Appointment[]> {
   const queryParams = new URLSearchParams()
 
   if (params?.from) queryParams.set('from', params.from)
   if (params?.to) queryParams.set('to', params.to)
   if (params?.limit) queryParams.set('limit', String(params.limit))
+  if (params?.includeInactive) queryParams.set('includeInactive', 'true')
 
   const queryString = queryParams.toString()
   const url = `/appointments/by-doctor/${doctorId}${queryString ? `?${queryString}` : ''}`
@@ -300,6 +301,22 @@ export function getStatusColor(status: AppointmentStatus): string {
     RESCHEDULED: 'purple',
   }
   return colors[status] || 'gray'
+}
+
+/**
+ * Get i18n key for appointment status (matches keys in appointments.status.*)
+ */
+export function getStatusI18nKey(status: AppointmentStatus): string {
+  const keys: Record<AppointmentStatus, string> = {
+    SCHEDULED: 'scheduled',
+    CONFIRMED: 'confirmed',
+    IN_PROGRESS: 'inProgress',
+    COMPLETED: 'completed',
+    CANCELLED: 'cancelled',
+    NO_SHOW: 'noShow',
+    RESCHEDULED: 'rescheduled',
+  }
+  return keys[status] || status.toLowerCase()
 }
 
 /**

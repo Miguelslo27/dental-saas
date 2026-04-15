@@ -26,6 +26,7 @@ import {
   getStatusBadgeClasses,
   formatTimeRange,
   getAppointmentPatientName,
+  getStatusI18nKey,
 } from '@/lib/appointment-api'
 import { downloadAppointmentPdf } from '@/lib/pdf-api'
 import { formatCurrency } from '@/lib/format'
@@ -194,7 +195,7 @@ function DoctorAppointmentCard({
       {/* Status badge */}
       <div className="mb-2">
         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClasses(appointment.status)}`}>
-          {t(`appointments.status.${appointment.status.toLowerCase()}`)}
+          {t(`appointments.status.${getStatusI18nKey(appointment.status)}`)}
         </span>
       </div>
 
@@ -275,6 +276,7 @@ export function DoctorAppointmentsSection({
     try {
       const data = await getAppointmentsByDoctor(doctorId, {
         limit: 100,
+        includeInactive: true,
       })
       setAppointments(data)
     } catch (e) {
