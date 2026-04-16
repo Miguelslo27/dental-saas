@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Loader2, Plus, Minus } from 'lucide-react'
 import type { Expense, CreateExpenseData } from '@/lib/expense-api'
+import { formatDateForInput } from '@/lib/format'
 
 // ============================================================================
 // Validation Schema
@@ -54,7 +55,7 @@ export function ExpenseFormModal({
     resolver: zodResolver(expenseFormSchema),
     defaultValues: {
       issuer: '',
-      date: new Date().toISOString().split('T')[0],
+      date: formatDateForInput(new Date()),
       amount: 0,
       items: [{ value: '' }],
       tags: [],
@@ -96,7 +97,7 @@ export function ExpenseFormModal({
       } else {
         reset({
           issuer: '',
-          date: new Date().toISOString().split('T')[0],
+          date: formatDateForInput(new Date()),
           amount: 0,
           items: [{ value: '' }],
           tags: [],

@@ -694,9 +694,9 @@ export async function getAppointmentStats(
 export async function getAppointmentsByDoctor(
   tenantId: string,
   doctorId: string,
-  options?: { from?: Date; to?: Date; limit?: number }
+  options?: { from?: Date; to?: Date; limit?: number; includeInactive?: boolean }
 ): Promise<SafeAppointment[]> {
-  const { from, to, limit = 50 } = options || {}
+  const { from, to, limit = 50, includeInactive = false } = options || {}
 
   // Verify doctor belongs to tenant
   const doctorValid = await verifyDoctorBelongsToTenant(doctorId, tenantId)
@@ -707,7 +707,7 @@ export async function getAppointmentsByDoctor(
   const where: Prisma.AppointmentWhereInput = {
     tenantId,
     doctorId,
-    isActive: true,
+    ...(includeInactive ? {} : { isActive: true }),
     ...(from || to
       ? {
           startTime: {

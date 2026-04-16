@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { X, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { CreatePaymentData } from '@/lib/payment-api'
+import { formatDateForInput } from '@/lib/format'
 
 // ============================================================================
 // Validation Schema
@@ -55,7 +56,7 @@ export function PaymentFormModal({
     resolver: zodResolver(createPaymentSchema(maxAmount)),
     defaultValues: {
       amount: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: formatDateForInput(new Date()),
       note: '',
     },
   })
@@ -64,7 +65,7 @@ export function PaymentFormModal({
     if (isOpen) {
       reset({
         amount: 0,
-        date: new Date().toISOString().split('T')[0],
+        date: formatDateForInput(new Date()),
         note: '',
       })
     }

@@ -1,4 +1,5 @@
-import { Stethoscope, Phone, Mail, Pencil, Trash2, RotateCcw } from 'lucide-react'
+import { Link } from 'react-router'
+import { Stethoscope, Phone, Mail, Pencil, Trash2, RotateCcw, ExternalLink } from 'lucide-react'
 import type { Doctor } from '@/lib/doctor-api'
 
 const DAYS_MAP: Record<string, string> = {
@@ -120,7 +121,15 @@ export function DoctorCard({ doctor, onEdit, onDelete, onRestore }: DoctorCardPr
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex justify-end gap-2">
+      <div className="px-6 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex justify-between">
+        <Link
+          to={`/doctors/${doctor.id}`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Ver detalle
+        </Link>
+        <div className="flex gap-2">
         {!doctor.isActive && onRestore ? (
           <button
             onClick={() => onRestore(doctor)}
@@ -147,6 +156,7 @@ export function DoctorCard({ doctor, onEdit, onDelete, onRestore }: DoctorCardPr
             </button>
           </>
         )}
+        </div>
       </div>
     </div>
   )

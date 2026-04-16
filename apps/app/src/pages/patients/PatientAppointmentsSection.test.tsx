@@ -24,6 +24,7 @@ vi.mock('@/lib/appointment-api', () => ({
   },
   getAppointmentDoctorName: (a: Appointment) =>
     a.doctor ? `${a.doctor.firstName} ${a.doctor.lastName}` : 'Unknown',
+  getStatusI18nKey: (status: string) => status.toLowerCase(),
 }))
 
 vi.mock('@/lib/pdf-api', () => ({

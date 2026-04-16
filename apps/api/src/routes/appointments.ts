@@ -210,12 +210,13 @@ appointmentsRouter.get('/by-doctor/:doctorId', requireMinRole('STAFF'), async (r
   try {
     const tenantId = req.user!.tenantId
     const { doctorId } = req.params
-    const { from, to, limit } = req.query
+    const { from, to, limit, includeInactive } = req.query
 
     const appointments = await getAppointmentsByDoctor(tenantId, doctorId, {
       from: from ? new Date(String(from)) : undefined,
       to: to ? new Date(String(to)) : undefined,
       limit: limit ? parseInt(String(limit), 10) : undefined,
+      includeInactive: includeInactive === 'true',
     })
 
     res.json({ success: true, data: appointments })

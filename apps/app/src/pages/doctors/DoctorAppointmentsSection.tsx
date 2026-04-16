@@ -3,11 +3,10 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   CalendarDays,
-  CalendarPlus,
   ChevronDown,
   ChevronUp,
   Clock,
-  Stethoscope,
+  User,
   MoreVertical,
   Edit,
   Trash2,
@@ -21,12 +20,12 @@ import { useAuthStore } from '@/stores/auth.store'
 import {
   type Appointment,
   type AppointmentStatus,
-  getAppointmentsByPatient,
+  getAppointmentsByDoctor,
   markAppointmentDone,
   deleteAppointment,
   getStatusBadgeClasses,
   formatTimeRange,
-  getAppointmentDoctorName,
+  getAppointmentPatientName,
   getStatusI18nKey,
 } from '@/lib/appointment-api'
 import { downloadAppointmentPdf } from '@/lib/pdf-api'
@@ -37,9 +36,8 @@ import i18n from '@/i18n'
 // Types
 // ============================================================================
 
-interface PatientAppointmentsSectionProps {
-  patientId: string
-  onNewAppointment: () => void
+interface DoctorAppointmentsSectionProps {
+  doctorId: string
   onEditAppointment: (appointment: Appointment) => void
   refreshKey?: number
 }
@@ -47,10 +45,10 @@ interface PatientAppointmentsSectionProps {
 type FilterPeriod = 'upcoming' | 'past' | 'all'
 
 // ============================================================================
-// PatientAppointmentCard
+// DoctorAppointmentCard
 // ============================================================================
 
-function PatientAppointmentCard({
+function DoctorAppointmentCard({
   appointment,
   onEdit,
   onComplete,
@@ -206,10 +204,10 @@ function PatientAppointmentCard({
         <p className="text-xs text-gray-600 mb-1 truncate">{appointment.type}</p>
       )}
 
-      {/* Doctor */}
+      {/* Patient (instead of Doctor) */}
       <div className="flex items-center gap-1 text-xs text-gray-500 truncate">
-        <Stethoscope className="h-3 w-3 text-gray-400 shrink-0" />
-        <span className="truncate">{getAppointmentDoctorName(appointment)}</span>
+        <User className="h-3 w-3 text-gray-400 shrink-0" />
+        <span className="truncate">{getAppointmentPatientName(appointment)}</span>
       </div>
 
       {/* Cost */}
@@ -231,19 +229,18 @@ function PatientAppointmentCard({
 // Main Section Component
 // ============================================================================
 
-export function PatientAppointmentsSection({
-  patientId,
-  onNewAppointment,
+export function DoctorAppointmentsSection({
+  doctorId,
   onEditAppointment,
   refreshKey = 0,
-}: PatientAppointmentsSectionProps) {
+}: DoctorAppointmentsSectionProps) {
   const { t } = useTranslation()
   const { can } = usePermissions()
 
   // Collapse state with localStorage persistence
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
-      return localStorage.getItem('patient-appointments-collapsed') !== 'false'
+      return localStorage.getItem('doctor-appointments-collapsed') !== 'false'
     } catch {
       return true
     }
@@ -255,7 +252,7 @@ export function PatientAppointmentsSection({
   const [error, setError] = useState<string | null>(null)
 
   // Filter state
-const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
   const [filterStatus, setFilterStatus] = useState<AppointmentStatus | ''>('')
   const [filterFrom, setFilterFrom] = useState('')
   const [filterTo, setFilterTo] = useState('')
@@ -267,7 +264,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
   const toggleCollapse = () => {
     setIsCollapsed(prev => {
       const next = !prev
-      try { localStorage.setItem('patient-appointments-collapsed', String(next)) } catch { /* ignore */ }
+      try { localStorage.setItem('doctor-appointments-collapsed', String(next)) } catch { /* ignore */ }
       return next
     })
   }
@@ -277,7 +274,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
     setIsLoading(true)
     setError(null)
     try {
-      const data = await getAppointmentsByPatient(patientId, {
+      const data = await getAppointmentsByDoctor(doctorId, {
         limit: 100,
         includeInactive: true,
       })
@@ -287,7 +284,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
     } finally {
       setIsLoading(false)
     }
-  }, [patientId])
+  }, [doctorId])
 
   useEffect(() => {
     fetchAppointments()
@@ -296,7 +293,6 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
   // Filter and sort appointments
   const now = new Date()
   const filteredAppointments = appointments.filter(a => {
-    // Period filter
     const startTime = new Date(a.startTime)
     if (filterPeriod === 'upcoming') {
       if (startTime < now && !isToday(startTime)) return false
@@ -305,10 +301,8 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
       if (startTime >= now || isToday(startTime)) return false
     }
 
-    // Status filter
     if (filterStatus && a.status !== filterStatus) return false
 
-    // Date range filter
     if (filterFrom && startTime < new Date(filterFrom)) return false
     if (filterTo) {
       const toDate = new Date(filterTo)
@@ -323,13 +317,11 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
     return filterPeriod === 'past' ? dateB - dateA : dateA - dateB
   })
 
-  // Count upcoming for header badge
   const upcomingCount = appointments.filter(a => {
     const startTime = new Date(a.startTime)
     return (startTime >= now || isToday(startTime)) && a.status !== 'CANCELLED' && a.isActive
   }).length
 
-  // Handle actions
   const handleComplete = async (appointment: Appointment) => {
     setConfirmAction({ type: 'complete', appointment })
   }
@@ -367,7 +359,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-      {/* Header - always visible */}
+      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
         <button
           onClick={toggleCollapse}
@@ -375,7 +367,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
         >
           <CalendarDays className="h-5 w-5 text-blue-600" />
           <h2 className="text-lg font-semibold text-gray-900">
-            {t('patients.appointments.sectionTitle')}
+            Citas
           </h2>
           {upcomingCount > 0 && (
             <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -388,86 +380,70 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
             <ChevronUp className="h-4 w-4 text-gray-400" />
           )}
         </button>
-
-        <div className="flex items-center gap-2">
-          {/* New appointment button - always visible */}
-          {can(Permission.APPOINTMENTS_CREATE) && (
-            <button
-              onClick={onNewAppointment}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <CalendarPlus className="h-4 w-4" />
-              {t('appointments.newAppointment')}
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Collapsible content */}
       {!isCollapsed && (
         <div className="px-6 pb-4">
-          {/* Filters panel - always visible */}
+          {/* Filters */}
           <div className="mb-4 p-3 bg-gray-50 rounded-lg flex flex-wrap items-center gap-3">
-              {/* Period toggle */}
-              <div className="inline-flex rounded-lg border border-gray-200 bg-white">
-                {(['upcoming', 'past', 'all'] as FilterPeriod[]).map(period => (
-                  <button
-                    key={period}
-                    onClick={() => setFilterPeriod(period)}
-                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                      filterPeriod === period
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    } ${period === 'upcoming' ? 'rounded-l-lg' : ''} ${period === 'all' ? 'rounded-r-lg' : ''}`}
-                  >
-                    {t(`patients.appointments.${period}`)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Status filter */}
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as AppointmentStatus | '')}
-                className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
-              >
-                <option value="">{t('appointments.allStatuses')}</option>
-                <option value="SCHEDULED">{t('appointments.status.scheduled')}</option>
-                <option value="CONFIRMED">{t('appointments.status.confirmed')}</option>
-                <option value="IN_PROGRESS">{t('appointments.status.inProgress')}</option>
-                <option value="COMPLETED">{t('appointments.status.completed')}</option>
-                <option value="CANCELLED">{t('appointments.status.cancelled')}</option>
-                <option value="NO_SHOW">{t('appointments.status.noShow')}</option>
-              </select>
-
-              {/* Date range */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={filterFrom}
-                  onChange={(e) => setFilterFrom(e.target.value)}
-                  className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
-                  placeholder={t('patients.appointments.dateFrom')}
-                />
-                <span className="text-xs text-gray-400">—</span>
-                <input
-                  type="date"
-                  value={filterTo}
-                  onChange={(e) => setFilterTo(e.target.value)}
-                  className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
-                  placeholder={t('patients.appointments.dateTo')}
-                />
-              </div>
-
-              {/* Clear filters */}
-              {hasActiveFilters && (
+            {/* Period toggle */}
+            <div className="inline-flex rounded-lg border border-gray-200 bg-white">
+              {(['upcoming', 'past', 'all'] as FilterPeriod[]).map(period => (
                 <button
-                  onClick={clearFilters}
-                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                  key={period}
+                  onClick={() => setFilterPeriod(period)}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    filterPeriod === period
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  } ${period === 'upcoming' ? 'rounded-l-lg' : ''} ${period === 'all' ? 'rounded-r-lg' : ''}`}
                 >
-                  {t('patients.appointments.clearFilters')}
+                  {t(`patients.appointments.${period}`)}
                 </button>
-              )}
+              ))}
+            </div>
+
+            {/* Status filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as AppointmentStatus | '')}
+              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+            >
+              <option value="">{t('appointments.allStatuses')}</option>
+              <option value="SCHEDULED">{t('appointments.status.scheduled')}</option>
+              <option value="CONFIRMED">{t('appointments.status.confirmed')}</option>
+              <option value="IN_PROGRESS">{t('appointments.status.inProgress')}</option>
+              <option value="COMPLETED">{t('appointments.status.completed')}</option>
+              <option value="CANCELLED">{t('appointments.status.cancelled')}</option>
+              <option value="NO_SHOW">{t('appointments.status.noShow')}</option>
+            </select>
+
+            {/* Date range */}
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={filterFrom}
+                onChange={(e) => setFilterFrom(e.target.value)}
+                className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+              />
+              <span className="text-xs text-gray-400">—</span>
+              <input
+                type="date"
+                value={filterTo}
+                onChange={(e) => setFilterTo(e.target.value)}
+                className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+              />
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                {t('patients.appointments.clearFilters')}
+              </button>
+            )}
           </div>
 
           {/* Loading */}
@@ -486,7 +462,7 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
           {!isLoading && filteredAppointments.length > 0 && (
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
               {filteredAppointments.map(appointment => (
-                <PatientAppointmentCard
+                <DoctorAppointmentCard
                   key={appointment.id}
                   appointment={appointment}
                   onEdit={onEditAppointment}
@@ -507,14 +483,6 @@ const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('upcoming')
                   ? t('patients.appointments.noPast')
                   : t('patients.appointments.noUpcoming')}
               </p>
-              {can(Permission.APPOINTMENTS_CREATE) && filterPeriod === 'upcoming' && (
-                <button
-                  onClick={onNewAppointment}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  {t('appointments.addAppointment')}
-                </button>
-              )}
             </div>
           )}
         </div>

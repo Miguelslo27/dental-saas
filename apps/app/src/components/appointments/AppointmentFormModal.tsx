@@ -7,6 +7,7 @@ import type { Appointment, CreateAppointmentData, UpdateAppointmentData, Appoint
 import { getStatusLabel } from '../../lib/appointment-api'
 import * as patientApi from '../../lib/patient-api'
 import * as doctorApi from '../../lib/doctor-api'
+import { formatDateForInput } from '../../lib/format'
 import { PatientSearchCombobox, type PatientOption } from '../ui/PatientSearchCombobox'
 
 const APPOINTMENT_STATUSES: AppointmentStatus[] = [
@@ -456,10 +457,6 @@ export function AppointmentFormModal({
 }
 
 // Helper functions
-function formatDateForInput(date: Date): string {
-  return date.toISOString().split('T')[0]
-}
-
 function formatTimeForInput(date: Date): string {
   return date.toTimeString().slice(0, 5)
 }

@@ -177,6 +177,16 @@ Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
 
 ---
 
+## Doctor Detail Page ✅
+
+- [x] `DoctorDetailPage` with header, contact info, schedule, bio, edit modal
+- [x] `DoctorAppointmentsSection` replicating PatientAppointmentsSection pattern (shows patient name instead of doctor, filters, actions)
+- [x] Route `/doctors/:id` added to App.tsx
+- [x] "Ver detalle" link added to DoctorCard
+- [x] Edit appointment modal integrated with conflict error handling
+
+---
+
 ## i18n Hardcoded Strings Migration (upcoming)
 
 Migrate hardcoded Spanish strings to i18n keys, split by module:
