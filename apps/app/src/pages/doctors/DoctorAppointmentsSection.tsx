@@ -14,8 +14,6 @@ import {
   FileText,
   Loader2,
 } from 'lucide-react'
-import { Permission } from '@dental/shared'
-import { usePermissions } from '@/hooks/usePermissions'
 import { useAuthStore } from '@/stores/auth.store'
 import {
   type Appointment,
@@ -235,7 +233,6 @@ export function DoctorAppointmentsSection({
   refreshKey = 0,
 }: DoctorAppointmentsSectionProps) {
   const { t } = useTranslation()
-  const { can } = usePermissions()
 
   // Collapse state with localStorage persistence
   const [isCollapsed, setIsCollapsed] = useState(() => {
