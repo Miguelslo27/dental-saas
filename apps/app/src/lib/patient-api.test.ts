@@ -12,6 +12,7 @@ import {
   updatePatientTeeth,
   updateToothData,
   deleteToothData,
+  updateShowPrimaryTeeth,
   updateToothNote,
   deleteToothNote,
   calculateAge,
@@ -47,6 +48,7 @@ const mockPatient: Patient = {
   address: '123 Main St',
   notes: { allergies: 'none' },
   teeth: { '11': 'cavity' },
+  showPrimaryTeeth: false,
   isActive: true,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-15T00:00:00Z',
@@ -347,6 +349,42 @@ describe('patient-api', () => {
           '11': { note: '', status: 'healthy' },
         })
         expect(result).toEqual(mockPatient)
+      })
+    })
+
+    describe('updateShowPrimaryTeeth', () => {
+      it('should PATCH the show-primary-teeth endpoint and return the persisted value', async () => {
+        vi.mocked(apiClient.patch).mockResolvedValue({
+          data: { success: true, data: { showPrimaryTeeth: true } },
+        })
+
+        const result = await updateShowPrimaryTeeth('patient-123', true)
+
+        expect(apiClient.patch).toHaveBeenCalledWith(
+          '/patients/patient-123/show-primary-teeth',
+          { showPrimaryTeeth: true }
+        )
+        expect(result).toBe(true)
+      })
+
+      it('should send the false value when disabling', async () => {
+        vi.mocked(apiClient.patch).mockResolvedValue({
+          data: { success: true, data: { showPrimaryTeeth: false } },
+        })
+
+        const result = await updateShowPrimaryTeeth('patient-123', false)
+
+        expect(apiClient.patch).toHaveBeenCalledWith(
+          '/patients/patient-123/show-primary-teeth',
+          { showPrimaryTeeth: false }
+        )
+        expect(result).toBe(false)
+      })
+
+      it('should propagate network errors', async () => {
+        vi.mocked(apiClient.patch).mockRejectedValue(new Error('Network error'))
+
+        await expect(updateShowPrimaryTeeth('patient-123', true)).rejects.toThrow('Network error')
       })
     })
 

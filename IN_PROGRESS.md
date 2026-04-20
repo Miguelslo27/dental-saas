@@ -187,6 +187,24 @@ Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
 
 ---
 
+## BUG: Cuadrantes incorrectos en dientes temporales (odontograma) ✅
+
+**Problema:** Los dientes temporales se mostraban y guardaban con cuadrantes 1, 2, 3 y 4 (notación de permanentes) en lugar de 5, 6, 7 y 8 (notación FDI correcta).
+
+**Causa:** La librería `react-odontogram` solo soporta cuadrantes 1-4. La instancia overlay con `maxTeeth={5}` reportaba el FDI sin diferenciar.
+
+**Fix:** Helper `remapPrimaryFdi` que convierte 1→5, 2→6, 3→7, 4→8 antes de guardar. Handler y tooltip dedicados para el chart de temporales. Reglas CSS de coloreado por estado scopeadas a `.odontogram-primary`.
+
+- [x] Helper `remapPrimaryFdi` en `apps/app/src/pages/patients/odontogram-utils.ts`
+- [x] Handler `handlePrimaryOdontogramChange` separado
+- [x] Tooltip dedicado para temporales
+- [x] CSS de coloreado por estado para temporales
+- [x] Test unitario del helper
+
+**Pendiente fuera del PR:** datos existentes guardados con keys 11-45 no se migran automáticamente. Decidir si dejarlos como están o ofrecer re-edición manual.
+
+---
+
 ## i18n Hardcoded Strings Migration (upcoming)
 
 Migrate hardcoded Spanish strings to i18n keys, split by module:

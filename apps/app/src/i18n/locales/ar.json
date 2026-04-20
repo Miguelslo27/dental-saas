@@ -118,6 +118,7 @@
     "dentalChart": "مخطط الأسنان",
     "dentalChartNotes": "ملاحظات مخطط الأسنان",
     "showPrimaryTeeth": "عرض الأسنان اللبنية",
+    "showPrimaryTeethError": "تعذر الحفظ. يرجى المحاولة مرة أخرى.",
     "permanentTeeth": "دائمة",
     "primaryTeeth": "لبنية",
     "tooth": "سن",

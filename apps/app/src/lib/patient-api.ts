@@ -17,6 +17,7 @@ export interface Patient {
   address: string | null
   notes: Record<string, unknown> | null
   teeth: TeethData | null
+  showPrimaryTeeth: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -242,6 +243,21 @@ export async function deleteToothData(
   toothNumber: string
 ): Promise<Patient> {
   return updatePatientTeeth(patientId, { [toothNumber]: { note: '', status: ToothStatus.HEALTHY } })
+}
+
+/**
+ * Toggle the primary-teeth chart visibility for a patient.
+ * Persists at the patient level so the choice is remembered across sessions.
+ */
+export async function updateShowPrimaryTeeth(
+  patientId: string,
+  showPrimaryTeeth: boolean
+): Promise<boolean> {
+  const response = await apiClient.patch<ApiResponse<{ showPrimaryTeeth: boolean }>>(
+    `/patients/${patientId}/show-primary-teeth`,
+    { showPrimaryTeeth }
+  )
+  return response.data.data.showPrimaryTeeth
 }
 
 /**

@@ -144,6 +144,42 @@ describe('Patients API', () => {
       expect(response.body.success).toBe(true)
       expect(response.body.data.firstName).toBe('Jane')
       expect(response.body.data.lastName).toBe('Smith')
+      // No dob → showPrimaryTeeth defaults to false
+      expect(response.body.data.showPrimaryTeeth).toBe(false)
+    })
+
+    it('should default showPrimaryTeeth=true for patients under 12', async () => {
+      const childDob = new Date()
+      childDob.setFullYear(childDob.getFullYear() - 8)
+
+      const response = await request(app)
+        .post('/api/patients')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          firstName: 'Child',
+          lastName: 'Patient',
+          dob: childDob.toISOString().split('T')[0],
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.showPrimaryTeeth).toBe(true)
+    })
+
+    it('should default showPrimaryTeeth=false for patients 12+', async () => {
+      const adultDob = new Date()
+      adultDob.setFullYear(adultDob.getFullYear() - 25)
+
+      const response = await request(app)
+        .post('/api/patients')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          firstName: 'Adult',
+          lastName: 'Patient',
+          dob: adultDob.toISOString().split('T')[0],
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.showPrimaryTeeth).toBe(false)
     })
 
     it('should return 400 for missing required fields', async () => {
@@ -912,6 +948,87 @@ describe('Patients API', () => {
       expect(response.status).toBe(200)
       expect(response.body.data.teeth['51']).toEqual({ note: 'Primary tooth note', status: 'healthy' })
       expect(response.body.data.teeth['75']).toEqual({ note: 'Another primary', status: 'caries' })
+    })
+  })
+
+  describe('PATCH /api/patients/:id/show-primary-teeth', () => {
+    let patientId: string
+
+    beforeEach(async () => {
+      const patient = await prisma.patient.create({
+        data: {
+          tenantId,
+          firstName: 'Primary',
+          lastName: 'Toggle',
+          showPrimaryTeeth: false,
+        },
+      })
+      patientId = patient.id
+    })
+
+    it('should enable showPrimaryTeeth (STAFF)', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/show-primary-teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ showPrimaryTeeth: true })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data).toEqual({ showPrimaryTeeth: true })
+
+      const persisted = await prisma.patient.findUnique({ where: { id: patientId } })
+      expect(persisted?.showPrimaryTeeth).toBe(true)
+    })
+
+    it('should disable showPrimaryTeeth', async () => {
+      await prisma.patient.update({
+        where: { id: patientId },
+        data: { showPrimaryTeeth: true },
+      })
+
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/show-primary-teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ showPrimaryTeeth: false })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.showPrimaryTeeth).toBe(false)
+    })
+
+    it('should return 400 for invalid payload (missing field)', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/show-primary-teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({})
+
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return 400 for invalid payload (wrong type)', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/show-primary-teeth`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ showPrimaryTeeth: 'yes' })
+
+      expect(response.status).toBe(400)
+    })
+
+    it('should return 404 for non-existent patient', async () => {
+      const response = await request(app)
+        .patch('/api/patients/non-existent-id/show-primary-teeth')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({ showPrimaryTeeth: true })
+
+      expect(response.status).toBe(404)
+    })
+
+    it('should return 401 without authentication', async () => {
+      const response = await request(app)
+        .patch(`/api/patients/${patientId}/show-primary-teeth`)
+        .send({ showPrimaryTeeth: true })
+
+      expect(response.status).toBe(401)
     })
   })
 })
