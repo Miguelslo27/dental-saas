@@ -256,6 +256,10 @@ model Patient {
   /// Format: { "11": "Crown needed", "21": "Caries", ... }
   teeth      Json?
 
+  /// Whether the primary (deciduous) teeth chart should be shown for this patient.
+  /// Defaults to true for patients under 12 at creation time; can be toggled manually.
+  showPrimaryTeeth Boolean @default(false)
+
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

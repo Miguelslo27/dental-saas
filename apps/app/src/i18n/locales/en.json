@@ -118,6 +118,7 @@
     "dentalChart": "Dental Chart",
     "dentalChartNotes": "Dental Chart Notes",
     "showPrimaryTeeth": "Show primary teeth",
+    "showPrimaryTeethError": "Couldn't save. Please try again.",
     "permanentTeeth": "Permanent",
     "primaryTeeth": "Primary",
     "tooth": "Tooth",

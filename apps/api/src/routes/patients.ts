@@ -15,6 +15,7 @@ import {
   getPatientAppointments,
   updatePatientTeeth,
   getPatientTeeth,
+  updatePatientShowPrimaryTeeth,
 } from '../services/patient.service.js'
 import { PdfService } from '../services/pdf.service.js'
 import { PatientHistoryPdf, sanitizeFilename } from '../pdfs/index.js'
@@ -473,6 +474,47 @@ patientsRouter.patch('/:id/teeth', requireMinRole('STAFF'), async (req, res, nex
     res.json({
       success: true,
       data: result.patient,
+    })
+  } catch (e) {
+    next(e)
+  }
+})
+
+/**
+ * PATCH /api/patients/:id/show-primary-teeth
+ * Toggle the showPrimaryTeeth flag for a patient (STAFF+ required).
+ * Lightweight endpoint for the odontogram UI toggle.
+ */
+const showPrimaryTeethSchema = z.object({
+  showPrimaryTeeth: z.boolean(),
+})
+
+patientsRouter.patch('/:id/show-primary-teeth', requireMinRole('STAFF'), async (req, res, next) => {
+  try {
+    const tenantId = req.user!.tenantId
+    const { id } = req.params
+
+    const parsed = showPrimaryTeethSchema.safeParse(req.body)
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid payload', code: 'INVALID_DATA', details: parsed.error.errors },
+      })
+    }
+
+    const result = await updatePatientShowPrimaryTeeth(tenantId, id, parsed.data.showPrimaryTeeth)
+
+    if (!result.success) {
+      const statusCode = result.errorCode === 'NOT_FOUND' ? 404 : 400
+      return res.status(statusCode).json({
+        success: false,
+        error: { message: result.error, code: result.errorCode },
+      })
+    }
+
+    res.json({
+      success: true,
+      data: { showPrimaryTeeth: result.patient.showPrimaryTeeth },
     })
   } catch (e) {
     next(e)

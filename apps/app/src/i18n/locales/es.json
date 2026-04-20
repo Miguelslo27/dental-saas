@@ -118,6 +118,7 @@
     "dentalChart": "Odontograma",
     "dentalChartNotes": "Notas del Odontograma",
     "showPrimaryTeeth": "Mostrar dientes temporales",
+    "showPrimaryTeethError": "No se pudo guardar. Intente de nuevo.",
     "permanentTeeth": "Permanentes",
     "primaryTeeth": "Temporales",
     "tooth": "Diente",

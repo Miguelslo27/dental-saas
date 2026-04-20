@@ -22,6 +22,7 @@ import {
   getPatientById,
   updateToothData,
   deleteToothData,
+  updateShowPrimaryTeeth,
   calculateAge,
   getPatientInitials,
 } from '@/lib/patient-api'
@@ -272,6 +273,8 @@ export default function PatientDetailPage() {
   const [isToothModalOpen, setIsToothModalOpen] = useState(false)
   const [isSavingTooth, setIsSavingTooth] = useState(false)
   const [showPrimaryTeeth, setShowPrimaryTeeth] = useState(false)
+  const [isSavingShowPrimaryTeeth, setIsSavingShowPrimaryTeeth] = useState(false)
+  const [showPrimaryTeethError, setShowPrimaryTeethError] = useState<string | null>(null)
   const [odontogramKey, setOdontogramKey] = useState(0)
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
   const [imageRefreshKey, setImageRefreshKey] = useState(0)
@@ -306,14 +309,7 @@ export default function PatientDetailPage() {
       try {
         const data = await getPatientById(id)
         setPatient(data)
-
-        // Auto-show primary teeth for children
-        if (data.dob) {
-          const age = calculateAge(data.dob)
-          if (age !== null && age < 14) {
-            setShowPrimaryTeeth(true)
-          }
-        }
+        setShowPrimaryTeeth(data.showPrimaryTeeth)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Error al cargar el paciente')
       } finally {
@@ -323,6 +319,28 @@ export default function PatientDetailPage() {
 
     fetchPatient()
   }, [id])
+
+  // Toggle the per-patient primary-teeth chart with optimistic UI and rollback on error.
+  const handleShowPrimaryTeethToggle = useCallback(
+    async (nextValue: boolean) => {
+      if (!id || isSavingShowPrimaryTeeth) return
+      const previousValue = showPrimaryTeeth
+      setShowPrimaryTeeth(nextValue)
+      setIsSavingShowPrimaryTeeth(true)
+      setShowPrimaryTeethError(null)
+      try {
+        const persisted = await updateShowPrimaryTeeth(id, nextValue)
+        setShowPrimaryTeeth(persisted)
+        setPatient(prev => (prev ? { ...prev, showPrimaryTeeth: persisted } : prev))
+      } catch {
+        setShowPrimaryTeeth(previousValue)
+        setShowPrimaryTeethError(t('patients.showPrimaryTeethError'))
+      } finally {
+        setIsSavingShowPrimaryTeeth(false)
+      }
+    },
+    [id, showPrimaryTeeth, isSavingShowPrimaryTeeth, t]
+  )
 
   // Handle odontogram change - when a tooth is clicked
   const handleOdontogramChange = useCallback((selected: ToothDetail[]) => {
@@ -671,17 +689,31 @@ export default function PatientDetailPage() {
         {/* Dental Chart Section */}
         <div className="flex-1 min-w-0 order-1 min-[1180px]:order-2">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
           <h2 className="text-lg font-semibold text-gray-900">Odontograma</h2>
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={showPrimaryTeeth}
-              onChange={(e) => setShowPrimaryTeeth(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            {t('patients.showPrimaryTeeth')}
-          </label>
+          <div className="flex flex-col items-end gap-1">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={showPrimaryTeeth}
+                disabled={isSavingShowPrimaryTeeth}
+                onChange={(e) => handleShowPrimaryTeethToggle(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-60"
+              />
+              {t('patients.showPrimaryTeeth')}
+              {isSavingShowPrimaryTeeth && (
+                <Loader2
+                  aria-label={t('common.saving')}
+                  className="w-4 h-4 animate-spin text-blue-500"
+                />
+              )}
+            </label>
+            {showPrimaryTeethError && (
+              <span role="alert" className="text-xs text-red-600">
+                {showPrimaryTeethError}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Dynamic per-tooth status colors */}

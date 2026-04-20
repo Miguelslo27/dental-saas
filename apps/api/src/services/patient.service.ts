@@ -22,6 +22,7 @@ const PATIENT_SELECT = {
   address: true,
   notes: true,
   teeth: true,
+  showPrimaryTeeth: true,
   isActive: true,
   createdAt: true,
   updatedAt: true,
@@ -39,9 +40,30 @@ export type SafePatient = {
   address: string | null
   notes: Prisma.JsonValue
   teeth: Prisma.JsonValue
+  showPrimaryTeeth: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+/**
+ * Threshold below which a patient is assumed to still have primary teeth.
+ * All permanent teeth (excluding third molars) have typically erupted by age 12.
+ */
+const PRIMARY_TEETH_AGE_THRESHOLD = 12
+
+/**
+ * Returns true if the given date of birth places the person strictly under
+ * PRIMARY_TEETH_AGE_THRESHOLD at the current moment.
+ */
+function isUnderPrimaryTeethAge(dob: Date): boolean {
+  const now = new Date()
+  let age = now.getFullYear() - dob.getFullYear()
+  const m = now.getMonth() - dob.getMonth()
+  if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) {
+    age--
+  }
+  return age < PRIMARY_TEETH_AGE_THRESHOLD
 }
 
 /**
@@ -150,6 +172,8 @@ export async function createPatient(
     dobValue = typeof dob === 'string' ? new Date(dob) : dob
   }
 
+  const showPrimaryTeeth = dobValue ? isUnderPrimaryTeethAge(dobValue) : false
+
   const patient = await prisma.patient.create({
     data: {
       tenantId,
@@ -161,6 +185,7 @@ export async function createPatient(
       gender,
       address,
       notes: notes ?? JsonNull,
+      showPrimaryTeeth,
     },
     select: PATIENT_SELECT,
   })
@@ -481,6 +506,32 @@ export async function updatePatientTeeth(
   })
 
   logger.info(`Updated teeth for patient ${patientId} - tenantId: ${tenantId}, teethCount: ${Object.keys(mergedTeeth).length}`)
+
+  return { success: true, patient: updated }
+}
+
+/**
+ * Update the showPrimaryTeeth flag for a patient.
+ */
+export async function updatePatientShowPrimaryTeeth(
+  tenantId: string,
+  patientId: string,
+  showPrimaryTeeth: boolean
+): Promise<{ success: true; patient: SafePatient } | { success: false; error: string; errorCode: PatientErrorCode }> {
+  const existing = await prisma.patient.findFirst({
+    where: { id: patientId, tenantId },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { success: false, error: 'Patient not found', errorCode: 'NOT_FOUND' }
+  }
+
+  const updated = await prisma.patient.update({
+    where: { id: patientId },
+    data: { showPrimaryTeeth },
+    select: PATIENT_SELECT,
+  })
 
   return { success: true, patient: updated }
 }
