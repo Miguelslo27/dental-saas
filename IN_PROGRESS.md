@@ -7,12 +7,6 @@ Active tasks for the current development cycle. Add tasks here before starting w
 - [x] Deploy and verify fix resolves the intermittent timeouts
 - [x] Confirmed: timeouts resolved in production
 
-## Rediseño de la Ficha del Paciente
-
-- [ ] Probar en desktop, tablet y mobile
-
----
-
 ## Epic: Vinculación Trabajo de Laboratorio ↔ Consulta (Precio Incluido)
 
 **Problema:** Cuando se crea una consulta y un trabajo de laboratorio, ambos se suman por separado a la deuda del paciente. Pero en muchos casos el precio del trabajo de laboratorio ya está incluido en el precio de la consulta. No hay forma de indicar esto, causando doble cobro.
@@ -187,7 +181,9 @@ Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
 
 ---
 
-## BUG: Cuadrantes incorrectos en dientes temporales (odontograma) ✅
+## Odontograma — fixes ✅ (PR #171)
+
+### Parte 1: Cuadrantes incorrectos en dientes temporales
 
 **Problema:** Los dientes temporales se mostraban y guardaban con cuadrantes 1, 2, 3 y 4 (notación de permanentes) en lugar de 5, 6, 7 y 8 (notación FDI correcta).
 
@@ -201,7 +197,24 @@ Suite de pruebas end-to-end automatizadas con Playwright contra la app local.
 - [x] CSS de coloreado por estado para temporales
 - [x] Test unitario del helper
 
-**Pendiente fuera del PR:** datos existentes guardados con keys 11-45 no se migran automáticamente. Decidir si dejarlos como están o ofrecer re-edición manual.
+### Parte 2: Persistencia del toggle "Mostrar dientes temporales"
+
+**Problema:** El checkbox era estado local (`useState`), se reseteaba en cada recarga. Hacía el control inútil para clínicos que ven al mismo paciente varias veces.
+
+**Fix:** Columna `showPrimaryTeeth` en `Patient`, endpoint `PATCH /patients/:id/show-primary-teeth` dedicado, UI optimista con spinner y rollback inline en error. Default en creación: `true` si edad < 12, `false` si no.
+
+- [x] Migración Prisma `20260420155523_add_show_primary_teeth_to_patient`
+- [x] `createPatient()` defaultea según edad (<12 = true)
+- [x] `updatePatientShowPrimaryTeeth()` service + route
+- [x] Zod schema en la ruta
+- [x] 8 tests backend (enable/disable, 400, 404, 401, defaults por edad)
+- [x] `updateShowPrimaryTeeth()` en patient-api + 3 tests
+- [x] `PatientDetailPage` inicializa desde DB, toggle optimista con `Loader2` spinner y error inline
+- [x] Claves i18n ES/EN/AR (`patients.showPrimaryTeethError`)
+
+**Pendientes fuera del PR:**
+- Datos existentes guardados con keys 11-45 no se migran automáticamente. Decidir si dejarlos como están o ofrecer re-edición manual.
+- Pacientes ya existentes tienen `showPrimaryTeeth = false` por default (no hay backfill por edad). Un click lo resuelve.
 
 ---
 
