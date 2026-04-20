@@ -140,6 +140,26 @@ pnpm dev
 - 📱 **App**: http://localhost:5002
 - 🌐 **Landing**: http://localhost:5003
 
+### Working with git worktrees
+
+If you use `git worktree` (or `git wt`) to check out additional branches into sibling directories, keep in mind:
+
+- **Docker containers are global to the machine**, not per-worktree. Running `docker compose -f docker-compose.dev.yml up -d` from a secondary worktree will fail with a name conflict (`dental-postgres`, `dental-redis`). From a secondary worktree, start the existing containers instead:
+
+  ```bash
+  docker start dental-postgres dental-redis
+  ```
+
+- **Internal workspace packages must be built once per worktree** before `pnpm dev` can resolve them (`@dental/database`, `@dental/shared`). After `pnpm install` in a fresh worktree, run:
+
+  ```bash
+  pnpm build
+  # or, at minimum:
+  pnpm --filter @dental/database build
+  ```
+
+- All worktrees share the same PostgreSQL and Redis instances on `localhost:5432` / `localhost:6379`, so migrations and data are shared across branches.
+
 ### Create Super Admin
 
 After starting the servers, create a super admin account:
