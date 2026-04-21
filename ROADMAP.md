@@ -2,11 +2,6 @@
 
 ## High Priority
 
-### Patient Budgets (Presupuestos)
-- [ ] Allow creating a budget per patient with planned treatments and costs
-- [ ] Share budget with patient (PDF or link)
-- [ ] When creating an appointment, allow selecting budgeted treatments to execute
-
 ### Labwork Improvements
 - [ ] Save laboratory name when creating a labwork (autocomplete from previously used labs, or create new)
 - [ ] Add labwork list/section to patient detail page
@@ -24,6 +19,25 @@
 - [ ] Detect and use browser's default language
 - [ ] Default timezone based on user's location
 - [ ] Country dropdown for phone number area code
+
+#### Portuguese (PT-BR) Language Support
+
+**Context:** The settings schemas already accept `'pt'` as a valid language value (`apps/api/src/routes/settings.ts`, `apps/app/src/lib/settings-api.ts`), but the translation file does not exist and `pt` is not registered in `apps/app/src/i18n/index.ts`. This is leftover preparation that needs to be completed.
+
+**Frontend:**
+- [ ] Create `apps/app/src/i18n/locales/pt.json` (full translation of `es.json` to Portuguese — Brazilian variant)
+- [ ] Register `pt` in `apps/app/src/i18n/index.ts` (`resources` object and `languages` array with native name "Português")
+- [ ] Add "Português (Brasil)" option to the language selector in the settings page
+- [ ] Add `pt` to `LanguageCode` type and update any consumers
+
+**Backend:**
+- [ ] Add PT translations to email templates (`apps/api/src/emails/`) — welcome email, password reset, etc.
+- [ ] Add PT translations to PDF templates (`apps/api/src/pdfs/`) — invoices, treatment plans, budgets (once shipped)
+- [ ] Ensure `getUserLanguage()` / backend i18n helpers handle `pt` fallback correctly
+
+**Tests:**
+- [ ] Add `pt` coverage to `apps/app/src/i18n/i18n.test.ts`
+- [ ] Smoke test: render at least one page in `pt` and verify no missing keys
 
 ### UX Improvements
 - [ ] Superadmin tables: allow clicking on clinic/user name to view details (not just ••• menu)
