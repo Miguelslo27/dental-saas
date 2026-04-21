@@ -242,5 +242,6 @@ Application deployed and running in production.
 
 - [ROADMAP.md](ROADMAP.md) - Full backlog, future epics, and business model
 - [IN_PROGRESS.md](IN_PROGRESS.md) - Active tasks for current development cycle
+- [HISTORY.md](HISTORY.md) - Log of completed work (task flow: ROADMAP → IN_PROGRESS → HISTORY)
 - [docs/COOLIFY-DEPLOYMENT.md](docs/COOLIFY-DEPLOYMENT.md) - Deployment guide
 - [docs/COOLIFY-TROUBLESHOOTING.md](docs/COOLIFY-TROUBLESHOOTING.md) - Troubleshooting guide
