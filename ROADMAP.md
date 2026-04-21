@@ -37,28 +37,7 @@
 - [ ] Doctor commission: doctors earn a percentage per consultation/labwork
 - [ ] Patient debt screen: dedicated view to see outstanding patient balances
 - [ ] Configurable appointment duration (different lengths per appointment type)
-- [ ] Patient payment tracking (entregas) — see plan below
-
-#### Plan: Patient Payment Tracking (Entregas)
-
-**Goal:** Allow admin/doctor to record patient payments toward outstanding debt, with automatic FIFO allocation to mark completed works as "Paid".
-
-**How it works:**
-1. A patient accumulates debt from completed treatments/labworks (each has a cost)
-2. Admin or doctor registers a payment (entrega) for any amount, up to the total debt
-3. The system cannot accept a payment greater than the outstanding balance
-4. Each payment is stored in a **payment history** (historial de entregas)
-5. Payments are allocated FIFO (oldest work first): once cumulative payments cover a work's cost, that work is automatically marked as **Paid**
-
-**Example:**
-- Patient has 3 works: Work A ($100), Work B ($100), Work C ($100) → total debt = $300
-- Patient pays $50 → no work fully paid yet (cumulative: $50)
-- Patient pays $60 → cumulative $110 ≥ $100 → Work A marked as "Paid"
-- Patient pays $100 → cumulative $210 ≥ $200 → Work B marked as "Paid"
-- Patient pays $90 → cumulative $300 ≥ $300 → Work C marked as "Paid", balance = $0
-
-**Remaining tasks:**
-- [ ] Visual indicator on each work showing paid/unpaid status
+- [ ] Visual indicator on each work showing paid/unpaid status (patient payment tracking — backend and basic frontend already shipped)
 
 ### Labworks
 - [ ] Add doctor name to labwork records
