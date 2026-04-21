@@ -8,18 +8,32 @@ Newest first. Each entry references the PR(s) that delivered the work.
 
 ## 2026-04
 
-### Bugfix: Primary-teeth quadrants in odontogram — 2026-04-20
+### Odontogram fixes: primary-teeth quadrants + per-patient toggle persistence — 2026-04-20
 **PR:** [#171](https://github.com/Miguelslo27/dental-saas/pull/171)
 
+#### Part 1: Primary-teeth quadrants (FDI)
 Primary teeth were being stored and displayed with permanent-teeth quadrants (1–4) instead of the correct FDI notation (5–8). Root cause: the `react-odontogram` overlay instance with `maxTeeth={5}` reports FDI without differentiating permanent/primary.
 
 - `remapPrimaryFdi` helper in `apps/app/src/pages/patients/odontogram-utils.ts` converts 1→5, 2→6, 3→7, 4→8 before persisting
 - Dedicated `handlePrimaryOdontogramChange` handler and tooltip for primary chart
 - CSS state-coloring rules scoped to `.odontogram-primary`
-- Unit tests for the helper
-- Visibility of primary chart persisted per patient
+- Unit test for the helper
 
-**Known follow-up (not migrated):** existing records saved with keys 11–45 are not auto-migrated. Decision deferred on whether to re-map historically or allow manual re-edit.
+#### Part 2: Persistence of the "Show primary teeth" toggle
+Toggle was stored in React local state and reset on every reload — useless for clinicians seeing the same patient multiple times.
+
+- Prisma migration `20260420155523_add_show_primary_teeth_to_patient` adds `showPrimaryTeeth` column to `Patient`
+- `createPatient()` defaults to `true` if patient age < 12, `false` otherwise
+- Dedicated `PATCH /patients/:id/show-primary-teeth` endpoint (`updatePatientShowPrimaryTeeth()` service)
+- Zod schema on the route
+- 8 backend tests (enable/disable, 400, 404, 401, age-based defaults)
+- `updateShowPrimaryTeeth()` in `patient-api` + 3 tests
+- `PatientDetailPage` initializes from DB; optimistic toggle with `Loader2` spinner and inline error rollback
+- i18n keys ES/EN/AR (`patients.showPrimaryTeethError`)
+
+**Known follow-ups (not in PR):**
+- Existing records saved with keys 11–45 are not auto-migrated. Decision deferred on whether to re-map historically or allow manual re-edit.
+- Pre-existing patients default to `showPrimaryTeeth = false` (no age-based backfill). One click resolves it per patient.
 
 ---
 

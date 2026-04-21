@@ -6,12 +6,6 @@ Workflow: `ROADMAP.md` → start a task → move here → finish → move to `HI
 
 ---
 
-## Rediseño de la Ficha del Paciente
-
-- [ ] Probar en desktop, tablet y mobile
-
----
-
 ## i18n Hardcoded Strings Migration
 
 Migrate hardcoded Spanish strings to i18n keys, split by module:
