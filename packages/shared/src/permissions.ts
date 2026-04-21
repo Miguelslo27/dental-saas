@@ -73,6 +73,13 @@ export enum Permission {
   PAYMENTS_VIEW = 'payments:view',
   PAYMENTS_CREATE = 'payments:create',
   PAYMENTS_DELETE = 'payments:delete',
+
+  // Budgets (Presupuestos)
+  BUDGETS_VIEW = 'budgets:view',
+  BUDGETS_CREATE = 'budgets:create',
+  BUDGETS_UPDATE = 'budgets:update',
+  BUDGETS_DELETE = 'budgets:delete',
+  BUDGETS_SHARE = 'budgets:share',
 }
 
 /**
@@ -93,6 +100,7 @@ const STAFF_PERMISSIONS = [
   Permission.LABWORKS_VIEW,
   Permission.EXPENSES_VIEW,
   Permission.PAYMENTS_VIEW,
+  Permission.BUDGETS_VIEW,
   Permission.DENTAL_CHARTS_VIEW,
   Permission.SETTINGS_VIEW,
   Permission.USERS_VIEW,
@@ -129,6 +137,12 @@ const CLINIC_ADMIN_PERMISSIONS = [
   Permission.PAYMENTS_VIEW,
   Permission.PAYMENTS_CREATE,
   Permission.PAYMENTS_DELETE,
+
+  Permission.BUDGETS_VIEW,
+  Permission.BUDGETS_CREATE,
+  Permission.BUDGETS_UPDATE,
+  Permission.BUDGETS_DELETE,
+  Permission.BUDGETS_SHARE,
 
   // View-only for users and settings
   Permission.USERS_VIEW,
@@ -178,6 +192,12 @@ const ADMIN_PERMISSIONS = [
   Permission.PAYMENTS_CREATE,
   Permission.PAYMENTS_DELETE,
 
+  Permission.BUDGETS_VIEW,
+  Permission.BUDGETS_CREATE,
+  Permission.BUDGETS_UPDATE,
+  Permission.BUDGETS_DELETE,
+  Permission.BUDGETS_SHARE,
+
   Permission.USERS_VIEW,
   Permission.USERS_CREATE,
   Permission.USERS_UPDATE,
@@ -210,6 +230,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.DENTAL_CHARTS_UPDATE,
     Permission.STATISTICS_VIEW,
     Permission.ATTACHMENTS_UPLOAD,
+    // Doctors typically build and adjust the patient's treatment plan (budget)
+    Permission.BUDGETS_CREATE,
+    Permission.BUDGETS_UPDATE,
   ],
 
   CLINIC_ADMIN: CLINIC_ADMIN_PERMISSIONS,

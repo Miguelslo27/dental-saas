@@ -15,23 +15,23 @@ datasource db {
 // ============================================================================
 
 model Plan {
-  id          String   @id @default(cuid())
-  name        String   @unique // free, basic, enterprise
+  id          String  @id @default(cuid())
+  name        String  @unique // free, basic, enterprise
   displayName String
-  price       Decimal  @db.Decimal(10, 2) // Monthly price in USD
-  
+  price       Decimal @db.Decimal(10, 2) // Monthly price in USD
+
   // Limits
   maxAdmins    Int
   maxDoctors   Int
   maxPatients  Int
-  maxStorageMb Int     @default(100)
-  
+  maxStorageMb Int @default(100)
+
   // Features (stored as JSON for flexibility)
-  features    Json     @default("[]")
-  
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  features Json @default("[]")
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   subscriptions Subscription[]
 
@@ -39,22 +39,22 @@ model Plan {
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  tenantId             String
-  planId               String
-  status               SubscriptionStatus @default(ACTIVE)
-  
+  id       String             @id @default(cuid())
+  tenantId String
+  planId   String
+  status   SubscriptionStatus @default(ACTIVE)
+
   // dLocal integration
-  dlocalCustomerId     String?
-  dlocalCardId         String?            // Tokenized card for recurring
-  
+  dlocalCustomerId String?
+  dlocalCardId     String? // Tokenized card for recurring
+
   // Billing period
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean            @default(false)
-  
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   plan     Plan      @relation(fields: [planId], references: [id], onDelete: Restrict)
@@ -68,25 +68,25 @@ model Subscription {
 }
 
 model Payment {
-  id               String        @id @default(cuid())
-  subscriptionId   String
-  
-  amount           Decimal       @db.Decimal(10, 2)
-  currency         String        @db.Char(3) // Inherited from tenant settings
-  status           PaymentStatus @default(PENDING)
-  
+  id             String @id @default(cuid())
+  subscriptionId String
+
+  amount   Decimal       @db.Decimal(10, 2)
+  currency String        @db.Char(3) // Inherited from tenant settings
+  status   PaymentStatus @default(PENDING)
+
   // dLocal fields
-  dlocalPaymentId  String?       @unique
-  dlocalOrderId    String?       @unique
-  paymentMethod    String?       // CARD, BANK_TRANSFER, etc.
-  
+  dlocalPaymentId String? @unique
+  dlocalOrderId   String? @unique
+  paymentMethod   String? // CARD, BANK_TRANSFER, etc.
+
   // Metadata
-  description      String?
-  failureReason    String?
-  paidAt           DateTime?
-  
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  description   String?
+  failureReason String?
+  paidAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
@@ -117,23 +117,23 @@ enum SubscriptionStatus {
 // ============================================================================
 
 model Tenant {
-  id        String   @id @default(cuid())
-  name      String   // Clinic name
+  id   String @id @default(cuid())
+  name String // Clinic name
   /// URL-friendly identifier. Must be validated at application level
   /// to contain only lowercase letters, numbers, and hyphens.
-  slug      String   @unique
-  
+  slug String @unique
+
   // Contact info
-  email     String?
-  phone     String?
-  address   String?  @db.Text
-  
+  email   String?
+  phone   String?
+  address String? @db.Text
+
   // Branding
-  logo      String?  // URL to logo
+  logo     String? // URL to logo
   /// IANA timezone identifier (e.g., "America/New_York", "Europe/London")
-  timezone  String   @default("America/Montevideo")
+  timezone String  @default("America/Montevideo")
   /// ISO 4217 currency code (e.g., USD, EUR, UYU)
-  currency  String   @db.Char(3) @default("UYU")
+  currency String  @default("UYU") @db.Char(3)
 
   /// Total storage used by attachments in bytes
   storageUsedBytes BigInt @default(0)
@@ -142,16 +142,17 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  subscription  Subscription?
-  settings      TenantSettings?
-  users         User[]
-  patients      Patient[]
-  doctors       Doctor[]
-  appointments  Appointment[]
-  labworks      Labwork[]
-  expenses         Expense[]
-  attachments      Attachment[]
-  patientPayments  PatientPayment[]
+  subscription    Subscription?
+  settings        TenantSettings?
+  users           User[]
+  patients        Patient[]
+  doctors         Doctor[]
+  appointments    Appointment[]
+  labworks        Labwork[]
+  expenses        Expense[]
+  attachments     Attachment[]
+  patientPayments PatientPayment[]
+  budgets         Budget[]
 
   @@index([slug])
   @@index([isActive])
@@ -159,30 +160,30 @@ model Tenant {
 }
 
 model TenantSettings {
-  id        String @id @default(cuid())
-  tenantId  String @unique
-  
+  id       String @id @default(cuid())
+  tenantId String @unique
+
   // Localization
-  language      String @default("es") // ISO 639-1: es, en, pt
-  dateFormat    String @default("DD/MM/YYYY") // DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
-  timeFormat    String @default("24h") // 12h, 24h
-  
+  language   String @default("es") // ISO 639-1: es, en, pt
+  dateFormat String @default("DD/MM/YYYY") // DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
+  timeFormat String @default("24h") // 12h, 24h
+
   // Appointment defaults
   defaultAppointmentDuration Int @default(30) // minutes
-  appointmentBuffer          Int @default(0)  // minutes between appointments
-  
+  appointmentBuffer          Int @default(0) // minutes between appointments
+
   // Business hours (JSON: { mon: { start: "09:00", end: "18:00" }, ... })
   businessHours Json @default("{}")
-  
+
   // Working days (array of day numbers: 0=Sunday, 1=Monday, etc.)
   workingDays Json @default("[1,2,3,4,5]") // Mon-Fri by default
-  
+
   // Notifications
-  emailNotifications    Boolean @default(true)
-  smsNotifications      Boolean @default(false)
-  appointmentReminders  Boolean @default(true)
-  reminderHoursBefore   Int     @default(24)
-  
+  emailNotifications   Boolean @default(true)
+  smsNotifications     Boolean @default(false)
+  appointmentReminders Boolean @default(true)
+  reminderHoursBefore  Int     @default(24)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -196,31 +197,31 @@ model TenantSettings {
 // ============================================================================
 
 model User {
-  id             String    @id @default(cuid())
+  id       String  @id @default(cuid())
   /// Nullable for SUPER_ADMIN users who don't belong to any tenant
-  tenantId       String?
-  
+  tenantId String?
+
   /// Email address. Must be validated at application level for format.
-  email          String
+  email        String
   /// Hashed password using bcrypt/argon2. NEVER expose in API responses.
   /// When querying users, always exclude this field from selections.
-  passwordHash   String    @db.VarChar(255)
-  
-  firstName      String
-  lastName       String
-  role           UserRole  @default(STAFF)
-  
+  passwordHash String @db.VarChar(255)
+
+  firstName String
+  lastName  String
+  role      UserRole @default(STAFF)
+
   // Profile
-  avatar         String?   // URL to avatar
-  phone          String?
-  
+  avatar String? // URL to avatar
+  phone  String?
+
   // Auth
-  emailVerified  Boolean   @default(false)
-  lastLoginAt    DateTime?
-  
-  isActive       Boolean   @default(true)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  emailVerified Boolean   @default(false)
+  lastLoginAt   DateTime?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tenant              Tenant?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   refreshTokens       RefreshToken[]
@@ -240,38 +241,39 @@ model User {
 // ============================================================================
 
 model Patient {
-  id         String   @id @default(cuid())
-  tenantId   String
+  id       String @id @default(cuid())
+  tenantId String
 
-  firstName  String
-  lastName   String
-  email      String?  
-  phone      String?
-  dob        DateTime?
-  gender     String?  @db.VarChar(20)
-  address    String?  @db.Text
-  notes      Json?
-  
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  dob       DateTime?
+  gender    String?   @db.VarChar(20)
+  address   String?   @db.Text
+  notes     Json?
+
   /// Dental chart notes per tooth (ISO 3950 notation)
   /// Format: { "11": "Crown needed", "21": "Caries", ... }
-  teeth      Json?
+  teeth Json?
 
   /// Whether the primary (deciduous) teeth chart should be shown for this patient.
   /// Defaults to true for patients under 12 at creation time; can be toggled manually.
   showPrimaryTeeth Boolean @default(false)
 
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant       Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   labworks     Labwork[]
   payments     PatientPayment[]
+  budgets      Budget[]
 
+  @@unique([tenantId, email])
   @@index([tenantId])
   @@index([lastName])
-  @@unique([tenantId, email])
   @@map("patients")
 }
 
@@ -280,46 +282,46 @@ model Patient {
 // ============================================================================
 
 model Doctor {
-  id             String   @id @default(cuid())
-  tenantId       String
+  id       String @id @default(cuid())
+  tenantId String
 
-  firstName      String
-  lastName       String
-  email          String?
-  phone          String?
-  
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+
   /// Medical specialty (e.g., "General Dentistry", "Orthodontics")
-  specialty      String?
+  specialty     String?
   /// Professional license number
-  licenseNumber  String?
-  
+  licenseNumber String?
+
   /// Working days as JSON array (e.g., ["MON", "TUE", "WED"])
-  workingDays    Json     @default("[]")
+  workingDays  Json  @default("[]")
   /// Working hours as JSON (e.g., {"start": "09:00", "end": "18:00"})
-  workingHours   Json?
-  
+  workingHours Json?
+
   /// Consultation room or office number
   consultingRoom String?
-  
+
   /// Profile photo URL
-  avatar         String?
+  avatar String?
   /// Bio or professional summary
-  bio            String?  @db.Text
-  
+  bio    String? @db.Text
+
   /// Hourly rate for billing purposes
-  hourlyRate     Decimal? @db.Decimal(10, 2)
+  hourlyRate Decimal? @db.Decimal(10, 2)
 
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   appointments Appointment[]
 
-  @@index([tenantId])
-  @@index([lastName])
   @@unique([tenantId, email])
   @@unique([tenantId, licenseNumber])
+  @@index([tenantId])
+  @@index([lastName])
   @@map("doctors")
 }
 
@@ -328,40 +330,41 @@ model Doctor {
 // ============================================================================
 
 model Appointment {
-  id          String            @id @default(cuid())
-  tenantId    String
-  patientId   String
-  doctorId    String
+  id        String @id @default(cuid())
+  tenantId  String
+  patientId String
+  doctorId  String
 
   /// Appointment start date and time (stored in UTC)
-  startTime   DateTime
+  startTime DateTime
   /// Appointment end date and time (stored in UTC)
-  endTime     DateTime
+  endTime   DateTime
   /// Duration in minutes (derived from start/end, stored for convenience)
-  duration    Int               @default(30)
+  duration  Int      @default(30)
 
-  status      AppointmentStatus @default(SCHEDULED)
-  
+  status AppointmentStatus @default(SCHEDULED)
+
   /// Type of appointment (e.g., "Checkup", "Cleaning", "Root Canal")
-  type        String?
+  type         String?
   /// Treatment or procedure notes
-  notes       String?           @db.Text
+  notes        String? @db.Text
   /// Private notes (not visible to patient)
-  privateNotes String?          @db.Text
-  
+  privateNotes String? @db.Text
+
   /// Cost of the appointment
-  cost        Decimal?          @db.Decimal(10, 2)
+  cost   Decimal? @db.Decimal(10, 2)
   /// Whether payment has been received
-  isPaid      Boolean           @default(false)
+  isPaid Boolean  @default(false)
 
-  isActive    Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor      Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  labworks    Labwork[]
+  tenant                 Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient                Patient                 @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor                 Doctor                  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  labworks               Labwork[]
+  budgetItemAppointments BudgetItemAppointment[]
 
   @@index([tenantId])
   @@index([patientId])
@@ -374,22 +377,22 @@ model Appointment {
 }
 
 enum AppointmentStatus {
-  SCHEDULED    // Confirmed appointment
-  CONFIRMED    // Patient confirmed attendance
-  IN_PROGRESS  // Currently happening
-  COMPLETED    // Successfully finished
-  CANCELLED    // Cancelled by patient or clinic
-  NO_SHOW      // Patient didn't show up
-  RESCHEDULED  // Moved to another time
+  SCHEDULED // Confirmed appointment
+  CONFIRMED // Patient confirmed attendance
+  IN_PROGRESS // Currently happening
+  COMPLETED // Successfully finished
+  CANCELLED // Cancelled by patient or clinic
+  NO_SHOW // Patient didn't show up
+  RESCHEDULED // Moved to another time
 }
 
 enum UserRole {
-  SUPER_ADMIN  // Platform super administrator, no tenant
-  OWNER        // Tenant owner, full access
-  ADMIN        // Administrative access
+  SUPER_ADMIN // Platform super administrator, no tenant
+  OWNER // Tenant owner, full access
+  ADMIN // Administrative access
   CLINIC_ADMIN // Operational management (no user/settings management)
-  DOCTOR       // Can manage patients and appointments
-  STAFF        // Limited access
+  DOCTOR // Can manage patients and appointments
+  STAFF // Limited access
 }
 
 // ============================================================================
@@ -397,14 +400,14 @@ enum UserRole {
 // ============================================================================
 
 model Labwork {
-  id          String   @id @default(cuid())
-  tenantId    String
-  
+  id       String @id @default(cuid())
+  tenantId String
+
   /// Optional reference to the patient this labwork is for
-  patientId   String?
+  patientId String?
 
   /// Optional reference to the appointment this labwork is linked to
-  appointmentId String?
+  appointmentId              String?
   /// Whether the labwork price is already included in the linked appointment cost
   priceIncludedInAppointment Boolean @default(false)
 
@@ -412,26 +415,26 @@ model Labwork {
   lab         String
   /// Contact phone for the laboratory
   phoneNumber String?
-  
-  /// Date the labwork was ordered/due
-  date        DateTime
-  
-  /// Description or notes about the work
-  note        String?  @db.Text
-  
-  /// Cost of the labwork
-  price       Decimal  @db.Decimal(10, 2) @default(0)
-  /// Whether payment has been made
-  isPaid      Boolean  @default(false)
-  /// Whether the labwork has been delivered
-  isDelivered Boolean  @default(false)
-  
-  /// IDs of doctors associated with this labwork (stored as JSON array)
-  doctorIds   Json     @default("[]")
 
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  /// Date the labwork was ordered/due
+  date DateTime
+
+  /// Description or notes about the work
+  note String? @db.Text
+
+  /// Cost of the labwork
+  price       Decimal @default(0) @db.Decimal(10, 2)
+  /// Whether payment has been made
+  isPaid      Boolean @default(false)
+  /// Whether the labwork has been delivered
+  isDelivered Boolean @default(false)
+
+  /// IDs of doctors associated with this labwork (stored as JSON array)
+  doctorIds Json @default("[]")
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   patient     Patient?     @relation(fields: [patientId], references: [id], onDelete: SetNull)
@@ -451,38 +454,38 @@ model Labwork {
 // ============================================================================
 
 model Expense {
-  id          String   @id @default(cuid())
-  tenantId    String
-  
+  id       String @id @default(cuid())
+  tenantId String
+
   /// Date of the expense
-  date        DateTime
-  
+  date DateTime
+
   /// Amount of the expense
-  amount      Decimal  @db.Decimal(10, 2) @default(0)
-  
+  amount Decimal @default(0) @db.Decimal(10, 2)
+
   /// Who issued the receipt/invoice
   issuer      String?
   /// Contact phone number
   phoneNumber String?
-  
-  /// Description or notes
-  note        String?  @db.Text
-  
-  /// List of items in this expense (stored as JSON array)
-  items       Json     @default("[]")
-  
-  /// Tags for categorization (stored as JSON array)
-  tags        Json     @default("[]")
-  
-  /// Whether the expense has been paid
-  isPaid      Boolean  @default(false)
-  
-  /// IDs of doctors/staff associated with this expense (stored as JSON array)
-  doctorIds   Json     @default("[]")
 
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  /// Description or notes
+  note String? @db.Text
+
+  /// List of items in this expense (stored as JSON array)
+  items Json @default("[]")
+
+  /// Tags for categorization (stored as JSON array)
+  tags Json @default("[]")
+
+  /// Whether the expense has been paid
+  isPaid Boolean @default(false)
+
+  /// IDs of doctors/staff associated with this expense (stored as JSON array)
+  doctorIds Json @default("[]")
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -497,7 +500,7 @@ model Expense {
 // ============================================================================
 
 model PatientPayment {
-  id        String   @id @default(cuid())
+  id        String @id @default(cuid())
   tenantId  String
   patientId String
 
@@ -523,6 +526,126 @@ model PatientPayment {
   @@map("patient_payments")
 }
 
+// ============================================================================
+// BUDGETS (Presupuestos)
+// ============================================================================
+
+model Budget {
+  id        String @id @default(cuid())
+  tenantId  String
+  patientId String
+
+  /// User id of the creator. Not a formal relation (matches PatientPayment.createdBy).
+  createdById String?
+
+  status      BudgetStatus @default(DRAFT)
+  /// Free-form notes about the budget (may include commercial terms)
+  notes       String?      @db.Text
+  /// Optional expiration date shown to the patient
+  validUntil  DateTime?
+  /// Sum of all item totals. Recalculated server-side on item changes.
+  totalAmount Decimal      @default(0) @db.Decimal(10, 2)
+
+  /// Public share token (unique). Null until the share link is generated.
+  publicToken          String?   @unique
+  /// Optional expiration for the public share link
+  publicTokenExpiresAt DateTime?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  patient Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  items   BudgetItem[]
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([status])
+  @@index([tenantId, patientId])
+  @@map("budgets")
+}
+
+model BudgetItem {
+  id       String @id @default(cuid())
+  budgetId String
+
+  /// Human-readable description of the treatment / item
+  description            String
+  /// Optional FDI tooth number (e.g. "11", "36", "55" for primary teeth)
+  toothNumber            String?
+  /// Positive integer quantity (e.g. number of teeth or sessions)
+  quantity               Int              @default(1)
+  /// Unit price
+  unitPrice              Decimal          @default(0) @db.Decimal(10, 2)
+  /// Line total (quantity * unitPrice). Recalculated server-side.
+  totalPrice             Decimal          @default(0) @db.Decimal(10, 2)
+  /// Optional planned appointment type label (e.g. "Cleaning", "Root Canal")
+  plannedAppointmentType String?
+  /// Lifecycle state of this particular line item
+  status                 BudgetItemStatus @default(PENDING)
+  /// Free-form notes per line
+  notes                  String?          @db.Text
+  /// Display order inside the budget (ascending)
+  order                  Int              @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  budget       Budget                  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  appointments BudgetItemAppointment[]
+
+  @@index([budgetId])
+  @@index([status])
+  @@map("budget_items")
+}
+
+/// Join table between BudgetItem and Appointment.
+/// A single budget item can be associated to many appointments across time —
+/// first with role SCHEDULED (planned for an appointment) and then, if the
+/// doctor confirms execution during that appointment, with role EXECUTED.
+model BudgetItemAppointment {
+  id            String                    @id @default(cuid())
+  budgetItemId  String
+  appointmentId String
+  role          BudgetItemAppointmentRole @default(SCHEDULED)
+  /// Free-form notes registered by the doctor at association / confirmation time
+  notes         String?                   @db.Text
+  /// User id who registered this association
+  createdById   String?
+
+  createdAt DateTime @default(now())
+
+  budgetItem  BudgetItem  @relation(fields: [budgetItemId], references: [id], onDelete: Cascade)
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetItemId, appointmentId, role])
+  @@index([budgetItemId])
+  @@index([appointmentId])
+  @@map("budget_item_appointments")
+}
+
+enum BudgetStatus {
+  DRAFT // Being edited, not yet shared with the patient
+  APPROVED // Shared with and approved by the patient
+  PARTIAL // At least one item executed, not all
+  COMPLETED // All items executed
+  CANCELLED
+}
+
+enum BudgetItemStatus {
+  PENDING // Not linked to any appointment yet
+  SCHEDULED // Associated to an upcoming / current appointment
+  IN_PROGRESS // Multi-session item in the middle of treatment
+  EXECUTED // Doctor confirmed execution
+  CANCELLED
+}
+
+enum BudgetItemAppointmentRole {
+  SCHEDULED
+  EXECUTED
+}
+
 model RefreshToken {
   id        String   @id @default(cuid())
   userId    String
@@ -531,7 +654,7 @@ model RefreshToken {
   tokenHash String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -572,8 +695,8 @@ model Attachment {
   tenantId    String
   module      AttachmentModule
   entityId    String
-  filename    String           // Original filename (sanitized)
-  storedName  String           // UUID-based name on disk
+  filename    String // Original filename (sanitized)
+  storedName  String // UUID-based name on disk
   mimeType    String
   sizeBytes   Int
   description String?          @db.Text
@@ -581,7 +704,7 @@ model Attachment {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@index([tenantId, module, entityId])

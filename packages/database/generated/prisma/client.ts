@@ -100,6 +100,24 @@ export type Expense = Prisma.ExpenseModel
  */
 export type PatientPayment = Prisma.PatientPaymentModel
 /**
+ * Model Budget
+ * 
+ */
+export type Budget = Prisma.BudgetModel
+/**
+ * Model BudgetItem
+ * 
+ */
+export type BudgetItem = Prisma.BudgetItemModel
+/**
+ * Model BudgetItemAppointment
+ * Join table between BudgetItem and Appointment.
+ * A single budget item can be associated to many appointments across time —
+ * first with role SCHEDULED (planned for an appointment) and then, if the
+ * doctor confirms execution during that appointment, with role EXECUTED.
+ */
+export type BudgetItemAppointment = Prisma.BudgetItemAppointmentModel
+/**
  * Model RefreshToken
  * 
  */
