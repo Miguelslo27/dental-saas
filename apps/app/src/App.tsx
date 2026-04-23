@@ -13,6 +13,7 @@ import PatientDetailPage from '@pages/patients/PatientDetailPage'
 import AppointmentsPage from '@pages/appointments/AppointmentsPage'
 import { LabworksPage } from '@pages/labworks/LabworksPage'
 import { ExpensesPage } from '@pages/expenses/ExpensesPage'
+import BudgetDetailPage from '@pages/budgets/BudgetDetailPage'
 import SettingsPage from '@pages/settings/SettingsPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AppLayout from '@/components/layout/AppLayout'
@@ -57,6 +58,10 @@ function App() {
         <Route path="/doctors/:id" element={<DoctorDetailPage />} />
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/patients/:id" element={<PatientDetailPage />} />
+        <Route
+          path="/patients/:patientId/budgets/:id"
+          element={<BudgetDetailPage />}
+        />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/labworks" element={<LabworksPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />

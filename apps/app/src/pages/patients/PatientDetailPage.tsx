@@ -39,6 +39,7 @@ import {
 } from '@/lib/appointment-api'
 import { PatientSidebar } from './PatientSidebar'
 import { PatientAppointmentsSection } from './PatientAppointmentsSection'
+import { BudgetsSection } from '@/components/budgets/BudgetsSection'
 import { remapPrimaryFdi } from './odontogram-utils'
 
 // ============================================================================
@@ -674,6 +675,9 @@ export default function PatientDetailPage() {
         }}
         refreshKey={appointmentsRefreshKey}
       />
+
+      {/* Budgets Section */}
+      <BudgetsSection patientId={patient.id} />
 
       {/* Two-column layout: Sidebar (Images + Payments) | Odontogram */}
       <div className="flex flex-col min-[1180px]:flex-row gap-6">
