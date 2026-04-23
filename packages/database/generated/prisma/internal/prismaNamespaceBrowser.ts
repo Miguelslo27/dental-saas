@@ -63,6 +63,9 @@ export const ModelName = {
   Labwork: 'Labwork',
   Expense: 'Expense',
   PatientPayment: 'PatientPayment',
+  Budget: 'Budget',
+  BudgetItem: 'BudgetItem',
+  BudgetItemAppointment: 'BudgetItemAppointment',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
   Attachment: 'Attachment'
@@ -320,6 +323,57 @@ export const PatientPaymentScalarFieldEnum = {
 } as const
 
 export type PatientPaymentScalarFieldEnum = (typeof PatientPaymentScalarFieldEnum)[keyof typeof PatientPaymentScalarFieldEnum]
+
+
+export const BudgetScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  patientId: 'patientId',
+  createdById: 'createdById',
+  status: 'status',
+  notes: 'notes',
+  validUntil: 'validUntil',
+  totalAmount: 'totalAmount',
+  publicToken: 'publicToken',
+  publicTokenExpiresAt: 'publicTokenExpiresAt',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetScalarFieldEnum = (typeof BudgetScalarFieldEnum)[keyof typeof BudgetScalarFieldEnum]
+
+
+export const BudgetItemScalarFieldEnum = {
+  id: 'id',
+  budgetId: 'budgetId',
+  description: 'description',
+  toothNumber: 'toothNumber',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  totalPrice: 'totalPrice',
+  plannedAppointmentType: 'plannedAppointmentType',
+  status: 'status',
+  notes: 'notes',
+  order: 'order',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetItemScalarFieldEnum = (typeof BudgetItemScalarFieldEnum)[keyof typeof BudgetItemScalarFieldEnum]
+
+
+export const BudgetItemAppointmentScalarFieldEnum = {
+  id: 'id',
+  budgetItemId: 'budgetItemId',
+  appointmentId: 'appointmentId',
+  role: 'role',
+  notes: 'notes',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type BudgetItemAppointmentScalarFieldEnum = (typeof BudgetItemAppointmentScalarFieldEnum)[keyof typeof BudgetItemAppointmentScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {

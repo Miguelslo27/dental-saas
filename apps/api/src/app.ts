@@ -9,6 +9,7 @@ import { doctorsRouter } from './routes/doctors.js'
 import { appointmentsRouter } from './routes/appointments.js'
 import { usersRouter } from './routes/users.js'
 import { labworksRouter } from './routes/labworks.js'
+import { budgetsRouter } from './routes/budgets.js'
 import { expensesRouter } from './routes/expenses.js'
 import { statsRouter } from './routes/stats.js'
 import billingRouter from './routes/billing.js'
@@ -52,6 +53,7 @@ app.use('/api/doctors', requireAuthWithTenant, doctorsRouter)
 app.use('/api/appointments', requireAuthWithTenant, appointmentsRouter)
 app.use('/api/users', requireAuthWithTenant, usersRouter)
 app.use('/api/labworks', requireAuthWithTenant, labworksRouter)
+app.use('/api/budgets', requireAuthWithTenant, budgetsRouter)
 app.use('/api/expenses', requireAuthWithTenant, expensesRouter)
 app.use('/api/stats', requireAuthWithTenant, statsRouter)
 app.use('/api/attachments/file', requireAuthWithTokenParam, requireTenant, fileRouter)

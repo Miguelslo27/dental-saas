@@ -25,6 +25,8 @@ import {
   deletePayment,
   getPatientBalance,
 } from '../services/payment.service.js'
+import { createBudget, listBudgetsByPatient } from '../services/budget.service.js'
+import { createBudgetSchema } from './budgets.js'
 import { requirePermission } from '../middleware/permissions.js'
 import { Permission } from '@dental/shared'
 
@@ -740,5 +742,105 @@ patientsRouter.delete('/:patientId/payments/:paymentId', requirePermission(Permi
     next(e)
   }
 })
+
+// ============================================================================
+// Patient Budgets
+// ============================================================================
+
+/**
+ * GET /api/patients/:id/budgets
+ * List budgets for a patient
+ */
+patientsRouter.get(
+  '/:id/budgets',
+  requirePermission(Permission.BUDGETS_VIEW),
+  async (req, res, next) => {
+    try {
+      const tenantId = req.user!.tenantId!
+      const { id: patientId } = req.params
+      const { limit, offset, includeInactive } = req.query
+
+      const result = await listBudgetsByPatient(tenantId, patientId, {
+        limit: limit ? Math.min(parseInt(String(limit), 10), 100) : undefined,
+        offset: offset ? parseInt(String(offset), 10) : undefined,
+        includeInactive: includeInactive === 'true',
+      })
+
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: {
+          total: result.total,
+          limit: limit ? parseInt(String(limit), 10) : 50,
+          offset: offset ? parseInt(String(offset), 10) : 0,
+        },
+      })
+    } catch (e) {
+      next(e)
+    }
+  }
+)
+
+/**
+ * POST /api/patients/:id/budgets
+ * Create a new budget for a patient
+ */
+patientsRouter.post(
+  '/:id/budgets',
+  requirePermission(Permission.BUDGETS_CREATE),
+  async (req, res, next) => {
+    try {
+      const tenantId = req.user!.tenantId!
+      const { id: patientId } = req.params
+
+      const parsed = createBudgetSchema.safeParse(req.body)
+      if (!parsed.success) {
+        res.status(400).json({
+          success: false,
+          error: 'Validation error',
+          details: parsed.error.flatten().fieldErrors,
+        })
+        return
+      }
+
+      const result = await createBudget(tenantId, patientId, {
+        notes: parsed.data.notes,
+        validUntil:
+          typeof parsed.data.validUntil === 'string'
+            ? new Date(parsed.data.validUntil)
+            : parsed.data.validUntil,
+        status: parsed.data.status,
+        items: parsed.data.items.map((item) => ({
+          description: item.description,
+          toothNumber: item.toothNumber,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          plannedAppointmentType: item.plannedAppointmentType,
+          notes: item.notes,
+          order: item.order,
+        })),
+        createdById: req.user!.userId,
+      })
+
+      if (!result.success) {
+        const statusMap: Record<string, number> = {
+          PATIENT_NOT_FOUND: 404,
+        }
+        const messageMap: Record<string, string> = {
+          PATIENT_NOT_FOUND: 'Patient not found',
+        }
+        res.status(statusMap[result.code] || 500).json({
+          success: false,
+          error: messageMap[result.code] || 'Unknown error',
+        })
+        return
+      }
+
+      res.status(201).json({ success: true, data: result.data })
+    } catch (e) {
+      next(e)
+    }
+  }
+)
 
 export { patientsRouter }

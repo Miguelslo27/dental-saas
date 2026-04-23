@@ -56,6 +56,36 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const BudgetStatus = {
+  DRAFT: 'DRAFT',
+  APPROVED: 'APPROVED',
+  PARTIAL: 'PARTIAL',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type BudgetStatus = (typeof BudgetStatus)[keyof typeof BudgetStatus]
+
+
+export const BudgetItemStatus = {
+  PENDING: 'PENDING',
+  SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  EXECUTED: 'EXECUTED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type BudgetItemStatus = (typeof BudgetItemStatus)[keyof typeof BudgetItemStatus]
+
+
+export const BudgetItemAppointmentRole = {
+  SCHEDULED: 'SCHEDULED',
+  EXECUTED: 'EXECUTED'
+} as const
+
+export type BudgetItemAppointmentRole = (typeof BudgetItemAppointmentRole)[keyof typeof BudgetItemAppointmentRole]
+
+
 export const AttachmentModule = {
   PATIENTS: 'PATIENTS',
   APPOINTMENTS: 'APPOINTMENTS',
