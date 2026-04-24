@@ -30,9 +30,14 @@ COPY . .
 WORKDIR /app/packages/shared
 RUN pnpm build
 
-# Build app (panel)
+# Build app (panel).
+# NOTE: We call vite directly (not `pnpm build`) to skip the `tsc -b` step,
+# which is a no-emit type-check that doubles the builder-stage memory footprint.
+# Type-checking still runs in CI via `pnpm lint` / `pnpm test` / local dev.
+# This reduced the parallel-build peak RAM enough to keep Coolify (small
+# instance) from being OOM-killed during multi-service builds.
 WORKDIR /app/apps/app
-RUN pnpm build
+RUN pnpm exec vite build
 
 # ============================================
 # STAGE 3: Production with Nginx
