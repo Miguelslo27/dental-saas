@@ -8,6 +8,57 @@ Newest first. Each entry references the PR(s) that delivered the work.
 
 ## 2026-04
 
+### Patient Budgets — frontend CRUD (PR B) — 2026-04-23
+**PR:** [#177](https://github.com/Miguelslo27/dental-saas/pull/177)
+
+Second PR of the Patient Budgets epic. Lets OWNER / ADMIN / DOCTOR create, view, edit and delete presupuestos from the patient detail page, with STAFF read-only and DOCTOR unable to delete the budget itself (matches backend RBAC from PR #176).
+
+- `budget-api.ts` client with 8 CRUD functions + `getExecutedItemsCount` helper
+- Zustand `budgets.store.ts` scoped to a patient's list plus a `currentBudget` for detail view; replaces the budget wholesale on every item mutation (backend returns the full budget every time)
+- `BudgetsSection` on `PatientDetailPage` with list, create, delete
+- `BudgetCard` with status badge, progress bar (X/Y executed), actions menu gated by `usePermissions()`
+- `BudgetFormModal` — one-shot creation with inline items via `useFieldArray` and Zod validation mirroring backend constraints
+- `BudgetDetailPage` at `/patients/:patientId/budgets/:id` — granular editing of metadata + add/edit/delete items + item status transitions
+- i18n keys `budgets.*` in ES / EN / AR + missing `common.status`
+- 22 new frontend tests (budget-api + store + BudgetCard permission gating)
+
+**Design decisions:**
+- Detail view as a dedicated page (shareable URL + history) instead of a modal
+- Items inline in the create modal (single `POST`) — no multi-step UX
+- Creation = modal; editing = detail page. Each backend endpoint handles its own concern; no client-side diff-and-dispatch
+- UI permissions mirror backend RBAC for immediate feedback
+
+**Follow-ups (tracked in `IN_PROGRESS.md` → Post-PR B polish):**
+- Hide auto-derived budget statuses (`PARTIAL`, `COMPLETED`) from the manual dropdown — discovered during local smoke testing; backend silently normalizes them so the UI made it look like "save" did nothing.
+
+---
+
+### Patient Budgets — data model + backend (PR A) — 2026-04-21
+**PR:** [#176](https://github.com/Miguelslo27/dental-saas/pull/176)
+
+First PR of the Patient Budgets epic. Ships data model, RBAC, service and routes with full integration test coverage. No frontend.
+
+**Data model:**
+- New Prisma models: `Budget`, `BudgetItem`, `BudgetItemAppointment` (join table, role `SCHEDULED | EXECUTED`) with cascades
+- New enums: `BudgetStatus` (`DRAFT | APPROVED | PARTIAL | COMPLETED | CANCELLED`), `BudgetItemStatus`, `BudgetItemAppointmentRole`
+- Migration `20260421154211_add_budget_models`
+
+**RBAC:**
+- New permissions `BUDGETS_VIEW / CREATE / UPDATE / DELETE / SHARE` (renamed `READ` → `VIEW` for codebase consistency)
+- STAFF: view only. DOCTOR: view + create + update. CLINIC_ADMIN+: full access (`DELETE` and `SHARE` gated to CLINIC_ADMIN+)
+
+**Service & routes:**
+- `budget.service.ts` — `createBudget`, `getBudget`, `listBudgetsByPatient`, `updateBudget`, `deleteBudget` (soft), `addBudgetItem`, `updateBudgetItem`, `deleteBudgetItem`
+- `totalAmount` auto-recalculated on every item change
+- `Budget.status` auto-transitions between `APPROVED` / `PARTIAL` / `COMPLETED` based on item state; `DRAFT` and `CANCELLED` are sticky (user-controlled). A **manual status change still gets normalized** against item state — the auto-derived statuses are not directly user-settable.
+- All mutations in a single transaction with recalculation
+- Cross-tenant isolation enforced at the service layer
+- Routes: `/api/budgets/:id` (GET, PATCH, DELETE), `/api/budgets/:id/items` (POST) and `/:itemId` (PATCH, DELETE), nested `/api/patients/:id/budgets` (GET list, POST create)
+- Inline Zod schemas shared between top-level and nested endpoints
+- 35 integration tests: validation, auth, cross-tenant isolation, totals recalculation, status transitions and all error branches
+
+---
+
 ### Odontogram fixes: primary-teeth quadrants + per-patient toggle persistence — 2026-04-20
 **PR:** [#171](https://github.com/Miguelslo27/dental-saas/pull/171)
 

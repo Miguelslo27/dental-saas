@@ -24,9 +24,14 @@ COPY --from=1 /app/node_modules ./node_modules
 COPY --from=1 /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
 
-# Build landing page
+# Build landing page.
+# NOTE: We call vite directly (not `pnpm build`) to skip the `tsc -b` step,
+# which is a no-emit type-check that doubles the builder-stage memory footprint.
+# Type-checking still runs in CI via `pnpm lint` / `pnpm test` / local dev.
+# This reduced the parallel-build peak RAM enough to keep Coolify (small
+# instance) from being OOM-killed during multi-service builds.
 WORKDIR /app/apps/web
-RUN pnpm build
+RUN pnpm exec vite build
 
 # ============================================
 # STAGE 3: Production with Nginx
