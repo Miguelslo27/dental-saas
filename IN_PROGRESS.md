@@ -57,14 +57,22 @@ Workflow: `ROADMAP.md` → start a task → move here → finish → move to `HI
 - [ ] Public page in `apps/web` at `/budget/:token` — read-only view with clinic branding
 - [ ] Tests for PDF generation and public access flow
 
-### Story 4: Frontend — budget management
+### Story 4: Frontend — budget management ✅
 
-- [ ] `BudgetsSection` in patient detail page (list + create button)
-- [ ] `BudgetFormModal` with editable item list (description, tooth number, quantity, unit price, auto-calculated total)
-- [ ] Per-budget actions: view detail, download PDF, copy public link, edit, delete
-- [ ] Status badge and progress indicator (X of Y items executed)
-- [ ] i18n keys for ES/EN/AR (PT to be added by parallel track)
-- [ ] Component tests
+- [x] `BudgetsSection` in patient detail page (list + create button)
+- [x] `BudgetFormModal` with inline editable item list (description, tooth number, quantity, unit price, auto-calculated total) via `useFieldArray`
+- [x] Per-budget actions: view detail, edit (in detail page), delete (PDF + public link deferred to PR C)
+- [x] Status badge and progress indicator (X of Y items executed)
+- [x] `BudgetDetailPage` at `/patients/:patientId/budgets/:id` with granular editing (metadata via `PATCH /budgets/:id`, items via sub-endpoints)
+- [x] i18n keys for ES/EN/AR (PT to be added by parallel track)
+- [x] Permission-gated UI via `usePermissions()` matching backend RBAC
+- [x] Component tests (22 new: budget-api + store + BudgetCard permission gating)
+
+### Post-PR B polish (before PR C)
+
+Small items found during local smoke testing of PR #177. Should land as a single tiny PR before starting PR C.
+
+- [ ] Hide auto-derived budget statuses (`PARTIAL`, `COMPLETED`) from the manual dropdown in `BudgetDetailPage`. Keep only `DRAFT`, `APPROVED`, `CANCELLED` as user-settable. Backend normalizes auto-derived statuses on every write (`deriveBudgetStatus` in `budget.service.ts`), so the dropdown currently lets the user "save" a value that is silently overridden — which reads like a bug from the UI.
 
 ### Story 5: Appointment integration (with doctor confirmation)
 
@@ -81,9 +89,9 @@ Workflow: `ROADMAP.md` → start a task → move here → finish → move to `HI
 
 | PR | Stories | Risk | Status |
 |----|---------|------|--------|
-| **A** | 1 + 2 (model + backend + RBAC + tests) | Low — pure API | 🟡 Ready on `feat/patient-budgets-backend`, pending push + PR |
-| **B** | 4 (frontend management, PDF-less) | Medium — UI | ⚪ Pending |
-| **C** | 3 (PDF + public share link) | Medium — web public surface | ⚪ Pending |
+| **A** | 1 + 2 (model + backend + RBAC + tests) | Low — pure API | ✅ Merged (#176) |
+| **B** | 4 (frontend management, PDF-less) | Medium — UI | ✅ Merged (#177) |
+| **C** | 3 (PDF + public share link) | Medium — web public surface | ⚪ Pending (blocked on polish above) |
 | **D** | 5 (appointment integration) | High — touches clinical flow | ⚪ Pending |
 
 ---
