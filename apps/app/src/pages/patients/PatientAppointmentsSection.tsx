@@ -212,17 +212,46 @@ function PatientAppointmentCard({
         <span className="truncate">{getAppointmentDoctorName(appointment)}</span>
       </div>
 
-      {/* Cost */}
-      {appointment.cost !== null && (
-        <div className="mt-2 text-xs">
-          <span className={appointment.isPaid ? 'text-green-600' : 'text-amber-600'}>
-            {formatCurrency(appointment.cost!, currency)}
-          </span>
-          <span className={`ml-1 ${appointment.isPaid ? 'text-green-500' : 'text-amber-500'}`}>
-            {appointment.isPaid ? `(${t('payment.paid')})` : `(${t('payment.pending')})`}
-          </span>
-        </div>
-      )}
+      {/* Cost + payment breakdown (paid / partial / pending) */}
+      {appointment.cost !== null && (() => {
+        const cost = appointment.cost!
+        const paidAmount = appointment.paidAmount ?? (appointment.isPaid ? cost : 0)
+        const isFullyPaid = appointment.isPaid
+        const isPartial = !isFullyPaid && paidAmount > 0
+        const colorMain = isFullyPaid
+          ? 'text-green-600'
+          : isPartial
+            ? 'text-blue-600'
+            : 'text-amber-600'
+        const colorTag = isFullyPaid
+          ? 'text-green-500'
+          : isPartial
+            ? 'text-blue-500'
+            : 'text-amber-500'
+
+        return (
+          <div className="mt-2 text-xs">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className={colorMain}>{formatCurrency(cost, currency)}</span>
+              <span className={colorTag}>
+                {isFullyPaid
+                  ? `(${t('payment.paid')})`
+                  : isPartial
+                    ? `(${t('payment.partial')})`
+                    : `(${t('payment.pending')})`}
+              </span>
+            </div>
+            {isPartial && (
+              <div className="mt-0.5 text-[11px] text-gray-500">
+                {t('payment.appliedOf', {
+                  paid: formatCurrency(paidAmount, currency),
+                  total: formatCurrency(cost, currency),
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })()}
     </div>
   )
 }

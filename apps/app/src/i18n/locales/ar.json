@@ -382,7 +382,9 @@
   },
   "payment": {
     "paid": "مدفوع",
-    "pending": "معلق"
+    "pending": "معلق",
+    "partial": "جزئي",
+    "appliedOf": "مطبق: {{paid}} من {{total}}"
   },
   "payments": {
     "title": "المدفوعات",

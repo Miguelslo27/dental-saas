@@ -382,7 +382,9 @@
   },
   "payment": {
     "paid": "Pagado",
-    "pending": "Pendiente"
+    "pending": "Pendiente",
+    "partial": "Parcial",
+    "appliedOf": "Aplicado: {{paid}} de {{total}}"
   },
   "payments": {
     "title": "Entregas",

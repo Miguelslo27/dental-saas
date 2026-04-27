@@ -373,7 +373,9 @@
   },
   "payment": {
     "paid": "Paid",
-    "pending": "Pending"
+    "pending": "Pending",
+    "partial": "Partial",
+    "appliedOf": "Applied: {{paid}} of {{total}}"
   },
   "payments": {
     "title": "Payments",

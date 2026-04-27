@@ -45,6 +45,10 @@ export interface Appointment {
   privateNotes: string | null
   cost: number | null
   isPaid: boolean
+  // FIFO breakdown — present on per-patient endpoints (getAppointmentsByPatient,
+  // getAppointmentById). undefined elsewhere.
+  paidAmount?: number
+  outstanding?: number
   isActive: boolean
   createdAt: string
   updatedAt: string
