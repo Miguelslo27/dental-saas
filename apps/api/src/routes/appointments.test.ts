@@ -747,6 +747,189 @@ describe('Appointments API', () => {
   })
 
   // ============================================================================
+  // AUTO-PAYMENT ON UPDATE TESTS
+  // ============================================================================
+
+  describe('PUT /api/appointments/:id - auto-payment', () => {
+    let appointmentId: string
+
+    beforeEach(async () => {
+      const times = getFutureTime(10)
+      const appointment = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date(times.startTime),
+          endTime: new Date(times.endTime),
+          duration: 30,
+          cost: 100,
+          isPaid: false,
+        },
+      })
+      appointmentId = appointment.id
+    })
+
+    it('should auto-create payment when isPaid transitions from false to true', async () => {
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      expect(response.status).toBe(200)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.isPaid).toBe(true)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+      expect(payments[0].amount.toNumber()).toBe(100)
+      expect(payments[0].note).toBe('Pago en consulta')
+    })
+
+    it('should use new cost when both cost and isPaid change', async () => {
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ cost: 250, isPaid: true })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.isPaid).toBe(true)
+      expect(Number(response.body.data.cost)).toBe(250)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+      expect(payments[0].amount.toNumber()).toBe(250)
+    })
+
+    it('should apply FIFO: pay older unpaid appointment first when marking newer as paid', async () => {
+      // Create an older unpaid appointment for the same patient
+      const olderTimes = getFutureTime(2, 9)
+      await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId: doctor2Id,
+          startTime: new Date(olderTimes.startTime),
+          endTime: new Date(olderTimes.endTime),
+          duration: 30,
+          cost: 100,
+          isPaid: false,
+        },
+      })
+
+      // Mark the newer appointment as paid (cost 100)
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      expect(response.status).toBe(200)
+      // FIFO sends the payment to the older appointment, so the edited (newer) one stays unpaid
+      expect(response.body.data.isPaid).toBe(false)
+
+      // Older appointment should now be marked as paid
+      const allActive = await prisma.appointment.findMany({
+        where: { tenantId, patientId, isActive: true },
+        orderBy: { startTime: 'asc' },
+      })
+      expect(allActive[0].isPaid).toBe(true)
+      expect(allActive[1].isPaid).toBe(false)
+    })
+
+    it('should reject attempt to unmark an already paid appointment', async () => {
+      // First mark it paid via the FIFO flow
+      await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      // Now try to unmark it
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: false })
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe('CANNOT_UNMARK_PAID')
+
+      // Payment should still exist
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+    })
+
+    it('should be a no-op when isPaid stays true', async () => {
+      // Mark paid first
+      await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      // Send another update with isPaid still true
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true, notes: 'Re-saved' })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.isPaid).toBe(true)
+      expect(response.body.data.notes).toBe('Re-saved')
+
+      // Should not have created a duplicate payment
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+    })
+
+    it('should not create payment when isPaid=true but cost is 0 or null', async () => {
+      // Reset cost to null
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: { cost: null },
+      })
+
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      expect(response.status).toBe(200)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(0)
+    })
+
+    it('should recalculate FIFO when cost changes alone', async () => {
+      // Pay 100 first
+      await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      // Confirm paid
+      const before = await prisma.appointment.findUnique({ where: { id: appointmentId } })
+      expect(before?.isPaid).toBe(true)
+
+      // Raise cost to 200 — payment of 100 no longer covers the full amount.
+      const response = await request(app)
+        .put(`/api/appointments/${appointmentId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ cost: 200 })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.isPaid).toBe(false)
+    })
+  })
+
+  // ============================================================================
   // DELETE TESTS
   // ============================================================================
 

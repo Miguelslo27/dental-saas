@@ -95,6 +95,9 @@ function mapErrorCodeToStatus(code: string): number {
       return 409
     case 'ALREADY_INACTIVE':
     case 'ALREADY_ACTIVE':
+    case 'CANNOT_UNMARK_PAID':
+    case 'EXCEEDS_BALANCE':
+    case 'PAYMENT_FAILED':
       return 400
     default:
       return 400

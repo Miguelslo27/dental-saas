@@ -1,6 +1,6 @@
 import { prisma, Prisma, AppointmentStatus } from '@dental/database'
 import { logger } from '../utils/logger.js'
-import { createPayment } from './payment.service.js'
+import { createPayment, recalculatePaidStatus, type PaymentErrorCode } from './payment.service.js'
 
 // Fields to include in appointment responses
 const APPOINTMENT_SELECT = {
@@ -80,6 +80,9 @@ export type AppointmentErrorCode =
   | 'TIME_CONFLICT'
   | 'INVALID_TIME_RANGE'
   | 'PAST_APPOINTMENT'
+  | 'CANNOT_UNMARK_PAID'
+  | 'PAYMENT_FAILED'
+  | 'EXCEEDS_BALANCE'
 
 export interface CreateAppointmentInput {
   patientId: string
@@ -382,12 +385,44 @@ export async function createAppointment(
         return { appointment: updated }
       }
     } else {
-      logger.warn({ appointmentId: appointment.id, code: paymentResult.code }, 'Auto-payment failed for appointment marked as paid')
+      logger.warn(
+        { appointmentId: appointment.id, code: paymentResult.code },
+        'Auto-payment failed for appointment marked as paid'
+      )
+      return {
+        error: {
+          code: mapPaymentErrorCode(paymentResult.code),
+          message: paymentErrorMessage(paymentResult.code),
+        },
+      }
     }
   }
 
   logger.info(`Appointment created: ${appointment.id} for tenant ${tenantId}`)
   return { appointment: appointment as SafeAppointment }
+}
+
+/**
+ * Map a payment service error code to an appointment error code.
+ */
+function mapPaymentErrorCode(code: PaymentErrorCode): AppointmentErrorCode {
+  if (code === 'EXCEEDS_BALANCE') return 'EXCEEDS_BALANCE'
+  return 'PAYMENT_FAILED'
+}
+
+function paymentErrorMessage(code: PaymentErrorCode): string {
+  switch (code) {
+    case 'EXCEEDS_BALANCE':
+      return 'Payment amount exceeds outstanding balance for this patient'
+    case 'PATIENT_NOT_FOUND':
+      return 'Patient not found'
+    case 'NOT_FOUND':
+      return 'Payment not found'
+    case 'ALREADY_INACTIVE':
+      return 'Payment is already inactive'
+    default:
+      return 'Failed to register payment'
+  }
 }
 
 /**
@@ -401,7 +436,15 @@ export async function updateAppointment(
   // Get existing appointment
   const existing = await prisma.appointment.findUnique({
     where: { id },
-    select: { tenantId: true, doctorId: true, startTime: true, endTime: true },
+    select: {
+      tenantId: true,
+      doctorId: true,
+      patientId: true,
+      startTime: true,
+      endTime: true,
+      isPaid: true,
+      cost: true,
+    },
   })
 
   if (!existing || existing.tenantId !== tenantId) {
@@ -464,7 +507,20 @@ export async function updateAppointment(
   if (data.notes !== undefined) updateData.notes = data.notes
   if (data.privateNotes !== undefined) updateData.privateNotes = data.privateNotes
   if (data.cost !== undefined) updateData.cost = data.cost
-  // isPaid is FIFO-controlled via PatientPayment records; not directly writable
+  // isPaid is not directly writable; it is derived from PatientPayment records via FIFO.
+  // Marking the checkbox in the UI triggers an auto-payment below.
+
+  // Reject explicit attempts to revert isPaid via this endpoint.
+  // FIFO has no 1:1 mapping between payment and item, so the user must delete
+  // the corresponding PatientPayment record to reverse a payment.
+  if (data.isPaid === false && existing.isPaid) {
+    return {
+      error: {
+        code: 'CANNOT_UNMARK_PAID',
+        message: 'Cannot revert paid status from this endpoint. Delete the corresponding payment record instead.',
+      },
+    }
+  }
 
   // Recalculate duration if time changed
   if ((data.startTime || data.endTime) && data.duration === undefined) {
@@ -480,6 +536,56 @@ export async function updateAppointment(
       doctor: { select: DOCTOR_INCLUDE },
     },
   })
+
+  // Resolve effective post-update cost (numeric) and patient.
+  const newCostNumber =
+    data.cost === null
+      ? null
+      : data.cost !== undefined
+        ? data.cost
+        : existing.cost?.toNumber() ?? null
+  const patientId = data.patientId ?? existing.patientId
+  const costChanged =
+    data.cost !== undefined &&
+    (existing.cost?.toNumber() ?? null) !== (data.cost ?? null)
+
+  // Auto-create payment when transitioning isPaid from false to true.
+  if (data.isPaid === true && !existing.isPaid && newCostNumber && newCostNumber > 0) {
+    const paymentResult = await createPayment(tenantId, patientId, {
+      amount: newCostNumber,
+      date: data.startTime ?? existing.startTime,
+      note: 'Pago en consulta',
+    })
+
+    if (!paymentResult.success) {
+      logger.warn(
+        { appointmentId: id, code: paymentResult.code },
+        'Auto-payment on update failed'
+      )
+      return {
+        error: {
+          code: mapPaymentErrorCode(paymentResult.code),
+          message: paymentErrorMessage(paymentResult.code),
+        },
+      }
+    }
+
+    // FIFO already ran inside createPayment; re-fetch to return fresh state.
+    const updated = await getAppointmentById(tenantId, id)
+    if (updated) {
+      logger.info(`Appointment updated with auto-payment: ${id}`)
+      return { appointment: updated }
+    }
+  } else if (costChanged) {
+    // Cost changed without an isPaid transition: re-run FIFO so derived
+    // isPaid stays consistent with the new debt total.
+    await recalculatePaidStatus(tenantId, patientId)
+    const updated = await getAppointmentById(tenantId, id)
+    if (updated) {
+      logger.info(`Appointment cost updated; FIFO recalculated: ${id}`)
+      return { appointment: updated }
+    }
+  }
 
   logger.info(`Appointment updated: ${id}`)
   return { appointment: appointment as SafeAppointment }
