@@ -49,12 +49,79 @@ export interface ListPaymentsOptions {
 /**
  * Billable item (appointment or labwork) used for FIFO allocation
  */
-interface BillableItem {
+export interface BillableItem {
   id: string
   type: 'appointment' | 'labwork'
   cost: number
   date: Date
   isPaid: boolean
+}
+
+/**
+ * Per-item result of FIFO allocation. paidAmount is what the patient's
+ * total payments cover for this specific item; outstanding is what is
+ * still owed. isPaid is true only when the item is fully covered.
+ */
+export interface FifoAllocation {
+  id: string
+  type: 'appointment' | 'labwork'
+  cost: number
+  paidAmount: number
+  outstanding: number
+  isPaid: boolean
+}
+
+/**
+ * Allocate a patient's total active payments across their billable items
+ * in FIFO order (oldest first). When a payment partially covers an item,
+ * the remainder is applied as a partial payment to that item and stops —
+ * later items receive paidAmount=0 even if a smaller item could have been
+ * fully covered. This keeps the model coherent with how patients reason
+ * about their debt: pagos cubren deudas en orden de antigüedad sin
+ * "saltearlas".
+ */
+export function computeFifoAllocation(
+  items: BillableItem[],
+  totalPaid: number
+): FifoAllocation[] {
+  let remaining = totalPaid
+  const result: FifoAllocation[] = []
+  for (const item of items) {
+    const paidAmount = Math.min(remaining, item.cost)
+    remaining = Math.max(0, remaining - item.cost)
+    result.push({
+      id: item.id,
+      type: item.type,
+      cost: item.cost,
+      paidAmount,
+      outstanding: Math.max(0, item.cost - paidAmount),
+      isPaid: item.cost > 0 && paidAmount >= item.cost,
+    })
+  }
+  return result
+}
+
+/**
+ * Get all billable items for a patient, ordered by date ASC (for FIFO).
+ * Exported so callers (e.g. appointment.service) can compute the
+ * allocation without duplicating the query.
+ */
+export async function listBillableItems(
+  tenantId: string,
+  patientId: string
+): Promise<BillableItem[]> {
+  return getBillableItems(tenantId, patientId)
+}
+
+/**
+ * Get total active payments for a patient.
+ */
+export async function getTotalPaid(tenantId: string, patientId: string): Promise<number> {
+  const aggregate = await prisma.patientPayment.aggregate({
+    where: { tenantId, patientId, isActive: true },
+    _sum: { amount: true },
+  })
+  return aggregate._sum.amount?.toNumber() || 0
 }
 
 /**
@@ -113,16 +180,14 @@ export async function recalculatePaidStatus(tenantId: string, patientId: string)
   ])
 
   const totalPaid = paymentsAggregate._sum.amount?.toNumber() || 0
-  let remaining = totalPaid
+  const allocations = computeFifoAllocation(items, totalPaid)
 
   const appointmentUpdates: { id: string; isPaid: boolean }[] = []
   const labworkUpdates: { id: string; isPaid: boolean }[] = []
 
-  for (const item of items) {
-    const shouldBePaid = remaining >= item.cost
-    if (shouldBePaid) {
-      remaining -= item.cost
-    }
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    const shouldBePaid = allocations[i].isPaid
 
     // Only update if status changed
     if (item.isPaid !== shouldBePaid) {

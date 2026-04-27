@@ -1494,6 +1494,61 @@ describe('Appointments API', () => {
       expect(response.status).toBe(200)
       expect(response.body.data.length).toBe(0)
     })
+
+    it('should expose paidAmount/outstanding using FIFO allocation', async () => {
+      // Wipe the auto-created appointment from the outer beforeEach so we
+      // control the entire timeline of this patient.
+      await prisma.appointment.deleteMany({ where: { tenantId, patientId } })
+      await prisma.patientPayment.deleteMany({ where: { tenantId, patientId } })
+
+      // Older appointment: $100 — will be fully paid by FIFO.
+      const older = getFutureTime(1, 9)
+      const olderApt = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date(older.startTime),
+          endTime: new Date(older.endTime),
+          duration: 30,
+          cost: 100,
+        },
+      })
+
+      // Newer appointment: $200 — only $50 of the $150 total payment will
+      // be left to apply, so this should come back as partially paid.
+      const newer = getFutureTime(2, 9)
+      const newerApt = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date(newer.startTime),
+          endTime: new Date(newer.endTime),
+          duration: 30,
+          cost: 200,
+        },
+      })
+
+      await prisma.patientPayment.create({
+        data: { tenantId, patientId, amount: 150, date: new Date() },
+      })
+
+      const response = await request(app)
+        .get(`/api/appointments/by-patient/${patientId}`)
+        .set('Authorization', `Bearer ${staffToken}`)
+
+      expect(response.status).toBe(200)
+      const byId = new Map<string, { paidAmount: number; outstanding: number; isPaid: boolean }>(
+        response.body.data.map((a: { id: string; paidAmount: number; outstanding: number; isPaid: boolean }) => [
+          a.id,
+          { paidAmount: a.paidAmount, outstanding: a.outstanding, isPaid: a.isPaid },
+        ])
+      )
+
+      expect(byId.get(olderApt.id)).toEqual({ paidAmount: 100, outstanding: 0, isPaid: true })
+      expect(byId.get(newerApt.id)).toEqual({ paidAmount: 50, outstanding: 150, isPaid: false })
+    })
   })
 
   // ============================================================================

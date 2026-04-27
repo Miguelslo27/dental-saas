@@ -1,8 +1,11 @@
 import { prisma, Prisma, AppointmentStatus } from '@dental/database'
 import { logger } from '../utils/logger.js'
 import {
+  computeFifoAllocation,
   createPayment,
   getPatientBalance,
+  getTotalPaid,
+  listBillableItems,
   recalculatePaidStatus,
   type PaymentErrorCode,
 } from './payment.service.js'
@@ -60,6 +63,10 @@ export type SafeAppointment = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+  // FIFO breakdown — present only on endpoints that compute it per patient
+  // (getAppointmentsByPatient, getAppointmentById). undefined elsewhere.
+  paidAmount?: number
+  outstanding?: number
   patient?: {
     id: string
     firstName: string
@@ -305,7 +312,56 @@ export async function getAppointmentById(
     return null
   }
 
-  return appointment as SafeAppointment
+  const allocationMap = await buildPatientAllocationMap(tenantId, appointment.patientId)
+  return mergeAllocation(appointment as SafeAppointment, allocationMap)
+}
+
+/**
+ * Build a map of appointmentId → FifoAllocation for every billable item
+ * the patient has, computed against their total active payments. Used by
+ * endpoints that need to expose paidAmount/outstanding per appointment.
+ */
+async function buildPatientAllocationMap(
+  tenantId: string,
+  patientId: string
+): Promise<Map<string, { paidAmount: number; outstanding: number; isPaid: boolean }>> {
+  const [items, totalPaid] = await Promise.all([
+    listBillableItems(tenantId, patientId),
+    getTotalPaid(tenantId, patientId),
+  ])
+  const allocations = computeFifoAllocation(items, totalPaid)
+  const map = new Map<string, { paidAmount: number; outstanding: number; isPaid: boolean }>()
+  for (const a of allocations) {
+    if (a.type === 'appointment') {
+      map.set(a.id, { paidAmount: a.paidAmount, outstanding: a.outstanding, isPaid: a.isPaid })
+    }
+  }
+  return map
+}
+
+/**
+ * Attach paidAmount/outstanding to an appointment using the patient's FIFO
+ * allocation map. Also overrides isPaid with the FIFO-derived value so the
+ * client always sees a consistent view (the persisted column is a cache
+ * that may briefly lag if a write skipped recalc).
+ *
+ * Appointments not present in the map (cost null/0) get paidAmount=0 and
+ * the persisted isPaid is preserved.
+ */
+function mergeAllocation(
+  appointment: SafeAppointment,
+  map: Map<string, { paidAmount: number; outstanding: number; isPaid: boolean }>
+): SafeAppointment {
+  const split = map.get(appointment.id)
+  if (!split) {
+    return { ...appointment, paidAmount: 0, outstanding: 0 }
+  }
+  return {
+    ...appointment,
+    paidAmount: split.paidAmount,
+    outstanding: split.outstanding,
+    isPaid: split.isPaid,
+  }
 }
 
 /**
@@ -916,5 +972,6 @@ export async function getAppointmentsByPatient(
     orderBy: { startTime: 'desc' },
   })
 
-  return appointments as SafeAppointment[]
+  const allocationMap = await buildPatientAllocationMap(tenantId, patientId)
+  return (appointments as SafeAppointment[]).map((a) => mergeAllocation(a, allocationMap))
 }
