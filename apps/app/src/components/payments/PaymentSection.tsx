@@ -23,9 +23,20 @@ import { PaymentFormModal } from './PaymentFormModal'
 interface PaymentSectionProps {
   patientId: string
   onCollapse?: () => void
+  // Bumped by the parent when an external action (e.g. saving an appointment
+  // with isPaid=true) may have created or recalculated payments via FIFO.
+  refreshKey?: number
+  // Called after this section creates or deletes a payment, so the parent can
+  // refresh sibling sections (appointments, labworks) whose isPaid may change.
+  onPaymentsChange?: () => void
 }
 
-export function PaymentSection({ patientId, onCollapse }: PaymentSectionProps) {
+export function PaymentSection({
+  patientId,
+  onCollapse,
+  refreshKey = 0,
+  onPaymentsChange,
+}: PaymentSectionProps) {
   const { t, i18n } = useTranslation()
   const { can } = usePermissions()
   const currency = useAuthStore((s) => s.user?.tenant?.currency) || 'USD'
@@ -61,7 +72,7 @@ export function PaymentSection({ patientId, onCollapse }: PaymentSectionProps) {
 
   useEffect(() => {
     fetchData()
-  }, [fetchData])
+  }, [fetchData, refreshKey])
 
   const handleCreatePayment = async (data: CreatePaymentData) => {
     setIsSaving(true)
@@ -69,6 +80,7 @@ export function PaymentSection({ patientId, onCollapse }: PaymentSectionProps) {
       await createPayment(patientId, data)
       setIsFormOpen(false)
       await fetchData()
+      onPaymentsChange?.()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error creating payment')
     } finally {
@@ -83,6 +95,7 @@ export function PaymentSection({ patientId, onCollapse }: PaymentSectionProps) {
     try {
       await deletePayment(patientId, paymentId)
       await fetchData()
+      onPaymentsChange?.()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error deleting payment')
     } finally {

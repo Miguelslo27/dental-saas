@@ -95,13 +95,18 @@
       "type": "Tipo",
       "notes": "Notas",
       "cost": "Costo",
-      "isPaid": "Pagado"
+      "isPaid": "Pagado",
+      "isPaidHint": "Al marcar, se registra una entrega que se aplica a la deuda más antigua del paciente.",
+      "alreadyPaidHint": "Para revertir el pago, elimine la entrega correspondiente desde la sección de pagos."
     },
     "errors": {
       "timeConflict": "El doctor ya tiene una cita en este horario. Por favor, selecciona otro horario o doctor.",
       "invalidPatient": "El paciente seleccionado no es válido.",
       "invalidDoctor": "El doctor seleccionado no es válido.",
       "invalidTimeRange": "La hora de fin debe ser posterior a la hora de inicio.",
+      "cannotUnmarkPaid": "No se puede desmarcar como pagada. Para revertir el pago, elimine la entrega correspondiente.",
+      "exceedsBalance": "El monto del pago supera el saldo pendiente del paciente.",
+      "paymentFailed": "No se pudo registrar la entrega asociada a la cita.",
       "unexpected": "Ocurrió un error inesperado. Intenta nuevamente."
     }
   },
@@ -377,7 +382,9 @@
   },
   "payment": {
     "paid": "Pagado",
-    "pending": "Pendiente"
+    "pending": "Pendiente",
+    "partial": "Parcial",
+    "appliedOf": "Aplicado: {{paid}} de {{total}}"
   },
   "payments": {
     "title": "Entregas",

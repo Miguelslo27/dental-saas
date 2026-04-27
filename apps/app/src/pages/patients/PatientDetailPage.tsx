@@ -284,6 +284,7 @@ export default function PatientDetailPage() {
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
   const [appointmentFormError, setAppointmentFormError] = useState<string | null>(null)
   const [appointmentsRefreshKey, setAppointmentsRefreshKey] = useState(0)
+  const [paymentsRefreshKey, setPaymentsRefreshKey] = useState(0)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem('patient-sidebar-collapsed') === 'true'
@@ -688,6 +689,8 @@ export default function PatientDetailPage() {
           onToggle={toggleSidebar}
           imageRefreshKey={imageRefreshKey}
           onImageUploadComplete={() => setImageRefreshKey((k) => k + 1)}
+          paymentsRefreshKey={paymentsRefreshKey}
+          onPaymentsChange={() => setAppointmentsRefreshKey((k) => k + 1)}
         />
 
         {/* Dental Chart Section */}
@@ -884,7 +887,10 @@ export default function PatientDetailPage() {
             }
             setIsAppointmentFormOpen(false)
             setEditingAppointment(null)
+            // FIFO may have created a payment and recalculated isPaid on
+            // multiple billable items, so refresh both sections.
             setAppointmentsRefreshKey(k => k + 1)
+            setPaymentsRefreshKey(k => k + 1)
           } catch (e) {
             setAppointmentFormError(getAppointmentApiErrorMessage(e))
           } finally {

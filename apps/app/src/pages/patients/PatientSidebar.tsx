@@ -12,6 +12,8 @@ interface PatientSidebarProps {
   onToggle: () => void
   imageRefreshKey: number
   onImageUploadComplete: () => void
+  paymentsRefreshKey?: number
+  onPaymentsChange?: () => void
 }
 
 export function PatientSidebar({
@@ -20,6 +22,8 @@ export function PatientSidebar({
   onToggle,
   imageRefreshKey,
   onImageUploadComplete,
+  paymentsRefreshKey,
+  onPaymentsChange,
 }: PatientSidebarProps) {
   const { t } = useTranslation()
   const { can } = usePermissions()
@@ -67,7 +71,12 @@ export function PatientSidebar({
         <div className="space-y-6 min-[1180px]:w-95">
           {/* Payments Card */}
           {can(Permission.PAYMENTS_VIEW) && (
-            <PaymentSection patientId={patientId} onCollapse={onToggle} />
+            <PaymentSection
+              patientId={patientId}
+              onCollapse={onToggle}
+              refreshKey={paymentsRefreshKey}
+              onPaymentsChange={onPaymentsChange}
+            />
           )}
 
           {/* Images Card */}

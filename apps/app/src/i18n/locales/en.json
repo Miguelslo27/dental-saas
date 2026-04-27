@@ -95,13 +95,18 @@
       "type": "Type",
       "notes": "Notes",
       "cost": "Cost",
-      "isPaid": "Paid"
+      "isPaid": "Paid",
+      "isPaidHint": "When checked, a payment is recorded and applied to the patient's oldest outstanding balance.",
+      "alreadyPaidHint": "To reverse the payment, delete the corresponding entry from the payments section."
     },
     "errors": {
       "timeConflict": "This doctor already has an appointment at this time. Please select a different time or doctor.",
       "invalidPatient": "The selected patient is not valid.",
       "invalidDoctor": "The selected doctor is not valid.",
       "invalidTimeRange": "The end time must be after the start time.",
+      "cannotUnmarkPaid": "Cannot mark as unpaid. To reverse the payment, delete the corresponding payment entry.",
+      "exceedsBalance": "The payment amount exceeds the patient's outstanding balance.",
+      "paymentFailed": "Failed to register the payment for this appointment.",
       "unexpected": "An unexpected error occurred. Please try again."
     }
   },
@@ -368,7 +373,9 @@
   },
   "payment": {
     "paid": "Paid",
-    "pending": "Pending"
+    "pending": "Pending",
+    "partial": "Partial",
+    "appliedOf": "Applied: {{paid}} of {{total}}"
   },
   "payments": {
     "title": "Payments",
