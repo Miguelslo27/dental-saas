@@ -930,6 +930,145 @@ describe('Appointments API', () => {
   })
 
   // ============================================================================
+  // AUTO-PAYMENT WITH EXISTING CREDIT TESTS
+  // ============================================================================
+
+  describe('Appointments - paid with existing patient credit', () => {
+    it('CREATE: should not create a new payment when prior credit fully covers the cost', async () => {
+      // Patient has a $200 credit (advance payment) with no debt yet.
+      await prisma.patientPayment.create({
+        data: { tenantId, patientId, amount: 200, date: new Date() },
+      })
+
+      const times = getFutureTime(20)
+      const response = await request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          doctorId,
+          ...times,
+          cost: 100,
+          isPaid: true,
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.isPaid).toBe(true)
+
+      // Only the original advance payment should exist — no new auto-payment.
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+      expect(payments[0].amount.toNumber()).toBe(200)
+    })
+
+    it('CREATE: should cap the auto-payment to the outstanding when credit partially covers the cost', async () => {
+      // Patient has a $50 advance payment with no debt yet.
+      await prisma.patientPayment.create({
+        data: { tenantId, patientId, amount: 50, date: new Date() },
+      })
+
+      const times = getFutureTime(21)
+      const response = await request(app)
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          patientId,
+          doctorId,
+          ...times,
+          cost: 100,
+          isPaid: true,
+        })
+
+      expect(response.status).toBe(201)
+      expect(response.body.data.isPaid).toBe(true)
+
+      // Auto-payment should only be $50 (the remaining outstanding), not $100.
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+        orderBy: { createdAt: 'asc' },
+      })
+      expect(payments).toHaveLength(2)
+      expect(payments[0].amount.toNumber()).toBe(50) // existing advance
+      expect(payments[1].amount.toNumber()).toBe(50) // capped auto-payment
+    })
+
+    it('UPDATE: should not create a new payment when prior credit fully covers the appointment', async () => {
+      // Existing unpaid appointment.
+      const times = getFutureTime(22)
+      const appointment = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date(times.startTime),
+          endTime: new Date(times.endTime),
+          duration: 30,
+          cost: 100,
+          isPaid: false,
+        },
+      })
+
+      // Patient prepaid $300 — more than covers the $100 cost.
+      await prisma.patientPayment.create({
+        data: { tenantId, patientId, amount: 300, date: new Date() },
+      })
+
+      const response = await request(app)
+        .put(`/api/appointments/${appointment.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.isPaid).toBe(true)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+      })
+      expect(payments).toHaveLength(1)
+      expect(payments[0].amount.toNumber()).toBe(300)
+    })
+
+    it('UPDATE: should cap the auto-payment to the outstanding when credit partially covers the appointment', async () => {
+      const times = getFutureTime(23)
+      const appointment = await prisma.appointment.create({
+        data: {
+          tenantId,
+          patientId,
+          doctorId,
+          startTime: new Date(times.startTime),
+          endTime: new Date(times.endTime),
+          duration: 30,
+          cost: 100,
+          isPaid: false,
+        },
+      })
+
+      // Patient prepaid $30 — outstanding for the appointment is $70.
+      await prisma.patientPayment.create({
+        data: { tenantId, patientId, amount: 30, date: new Date() },
+      })
+
+      const response = await request(app)
+        .put(`/api/appointments/${appointment.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ isPaid: true })
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.isPaid).toBe(true)
+
+      const payments = await prisma.patientPayment.findMany({
+        where: { tenantId, patientId },
+        orderBy: { createdAt: 'asc' },
+      })
+      expect(payments).toHaveLength(2)
+      expect(payments[0].amount.toNumber()).toBe(30)
+      expect(payments[1].amount.toNumber()).toBe(70)
+    })
+  })
+
+  // ============================================================================
   // DELETE TESTS
   // ============================================================================
 

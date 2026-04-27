@@ -1,6 +1,11 @@
 import { prisma, Prisma, AppointmentStatus } from '@dental/database'
 import { logger } from '../utils/logger.js'
-import { createPayment, recalculatePaidStatus, type PaymentErrorCode } from './payment.service.js'
+import {
+  createPayment,
+  getPatientBalance,
+  recalculatePaidStatus,
+  type PaymentErrorCode,
+} from './payment.service.js'
 
 // Fields to include in appointment responses
 const APPOINTMENT_SELECT = {
@@ -369,37 +374,82 @@ export async function createAppointment(
     },
   })
 
-  // Auto-create payment if marked as paid with positive cost
+  // Apply the paid transition (creates a capped PatientPayment or just
+  // reruns FIFO if existing credit already covers this appointment).
   if (data.isPaid && data.cost && data.cost > 0) {
-    const paymentResult = await createPayment(tenantId, data.patientId, {
-      amount: data.cost,
-      date: data.startTime,
-      note: 'Pago en consulta',
-    })
-
-    if (paymentResult.success) {
-      // Re-fetch to get FIFO-updated isPaid
-      const updated = await getAppointmentById(tenantId, appointment.id)
-      if (updated) {
-        logger.info(`Appointment created with auto-payment: ${appointment.id} for tenant ${tenantId}`)
-        return { appointment: updated }
-      }
-    } else {
+    const transition = await applyPaidTransition(tenantId, data.patientId, data.cost, data.startTime)
+    if (!transition.ok) {
       logger.warn(
-        { appointmentId: appointment.id, code: paymentResult.code },
+        { appointmentId: appointment.id, code: transition.code },
         'Auto-payment failed for appointment marked as paid'
       )
-      return {
-        error: {
-          code: mapPaymentErrorCode(paymentResult.code),
-          message: paymentErrorMessage(paymentResult.code),
-        },
-      }
+      return { error: { code: transition.code, message: transition.message } }
+    }
+    const updated = await getAppointmentById(tenantId, appointment.id)
+    if (updated) {
+      logger.info(`Appointment created with auto-payment: ${appointment.id} for tenant ${tenantId}`)
+      return { appointment: updated }
     }
   }
 
   logger.info(`Appointment created: ${appointment.id} for tenant ${tenantId}`)
   return { appointment: appointment as SafeAppointment }
+}
+
+/**
+ * Apply the "appointment marked as paid" side effect using FIFO accounting.
+ *
+ * The intent of the checkbox is "this appointment should end up paid", not
+ * "register a payment of exactly `cost`". When the patient already has a
+ * credit (overpayment / advance) that fully or partially covers the new
+ * debt, sending a payment of `cost` would exceed the outstanding balance
+ * and be rejected. Instead we:
+ *   - recompute the patient's outstanding balance after the appointment
+ *     write (the caller must have already persisted cost/isPaid changes);
+ *   - create a payment for `min(cost, outstanding)` only when there is
+ *     something left to cover;
+ *   - otherwise skip the payment and just rerun FIFO so the existing
+ *     credit gets allocated to the new item.
+ */
+async function applyPaidTransition(
+  tenantId: string,
+  patientId: string,
+  cost: number,
+  date: Date
+): Promise<{ ok: true } | { ok: false; code: AppointmentErrorCode; message: string }> {
+  const balanceResult = await getPatientBalance(tenantId, patientId)
+  if (!balanceResult.success) {
+    return {
+      ok: false,
+      code: mapPaymentErrorCode(balanceResult.code),
+      message: paymentErrorMessage(balanceResult.code),
+    }
+  }
+
+  const outstanding = balanceResult.data.outstanding
+  if (outstanding <= 0) {
+    // Patient already has enough credit to cover this appointment; just
+    // rerun FIFO so isPaid flips for the now-covered items.
+    await recalculatePaidStatus(tenantId, patientId)
+    return { ok: true }
+  }
+
+  const amount = Math.min(cost, outstanding)
+  const paymentResult = await createPayment(tenantId, patientId, {
+    amount,
+    date,
+    note: 'Pago en consulta',
+  })
+
+  if (!paymentResult.success) {
+    return {
+      ok: false,
+      code: mapPaymentErrorCode(paymentResult.code),
+      message: paymentErrorMessage(paymentResult.code),
+    }
+  }
+
+  return { ok: true }
 }
 
 /**
@@ -549,28 +599,23 @@ export async function updateAppointment(
     data.cost !== undefined &&
     (existing.cost?.toNumber() ?? null) !== (data.cost ?? null)
 
-  // Auto-create payment when transitioning isPaid from false to true.
+  // Auto-apply paid transition when going from unpaid to paid.
   if (data.isPaid === true && !existing.isPaid && newCostNumber && newCostNumber > 0) {
-    const paymentResult = await createPayment(tenantId, patientId, {
-      amount: newCostNumber,
-      date: data.startTime ?? existing.startTime,
-      note: 'Pago en consulta',
-    })
+    const transition = await applyPaidTransition(
+      tenantId,
+      patientId,
+      newCostNumber,
+      data.startTime ?? existing.startTime
+    )
 
-    if (!paymentResult.success) {
+    if (!transition.ok) {
       logger.warn(
-        { appointmentId: id, code: paymentResult.code },
+        { appointmentId: id, code: transition.code },
         'Auto-payment on update failed'
       )
-      return {
-        error: {
-          code: mapPaymentErrorCode(paymentResult.code),
-          message: paymentErrorMessage(paymentResult.code),
-        },
-      }
+      return { error: { code: transition.code, message: transition.message } }
     }
 
-    // FIFO already ran inside createPayment; re-fetch to return fresh state.
     const updated = await getAppointmentById(tenantId, id)
     if (updated) {
       logger.info(`Appointment updated with auto-payment: ${id}`)
