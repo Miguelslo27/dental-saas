@@ -431,6 +431,9 @@ const APPOINTMENT_ERROR_KEY_MAP: Record<string, string> = {
   INVALID_PATIENT: 'appointments.errors.invalidPatient',
   INVALID_DOCTOR: 'appointments.errors.invalidDoctor',
   INVALID_TIME_RANGE: 'appointments.errors.invalidTimeRange',
+  CANNOT_UNMARK_PAID: 'appointments.errors.cannotUnmarkPaid',
+  EXCEEDS_BALANCE: 'appointments.errors.exceedsBalance',
+  PAYMENT_FAILED: 'appointments.errors.paymentFailed',
 }
 
 function getUserLanguage(): string {

@@ -74,6 +74,9 @@ export function AppointmentFormModal({
 }: AppointmentFormModalProps) {
   const modalTitleId = useId()
   const isEditing = !!appointment
+  // When editing an already-paid appointment, the checkbox must be locked:
+  // the FIFO payment can only be reversed by deleting the underlying PatientPayment.
+  const isAlreadyPaid = isEditing && !!appointment?.isPaid
 
   // State for doctor options
   const [doctors, setDoctors] = useState<DoctorOption[]>([])
@@ -402,17 +405,27 @@ export function AppointmentFormModal({
                   />
                 </div>
 
-                <div className="flex items-center">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                <div>
+                  <label className={`flex items-center gap-2 ${isAlreadyPaid ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                     <input
                       type="checkbox"
                       {...register('isPaid')}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      disabled={isAlreadyPaid}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-60"
                     />
                     <span className="text-sm font-medium text-gray-700">
                       Pagado
                     </span>
                   </label>
+                  {isAlreadyPaid ? (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Para revertir el pago, elimine la entrega correspondiente desde la sección de pagos del paciente.
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Al marcar, se registra una entrega que se aplica a la deuda más antigua del paciente.
+                    </p>
+                  )}
                 </div>
               </div>
 
