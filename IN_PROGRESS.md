@@ -68,12 +68,6 @@ Workflow: `ROADMAP.md` → start a task → move here → finish → move to `HI
 - [x] Permission-gated UI via `usePermissions()` matching backend RBAC
 - [x] Component tests (22 new: budget-api + store + BudgetCard permission gating)
 
-### Post-PR B polish (before PR C)
-
-Small items found during local smoke testing of PR #177. Should land as a single tiny PR before starting PR C.
-
-- [ ] Hide auto-derived budget statuses (`PARTIAL`, `COMPLETED`) from the manual dropdown in `BudgetDetailPage`. Keep only `DRAFT`, `APPROVED`, `CANCELLED` as user-settable. Backend normalizes auto-derived statuses on every write (`deriveBudgetStatus` in `budget.service.ts`), so the dropdown currently lets the user "save" a value that is silently overridden — which reads like a bug from the UI.
-
 ### Story 5: Appointment integration (with doctor confirmation)
 
 - [ ] On appointment create/edit: if the patient has budgets with items in `PENDING` or `SCHEDULED`, show a multi-select to **associate** items to this appointment. Associated items transition to `SCHEDULED` (not executed yet).
@@ -91,7 +85,7 @@ Small items found during local smoke testing of PR #177. Should land as a single
 |----|---------|------|--------|
 | **A** | 1 + 2 (model + backend + RBAC + tests) | Low — pure API | ✅ Merged (#176) |
 | **B** | 4 (frontend management, PDF-less) | Medium — UI | ✅ Merged (#177) |
-| **C** | 3 (PDF + public share link) | Medium — web public surface | ⚪ Pending (blocked on polish above) |
+| **C** | 3 (PDF + public share link) | Medium — web public surface | ⚪ Pending |
 | **D** | 5 (appointment integration) | High — touches clinical flow | ⚪ Pending |
 
 ---
