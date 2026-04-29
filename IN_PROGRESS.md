@@ -6,34 +6,6 @@ Workflow: `ROADMAP.md` → start a task → move here → finish → move to `HI
 
 ---
 
-## Hotfix: Appointment "Paid" checkbox + FIFO breakdown — 2026-04-27
-
-**Branch:** `fix/appointment-update-payment-fifo`
-**PR:** [#179](https://github.com/Miguelslo27/dental-saas/pull/179) (open, awaiting review/merge)
-
-**Original report:** A patient had her treatment, the appointment was created with a cost and the "Paid" checkbox was ticked, but on save the appointment kept showing as pending. While investigating, several adjacent FIFO bugs surfaced and got fixed in the same branch.
-
-### Delivered
-
-- [x] **Marking as paid on update now actually pays.** `updateAppointment` used to discard `isPaid` because the column is derived. It now triggers the same FIFO auto-payment flow as create. Reverting paid → unpaid is rejected with `CANNOT_UNMARK_PAID`; the UI disables the checkbox in that case.
-- [x] **Auto-payment errors are no longer silent.** `createAppointment` previously logged a warning and returned the appointment as if everything worked. The API now surfaces `EXCEEDS_BALANCE` / `PAYMENT_FAILED` to the client.
-- [x] **Auto-payment is capped at the outstanding balance.** Patients with prior credit (advance payments) used to crash with `EXCEEDS_BALANCE`. Both create and update now share `applyPaidTransition` which creates a payment for `min(cost, outstanding)`, or skips and just reruns FIFO when the existing credit already covers the appointment.
-- [x] **Payments section refreshes after appointment changes.** Saving an appointment with `isPaid=true` left balance / total paid / payment list stale. New `paymentsRefreshKey` on `PatientDetailPage` is bumped on appointment submit; reverse path also wired (creating/deleting a payment refreshes the appointments section).
-- [x] **Partial-paid state on appointment cards.** Per-patient endpoints now expose `paidAmount` and `outstanding` per appointment via a new `computeFifoAllocation` helper. The card renders three states: `Pagado` (green), `Parcial` blue + "Aplicado: $X de $Y", `Pendiente` (amber). `recalculatePaidStatus` was refactored onto the same helper, switching to **strict FIFO** (a partial payment exhausts itself on the older item instead of "skipping" to a cheaper later one). `isPaid` exposed by the per-patient endpoints is the FIFO-derived value, not the persisted column, so the UI never shows a stale view.
-- [x] i18n (es / en / ar): paid hint, already-paid hint, error codes (`cannotUnmarkPaid`, `exceedsBalance`, `paymentFailed`), partial label, "Aplicado: X de Y" line.
-
-### Tests
-
-- API: 70 appointment route tests + 22 payment route tests + 11 labwork route tests pass on this branch (the 2 pre-existing failures in `admin/stats.test.ts` also fail on `main` and are unrelated). Specific new coverage: `PUT /:id` paid transitions (false→true, idempotent stay-true, reject unmark, FIFO with older debt, cost-only change recalcs), prior-credit scenarios (full + partial coverage on both create and update), and the FIFO breakdown in `getAppointmentsByPatient`.
-- Frontend: 978/978 tests pass; lint clean (the 3 pre-existing warnings in `LabworkFormModal` are unrelated).
-
-### Out of scope (follow-ups)
-
-- Other endpoints that return appointments (global list, calendar, by-doctor) do not include `paidAmount` / `outstanding` yet. The per-patient view (where the user reads the breakdown) is fully covered; extending the others is mechanical.
-- Labworks have the same model and the same gaps. The shared FIFO helpers (`computeFifoAllocation`, `listBillableItems`, `getTotalPaid`) are already exported from `payment.service` so wiring labworks up is a small follow-up PR.
-
----
-
 ## Epic: Patient Budgets (Presupuestos)
 
 **Goal:** Allow creating a budget per patient with planned treatments and costs, share it with the patient (PDF or public link), and link budget items to appointments for tracking execution. Items may span multiple appointments and are only marked as executed on explicit doctor confirmation.
