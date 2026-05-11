@@ -9,6 +9,55 @@
 ### Production Hardening
 - [ ] Harden API startup: eager Prisma init, DB-verified health check, graceful shutdown, connection timeout — see [docs/GATEWAY-TIMEOUT-FIX.md](docs/GATEWAY-TIMEOUT-FIX.md)
 
+### UX Improvements
+
+#### Spike: Patient & Doctor list view alternatives
+
+Both the patient list and the doctor list currently use a card-based layout. Explore alternative presentations to improve the user experience on both screens.
+
+**Scope:** Patients list page and Doctors list page only.
+
+**Deliverables:**
+- [ ] Three list/view alternatives, each with a UX-driven rationale explaining why it is among the best options
+- [ ] Comparative analysis of the three alternatives (pros, cons, fit for the data shown on each screen, accessibility, mobile/RTL behavior)
+- [ ] Mockups and visual references for each alternative
+- [ ] POC implementation of all three alternatives so a full hands-on comparison is possible
+- [ ] Final recommendation: which option to adopt and whether it applies to one screen or both
+
+**Acceptance:** the user can interact with all three POCs side by side and pick the one to ship as the follow-up implementation task.
+
+#### Implement new list view for Patients and Doctors
+
+Follow-up to the spike above. Once the spike picks a winning option, implement it on the Patients and Doctors list pages.
+
+**Blocked by:** Spike: Patient & Doctor list view alternatives
+
+- [ ] Replace the card layout on the Patients list page with the chosen alternative
+- [ ] Replace the card layout on the Doctors list page with the chosen alternative
+- [ ] Remove dead code from the previous card layout
+
+#### Patient detail page redesign
+
+Today the patient detail page stacks several blocks vertically (patient info, appointments, budgets, payments, images) with the odontogram as the main section. As more information lives on this page, the layout becomes hard to navigate. Reorganize it so the odontogram is always visible and the rest of the information moves into tabs.
+
+The three sub-tasks below should be done in sequence: tabs first, then the new odontogram layout, then the visual polish that takes advantage of the wider available space.
+
+##### 1. Reorganize patient detail into tabs
+
+- [ ] Convert the existing blocks into tabs: `Patient` | `Appointments` | `Budgets` | `Payments` | `Images`
+- [ ] The odontogram stays always visible, outside the tab system
+
+##### 2. New odontogram layout (1 / 3 / 1 columns)
+
+- [ ] Left column: legend / condition keys
+- [ ] Center column: odontogram itself
+- [ ] Right column: registered teeth list
+
+##### 3. Visual polish per tab
+
+- [ ] Redistribute the content inside each tab to take advantage of the wider available space
+- [ ] Apply the polish to all five tabs: `Patient`, `Appointments`, `Budgets`, `Payments`, `Images`
+
 ## Medium Priority
 
 ### Language & Regional Settings
